@@ -12,6 +12,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MAXSwerveConstants;
+import frc.robot.subsystems.GamePieceSubsystems.Outake.Outake;
+import frc.robot.subsystems.GamePieceSubsystems.Outake.OutakeIO_Real;
+import frc.robot.subsystems.GamePieceSubsystems.Outake.OutakeIO_Sim;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIO_Real;
 import frc.robot.subsystems.drive.MAXSwerve;
@@ -63,6 +66,11 @@ public class Robot extends LoggedRobot {
                 new MAXSwerveIO_Sim()
               });
 
+
+  private Outake outtake = new Outake(
+    new OutakeIO_Sim()
+  );
+
   @SuppressWarnings(value = "resource")
   @Override
   public void robotInit() {
@@ -104,10 +112,15 @@ public class Robot extends LoggedRobot {
                         * DriveConstants.kMaxAngularVelocity
                         * 0.25)));
 
+    //outtake.setDefaultCommand(outtake.run(0));
+
     autoChooser.addDefaultOption("None", null);
 
     controller.a().whileTrue(Commands.runOnce(()-> drivebase.setPose(new Pose2d(0, 0, new Rotation2d(0))), drivebase));
     controller.b().whileTrue(drivebase.goToPose(new Pose2d(0, 0, new Rotation2d(0))));
+
+    controller.y().whileTrue(outtake.run(1000).andThen(outtake.run(0)));
+    controller.x().whileTrue(outtake.run(0).andThen(outtake.run(0)));
     
   }
 

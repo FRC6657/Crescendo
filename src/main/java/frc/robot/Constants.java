@@ -32,8 +32,7 @@ public class Constants {
 
     public static final int kPigeon = 10;
 
-    // public static final int kElevator = 10;
-    // public static final int kIntake = 11;
+    public static final int kOutakeWeels = 11;
 
   }
 

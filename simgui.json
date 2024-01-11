@@ -11,10 +11,10 @@
         "DashboardInputs": {
           "open": true
         },
-        "Gyro": {
-          "open": true
-        },
         "RealOutputs": {
+          "Outtake": {
+            "open": true
+          },
           "open": true
         },
         "open": true
