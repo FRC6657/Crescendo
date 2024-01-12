@@ -1,6 +1,5 @@
 package frc.robot.subsystems.drive;
 
-import org.littletonrobotics.junction.Logger;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -13,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.DriveConstants.SwerveModuleInformation;
 import frc.robot.Constants.MAXSwerveConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class MAXSwerveIO_Real implements MAXSwerveIO {
 
@@ -103,7 +103,6 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
     Logger.recordOutput("Turn Voltage", turnMotor.getAppliedOutput());
   }
 
-
   /** Sets the drive MPS Setpoint */
   @Override
   public void setDriveMPS(double mps) {
@@ -113,7 +112,8 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
   /** Sets the turn angle setpoint */
   @Override
   public void setTurnAngle(Rotation2d angle) {
-    turnPID.setReference(angle.getRadians() - moduleInformation.moduleOffset.getRadians(), ControlType.kPosition);
+    turnPID.setReference(
+        angle.getRadians() - moduleInformation.moduleOffset.getRadians(), ControlType.kPosition);
   }
 
   /** Get the turn angle */

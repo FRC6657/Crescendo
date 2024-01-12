@@ -1,12 +1,10 @@
-package frc.robot.subsystems.GamePieceSubsystems.Outake;
+package frc.robot.subsystems.outake;
 
 import org.littletonrobotics.junction.AutoLog;
 
 public interface OutakeIO {
 
-
-    
-    @AutoLog
+  @AutoLog
   public static class OutakeIOInputs {
     public double currentRPM = 0.0;
     public double motorTemperature = 0.0;

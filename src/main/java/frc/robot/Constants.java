@@ -33,7 +33,6 @@ public class Constants {
     public static final int kPigeon = 10;
 
     public static final int kOutakeWeels = 11;
-
   }
 
   public static final class AutoConstants {
@@ -69,10 +68,7 @@ public class Constants {
     // Define Swerve Modules
     public static final SwerveModuleInformation kFrontLeftSwerveModule =
         new SwerveModuleInformation(
-            "Front Left",
-            CANID.kFrontLeftDrive,
-            CANID.kFrontLeftTurn,
-            new Rotation2d(Math.PI / 2));
+            "Front Left", CANID.kFrontLeftDrive, CANID.kFrontLeftTurn, new Rotation2d(Math.PI / 2));
     public static final SwerveModuleInformation kBackLeftSwerveModule =
         new SwerveModuleInformation(
             "Back Left", CANID.kBackLeftDrive, CANID.kBackLeftTurn, new Rotation2d(Math.PI));
@@ -81,7 +77,10 @@ public class Constants {
             "Front Right", CANID.kFrontRightDrive, CANID.kFrontRightTurn, new Rotation2d(0));
     public static final SwerveModuleInformation kBackRightSwerveModule =
         new SwerveModuleInformation(
-            "Back Right", CANID.kBackRightDrive, CANID.kBackRightTurn, new Rotation2d(-Math.PI / 2));
+            "Back Right",
+            CANID.kBackRightDrive,
+            CANID.kBackRightTurn,
+            new Rotation2d(-Math.PI / 2));
 
     public static final SwerveModuleInformation[] kIndexedSwerveModuleInformation = {
       kFrontLeftSwerveModule, kBackLeftSwerveModule, kFrontRightSwerveModule, kBackRightSwerveModule

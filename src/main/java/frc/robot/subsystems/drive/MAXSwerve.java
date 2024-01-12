@@ -229,7 +229,9 @@ public class MAXSwerve extends SubsystemBase {
 
               this.runChassisSpeeds(
                   ChassisSpeeds.fromFieldRelativeSpeeds(
-                      new ChassisSpeeds(MathUtil.clamp(xSpeed, -2, 2), MathUtil.clamp(ySpeed, -2, 2), thetaSpeed), getPose().getRotation()));
+                      new ChassisSpeeds(
+                          MathUtil.clamp(xSpeed, -2, 2), MathUtil.clamp(ySpeed, -2, 2), thetaSpeed),
+                      getPose().getRotation()));
             })
         .beforeStarting(
             () -> {
