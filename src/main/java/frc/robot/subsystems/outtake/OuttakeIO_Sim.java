@@ -1,4 +1,4 @@
-package frc.robot.subsystems.outake;
+package frc.robot.subsystems.outtake;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -9,7 +9,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants.CodeConstants;
 
-public class OutakeIO_Sim implements OutakeIO {
+public class OuttakeIO_Sim implements OuttakeIO {
   private double voltage = 0;
 
   private FlywheelSim flywheelSim = new FlywheelSim(DCMotor.getFalcon500(2), 2, 0.00146376);
@@ -18,7 +18,7 @@ public class OutakeIO_Sim implements OutakeIO {
   private PIDController flyWheelPID = new PIDController(0.0032,0,0);
 
   @Override
-  public void updateInputs(OutakeIOInputs inputs) {
+  public void updateInputs(OuttakeIOInputs inputs) {
 
     flywheelSim.update(1 / CodeConstants.kMainLoopFrequency);
 

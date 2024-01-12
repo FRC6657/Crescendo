@@ -18,8 +18,9 @@ import frc.robot.subsystems.drive.MAXSwerve;
 import frc.robot.subsystems.drive.MAXSwerveIO;
 import frc.robot.subsystems.drive.MAXSwerveIO_Real;
 import frc.robot.subsystems.drive.MAXSwerveIO_Sim;
-import frc.robot.subsystems.outake.Outake;
-import frc.robot.subsystems.outake.OutakeIO_Sim;
+import frc.robot.subsystems.outtake.Outtake;
+import frc.robot.subsystems.outtake.OuttakeIO_Sim;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -65,7 +66,7 @@ public class Robot extends LoggedRobot {
                 new MAXSwerveIO_Sim()
               });
 
-  private Outake outtake = new Outake(new OutakeIO_Sim());
+  private Outtake outtake = new Outtake(new OuttakeIO_Sim());
 
   @SuppressWarnings(value = "resource")
   @Override
