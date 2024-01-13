@@ -12,7 +12,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Outtake extends SubsystemBase {
   private final OuttakeIO outtakeIO;
-  private final OuttakeIOInputs outtakeInputs = new OuttakeIOInputs();
+  private final OuttakeIOInputsAutoLogged outtakeInputs = new OuttakeIOInputsAutoLogged();
 
   private double rpmSetpoint = 0.0;
 
@@ -23,7 +23,6 @@ public class Outtake extends SubsystemBase {
   public Command run() {
     return this.run(
         () -> {
-          Logger.recordOutput("Outtake/RPM Setpoint", rpmSetpoint);
           outtakeIO.run(rpmSetpoint);
         });
   }
@@ -38,7 +37,6 @@ public class Outtake extends SubsystemBase {
   @Override
   public void periodic() {
     outtakeIO.updateInputs(outtakeInputs);
-    Logger.recordOutput("Outtake/RPM", outtakeInputs.currentRPM);
-    Logger.recordOutput("Outtake/Volts", outtakeInputs.motorVoltage);
+    Logger.processInputs("Outtake", outtakeInputs);
   }
 }

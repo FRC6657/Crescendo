@@ -33,10 +33,6 @@ public class OuttakeIO_Sim implements OuttakeIO {
     rpm = MathUtil.clamp(rpm, -3190, 3190);
     double ffEffort = flyWheelFeedForward.calculate(rpm);
     double pidEffort = flyWheelPID.calculate(flywheelSim.getAngularVelocityRPM(), rpm);
-
-    Logger.recordOutput("Outtake/FF Effort", ffEffort);
-    Logger.recordOutput("Outtake/PID Effort", pidEffort);
-
     voltage = MathUtil.clamp(ffEffort + pidEffort, -12, 12);
     flywheelSim.setInput(voltage);
   }

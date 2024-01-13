@@ -21,6 +21,7 @@ public class MAXSwerveModule {
 
   public void updateInputs() {
     io.updateInputs(inputs);
+    Logger.processInputs("Swerve/" + name + " Module", inputs);
   }
 
   /**
@@ -38,6 +39,7 @@ public class MAXSwerveModule {
 
   /** Logs the module IO */
   public void periodic() {
+    io.updateInputs(inputs);
     Logger.processInputs("Swerve/" + name + " Module", inputs);
   }
 
