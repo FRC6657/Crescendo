@@ -4,16 +4,17 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MAXSwerveConstants;
+import frc.robot.subsystems.Superstructure;
+import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.climb.ClimberIO_Sim;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIO_Real;
 import frc.robot.subsystems.drive.MAXSwerve;
@@ -71,6 +72,9 @@ public class Robot extends LoggedRobot {
 
   private Outtake outtake = new Outtake(new OuttakeIO_Sim());
   private Intake intake = new Intake(new IntakeIO_Sim());
+  private Climb climb = new Climb(new ClimberIO_Sim(), new ClimberIO_Sim());
+
+  private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
 
   @SuppressWarnings(value = "resource")
   @Override
@@ -123,11 +127,15 @@ public class Robot extends LoggedRobot {
     controller.b().whileTrue(drivebase.goToPose(new Pose2d(0, 0, new Rotation2d(0))));
 
     controller.y().onTrue(outtake.changeRPM(1000)).onFalse(outtake.changeRPM(0));
+
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+
+    superstructure.update3DPose();
+
   }
 
   @Override

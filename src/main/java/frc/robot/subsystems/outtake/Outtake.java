@@ -42,13 +42,10 @@ public class Outtake extends SubsystemBase {
   public void periodic() {
     outtakeIO.updateInputs(outtakeInputs);
     Logger.processInputs("Outtake", outtakeInputs);
-    set3DPose();
   }
 
-  private void set3DPose() {
-    Logger.recordOutput(
-        "3DPoses/Outtake",
-        new Pose3d(
-            -0.32385, 0, 0.6312130886, new Rotation3d(0, outtakeInputs.pivotMotorPosition, 0)));
+  public Pose3d get3DPose() {
+    return new Pose3d(-0.32385, 0, 0.6312130886, new Rotation3d(0, outtakeInputs.pivotMotorPosition, 0));
   }
+
 }
