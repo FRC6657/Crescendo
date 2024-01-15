@@ -4,11 +4,13 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MAXSwerveConstants;
@@ -18,9 +20,10 @@ import frc.robot.subsystems.drive.MAXSwerve;
 import frc.robot.subsystems.drive.MAXSwerveIO;
 import frc.robot.subsystems.drive.MAXSwerveIO_Real;
 import frc.robot.subsystems.drive.MAXSwerveIO_Sim;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO_Sim;
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;
-
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -67,6 +70,7 @@ public class Robot extends LoggedRobot {
               });
 
   private Outtake outtake = new Outtake(new OuttakeIO_Sim());
+  private Intake intake = new Intake(new IntakeIO_Sim());
 
   @SuppressWarnings(value = "resource")
   @Override
@@ -108,8 +112,6 @@ public class Robot extends LoggedRobot {
                     -MathUtil.applyDeadband(controller.getRightX(), 0.15)
                         * DriveConstants.kMaxAngularVelocity
                         * 0.25)));
-
-    outtake.setDefaultCommand(outtake.run());
 
     autoChooser.addDefaultOption("None", null);
 
