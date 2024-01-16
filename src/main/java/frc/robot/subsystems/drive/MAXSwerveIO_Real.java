@@ -9,6 +9,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.DriveConstants.SwerveModuleInformation;
 import frc.robot.Constants.MAXSwerveConstants;
@@ -27,6 +28,8 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
   SparkPIDController turnPID;
 
   SwerveModuleInformation moduleInformation;
+
+  double setpoint = 0.0;
 
   public MAXSwerveIO_Real(SwerveModuleInformation moduleInformation) {
 
@@ -81,8 +84,14 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
     turnMotor.setPeriodicFramePeriod(
         PeriodicFrame.kStatus2, (int) (1000 / CodeConstants.kMainLoopFrequency));
 
+    Timer.delay(1);
+
     driveMotor.burnFlash();
+
+    Timer.delay(1);
+
     turnMotor.burnFlash();
+
   }
 
   /** Updates the IO */
@@ -100,6 +109,8 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
     inputs.turnAppliedVolts = turnMotor.getAppliedOutput();
     inputs.turnCurrentAmps = turnMotor.getOutputCurrent();
 
+    inputs.turnError = setpoint - inputs.turnPositionRad.getRadians();
+
     Logger.recordOutput("Turn Voltage", turnMotor.getAppliedOutput());
   }
 
@@ -112,6 +123,9 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
   /** Sets the turn angle setpoint */
   @Override
   public void setTurnAngle(Rotation2d angle) {
+
+    setpoint = angle.getRadians() - moduleInformation.moduleOffset.getRadians();
+
     turnPID.setReference(
         angle.getRadians() - moduleInformation.moduleOffset.getRadians(), ControlType.kPosition);
   }

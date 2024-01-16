@@ -16,6 +16,7 @@ public interface MAXSwerveIO {
     public double turnVelocityRadPerSec = 0.0;
     public double turnAppliedVolts = 0.0;
     public double turnCurrentAmps = 0.0;
+    public double turnError = 0.0;
   }
 
   public default void updateInputs(MAXSwerveIOInputs inputs) {}
