@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -18,6 +19,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MAXSwerveConstants;
+import frc.robot.Constants.VisionConstants;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -108,6 +110,9 @@ public class MAXSwerve extends SubsystemBase {
       Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
+
+    Logger.recordOutput(
+        "FrontCameraPos", new Pose3d(getPose()).transformBy(VisionConstants.kSideCameraPose));
   }
 
   /**

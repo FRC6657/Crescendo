@@ -91,7 +91,6 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
     Timer.delay(1);
 
     turnMotor.burnFlash();
-
   }
 
   /** Updates the IO */

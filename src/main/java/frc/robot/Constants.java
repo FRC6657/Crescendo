@@ -5,7 +5,10 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.IntakeConstants.IntakeDirection;
@@ -14,6 +17,13 @@ public class Constants {
 
   public static final class CodeConstants {
     public static final double kMainLoopFrequency = 50; // Hz
+  }
+
+  public static final class VisionConstants {
+    public static final Transform3d kFrontCameraPose =
+        new Transform3d(new Translation3d(-0.336886, 0, 0.531201), new Rotation3d(0, 0.485314, 0));
+    public static final Transform3d kSideCameraPose =
+        new Transform3d(new Translation3d(-0.242086, 0.170791, 0.511322), new Rotation3d(0, 0.122173, -1.28248701081));
   }
 
   public static final class CANID {

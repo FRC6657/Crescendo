@@ -127,7 +127,6 @@ public class Robot extends LoggedRobot {
     controller.b().whileTrue(drivebase.goToPose(new Pose2d(0, 0, new Rotation2d(0))));
 
     controller.y().onTrue(outtake.changeRPM(1000)).onFalse(outtake.changeRPM(0));
-
   }
 
   @Override
@@ -135,7 +134,6 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
 
     superstructure.update3DPose();
-
   }
 
   @Override

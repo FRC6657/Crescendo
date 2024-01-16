@@ -22,17 +22,21 @@
       "rotations": [
         {
           "axis": "y",
-          "degrees": 20
+          "degrees": -27.806455
+        },
+        {
+          "axis": "z",
+          "degrees": 180
         }
       ],
       "position": [
-        0.2,
+        -0.336886,
         0,
-        0.8
+        0.531201
       ],
       "resolution": [
-        960,
-        720
+        1280,
+        800
       ],
       "fov": 70
     },
@@ -41,21 +45,21 @@
       "rotations": [
         {
           "axis": "y",
-          "degrees": 20
+          "degrees": -7
         },
         {
           "axis": "z",
-          "degrees": -90
+          "degrees": 106.518907
         }
       ],
       "position": [
-        0,
-        -0.2,
-        0.8
+        -0.242086,
+        0.170791,
+        0.511322
       ],
       "resolution": [
-        960,
-        720
+        1280,
+        800
       ],
       "fov": 70
     }
