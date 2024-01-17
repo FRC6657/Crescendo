@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.SparkPIDController;
@@ -47,6 +48,9 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
     drivePID = driveMotor.getPIDController();
     turnPID = turnMotor.getPIDController();
 
+    drivePID.setFeedbackDevice(driveEncoder);
+    turnPID.setFeedbackDevice(turnEncoder);
+
     driveEncoder.setPositionConversionFactor(MAXSwerveConstants.kDriveEncoderPositionFactor);
     driveEncoder.setVelocityConversionFactor(MAXSwerveConstants.kDriveEncoderVelocityFactor);
     driveEncoder.setMeasurementPeriod((int) (1000 / CodeConstants.kMainLoopFrequency));
@@ -55,7 +59,6 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
     turnEncoder.setPositionConversionFactor(MAXSwerveConstants.kTurnEncoderPositionFactor);
     turnEncoder.setVelocityConversionFactor(MAXSwerveConstants.kTurnEncoderVelocityFactor);
     turnEncoder.setInverted(MAXSwerveConstants.kTurnEncoderInverted);
-    turnEncoder.setAverageDepth(2);
 
     turnPID.setPositionPIDWrappingEnabled(true);
     turnPID.setPositionPIDWrappingMinInput(MAXSwerveConstants.kTurnEncoderPositionPIDMinInput);
@@ -79,19 +82,19 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
     driveMotor.setSmartCurrentLimit(MAXSwerveConstants.kDriveCurrentLimit);
     turnMotor.setSmartCurrentLimit(MAXSwerveConstants.kTurnCurrentLimit);
 
+
     driveMotor.setPeriodicFramePeriod(
         PeriodicFrame.kStatus2, (int) (1000 / CodeConstants.kMainLoopFrequency));
     turnMotor.setPeriodicFramePeriod(
         PeriodicFrame.kStatus2, (int) (1000 / CodeConstants.kMainLoopFrequency));
 
-    Timer.delay(1);
+    // Timer.delay(1);
 
     driveMotor.burnFlash();
 
-    Timer.delay(1);
+    // Timer.delay(1);
 
     turnMotor.burnFlash();
-
   }
 
   /** Updates the IO */

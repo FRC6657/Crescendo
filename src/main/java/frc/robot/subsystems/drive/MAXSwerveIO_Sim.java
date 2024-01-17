@@ -86,8 +86,6 @@ public class MAXSwerveIO_Sim implements MAXSwerveIO {
 
     // Calculates the needed voltage to achieve the desired angle
 
-
-
     setTurnVoltage(turnController.calculate(getTurnAngle().getRadians(), angle.getRadians()));
   }
 

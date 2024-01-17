@@ -45,7 +45,7 @@ public class Outtake extends SubsystemBase {
   }
 
   public Pose3d get3DPose() {
-    return new Pose3d(-0.32385, 0, 0.6312130886, new Rotation3d(0, outtakeInputs.pivotMotorPosition, 0));
+    return new Pose3d(
+        -0.32385, 0, 0.6312130886, new Rotation3d(0, outtakeInputs.pivotMotorPosition, 0));
   }
-
 }

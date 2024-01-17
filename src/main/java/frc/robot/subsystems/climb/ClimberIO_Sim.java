@@ -8,12 +8,8 @@ public class ClimberIO_Sim implements ClimberIO {
   public void updateInputs(ClimberIOInputs inputs) {
 
     inputs.position = height;
-
   }
 
   @Override
-  public void run(double height) {
-    
-  }
-
+  public void run(double height) {}
 }

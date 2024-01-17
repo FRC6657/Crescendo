@@ -47,5 +47,4 @@ public class Intake extends SubsystemBase {
   public Pose3d get3DPose() {
     return new Pose3d(0.332169, 0, 0.210783, new Rotation3d(0, intakeInputs.pivotMotorPosition, 0));
   }
-
 }

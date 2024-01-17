@@ -30,5 +30,4 @@ public class Climber {
   public Pose3d get3DPose() {
     return new Pose3d(0, 0, inputs.position, new Rotation3d(0, 0, 0));
   }
-
 }
