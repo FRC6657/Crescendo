@@ -42,7 +42,12 @@ public class Constants {
 
     public static final int kPigeon = 10;
 
-    public static final int kOutakeWeels = 11;
+    public static final int kRightShooter = 11;
+    public static final int kLeftShooter = 12;
+
+    public static final int kShooterPivot = 13;
+
+    
   }
 
   public static final class AutoConstants {
@@ -199,11 +204,6 @@ public class Constants {
 
   public static final class ElevatorConstants {
 
-    public static enum GamePiece {
-      CONE,
-      CUBE
-    }
-
     public static final double kMinHeight = 9.6;
     public static final double kMaxHeight = 54;
     public static final int kStages = 2;
@@ -239,6 +239,13 @@ public class Constants {
             .withSupplyCurrentLimitEnable(true)
             .withSupplyCurrentThreshold(40)
             .withSupplyTimeThreshold(40);
+  }
+
+  public static final class OuttakeConstants {
+
+    public static final double kGearing = 1d/12 * 16d/36;
+    public static final double kSensorToDegrees = 360d / kGearing;
+
   }
 
   public static final record ScoringSetpoint(

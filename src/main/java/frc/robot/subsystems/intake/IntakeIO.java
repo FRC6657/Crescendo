@@ -6,7 +6,7 @@ public interface IntakeIO {
 
   @AutoLog
   public static class IntakeIOInputs {
-    public double currentRPM = 0.0;
+    public double currentSpeed = 0.0;
     public double rollerMotorTemp = 0.0;
     public double rollerMotorVoltage = 0.0;
     public double rollerMotorCurrent = 0.0;
@@ -19,7 +19,7 @@ public interface IntakeIO {
 
   public default void updateInputs(IntakeIOInputs inputs) {}
 
-  public default void runRollers(double rpm) {}
+  public default void runRollers(double speed) {}
 
   public default void runPivot(double angle) {}
 }
