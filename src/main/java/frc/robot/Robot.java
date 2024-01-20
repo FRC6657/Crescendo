@@ -117,6 +117,10 @@ public class Robot extends LoggedRobot {
                         * DriveConstants.kMaxAngularVelocity
                         * 0.25)));
 
+    outtake.setDefaultCommand(outtake.run());
+    
+    intake.setDefaultCommand(intake.run());
+
     autoChooser.addDefaultOption("None", null);
 
     controller
@@ -127,6 +131,11 @@ public class Robot extends LoggedRobot {
     controller.b().whileTrue(drivebase.goToPose(new Pose2d(0, 0, new Rotation2d(0))));
 
     controller.y().onTrue(outtake.changeRPM(1000)).onFalse(outtake.changeRPM(0));
+
+    controller.x().onTrue(intake.changeAngle(90));
+
+    controller.leftBumper().onTrue(outtake.changeAngle(32));
+    controller.rightBumper().onTrue(outtake.changeAngle(178));
   }
 
   @Override

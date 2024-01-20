@@ -15,6 +15,7 @@ public class Outtake extends SubsystemBase {
   private final OuttakeIOInputsAutoLogged outtakeInputs = new OuttakeIOInputsAutoLogged();
 
   private double rpmSetpoint = 0.0;
+  private double angleSetpoint = 0.0;
 
   public Outtake(OuttakeIO outtakeIO) {
     this.outtakeIO = outtakeIO;
@@ -24,6 +25,7 @@ public class Outtake extends SubsystemBase {
     return this.run(
         () -> {
           outtakeIO.runFlywheel(rpmSetpoint);
+          outtakeIO.runPivot(angleSetpoint);
         });
   }
 
@@ -32,6 +34,13 @@ public class Outtake extends SubsystemBase {
         () -> {
           rpmSetpoint = rpm;
         });
+  }
+
+  public Command changeAngle(double angle) {
+    return this.runOnce(
+    () -> {
+      angleSetpoint = angle;
+    });
   }
 
   public void setAngle(double angle) {
