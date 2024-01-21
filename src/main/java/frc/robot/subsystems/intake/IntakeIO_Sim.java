@@ -20,18 +20,20 @@ public class IntakeIO_Sim implements IntakeIO {
 
     pivotSim.update(1 / CodeConstants.kMainLoopFrequency);
 
-    inputs.pivotMotorPosition = pivotSim.getAngularPositionRotations() * Constants.OuttakeConstants.kSensorToDegrees;
+    inputs.pivotMotorPosition =
+        pivotSim.getAngularPositionRotations() * Constants.OuttakeConstants.kSensorToDegrees;
     inputs.pivotMotorVoltage = voltage;
     inputs.pivotMotorTemp = 0;
     inputs.pivotMotorCurrent = pivotSim.getCurrentDrawAmps();
-
   }
 
- @Override
+  @Override
   public void runPivot(double angle) {
-    double pidEffort = pivotPID.calculate(pivotSim.getAngularPositionRotations() * Constants.OuttakeConstants.kSensorToDegrees, angle);
+    double pidEffort =
+        pivotPID.calculate(
+            pivotSim.getAngularPositionRotations() * Constants.OuttakeConstants.kSensorToDegrees,
+            angle);
     voltage = MathUtil.clamp(pidEffort, -12, 12);
     pivotSim.setInput(voltage);
   }
-
 }

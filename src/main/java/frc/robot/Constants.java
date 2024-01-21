@@ -23,7 +23,9 @@ public class Constants {
     public static final Transform3d kFrontCameraPose =
         new Transform3d(new Translation3d(-0.336886, 0, 0.531201), new Rotation3d(0, 0.485314, 0));
     public static final Transform3d kSideCameraPose =
-        new Transform3d(new Translation3d(-0.242086, 0.170791, 0.511322), new Rotation3d(0, 0.122173, -1.28248701081));
+        new Transform3d(
+            new Translation3d(-0.242086, 0.170791, 0.511322),
+            new Rotation3d(0, 0.122173, -1.28248701081));
   }
 
   public static final class CANID {
@@ -46,8 +48,6 @@ public class Constants {
     public static final int kLeftShooter = 12;
 
     public static final int kShooterPivot = 13;
-
-    
   }
 
   public static final class AutoConstants {
@@ -243,9 +243,8 @@ public class Constants {
 
   public static final class OuttakeConstants {
 
-    public static final double kGearing = 1d/12 * 16d/36;
+    public static final double kGearing = 1d / 12 * 16d / 36;
     public static final double kSensorToDegrees = 360d / kGearing;
-
   }
 
   public static final record ScoringSetpoint(

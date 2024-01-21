@@ -10,21 +10,22 @@ import frc.robot.Constants;
 
 public class OuttakeIO_Real implements OuttakeIO {
 
-  TalonFX rightShooter = new TalonFX(Constants.CANID.kRightShooter); 
+  TalonFX rightShooter = new TalonFX(Constants.CANID.kRightShooter);
   TalonFX leftShooter = new TalonFX(Constants.CANID.kLeftShooter);
-  
+
   TalonFX pivot = new TalonFX(Constants.CANID.kShooterPivot);
 
   private double voltage = 0;
   private double angle = 0.0;
 
   public OuttakeIO_Real() {
-    
+
     var shooterPivotConfigurator = pivot.getConfigurator();
     var shooterPivotConfigs = new TalonFXConfiguration();
 
-    shooterPivotConfigs.Feedback.SensorToMechanismRatio = Constants.OuttakeConstants.kSensorToDegrees;
-    
+    shooterPivotConfigs.Feedback.SensorToMechanismRatio =
+        Constants.OuttakeConstants.kSensorToDegrees;
+
     var slot0Configs = new Slot0Configs();
     slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
     slot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
@@ -36,9 +37,8 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     pivot.getConfigurator().apply(slot0Configs);
 
-    final TrapezoidProfile mProfile = new TrapezoidProfile(
-      new TrapezoidProfile.Constraints(360, 2880)
-    );
+    final TrapezoidProfile mProfile =
+        new TrapezoidProfile(new TrapezoidProfile.Constraints(360, 2880));
 
     TrapezoidProfile.State mGoal = new TrapezoidProfile.State(180, 0);
     TrapezoidProfile.State mSetpoint = new TrapezoidProfile.State();
@@ -49,7 +49,7 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     mRequest.Position = mSetpoint.position;
     mRequest.Velocity = mSetpoint.velocity;
-    
+
     pivot.setControl(mRequest.withPosition(mSetpoint.position).withFeedForward(0.5));
 
     shooterPivotConfigurator.apply(shooterPivotConfigs);
@@ -60,10 +60,7 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     inputs.pivotMotorPosition = angle;
     inputs.flywheelMotorVoltage = voltage;
-    
+
     pivot.getPosition();
-
   }
-
-  
 }

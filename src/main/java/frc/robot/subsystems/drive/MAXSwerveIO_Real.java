@@ -80,7 +80,6 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
     driveMotor.setSmartCurrentLimit(MAXSwerveConstants.kDriveCurrentLimit);
     turnMotor.setSmartCurrentLimit(MAXSwerveConstants.kTurnCurrentLimit);
 
-
     driveMotor.setPeriodicFramePeriod(
         PeriodicFrame.kStatus2, (int) (1000 / CodeConstants.kMainLoopFrequency));
     turnMotor.setPeriodicFramePeriod(

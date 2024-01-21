@@ -118,7 +118,7 @@ public class Robot extends LoggedRobot {
                         * 0.25)));
 
     outtake.setDefaultCommand(outtake.run());
-    
+
     intake.setDefaultCommand(intake.run());
 
     autoChooser.addDefaultOption("None", null);

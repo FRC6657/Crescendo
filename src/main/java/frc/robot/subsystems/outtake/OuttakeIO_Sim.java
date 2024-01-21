@@ -22,7 +22,6 @@ public class OuttakeIO_Sim implements OuttakeIO {
 
   private PIDController pivotPID = new PIDController(0.001, 0, 0);
 
-
   @Override
   public void updateInputs(OuttakeIOInputs inputs) {
 
@@ -34,11 +33,11 @@ public class OuttakeIO_Sim implements OuttakeIO {
     inputs.flywheelMotorTemp = 0;
     inputs.flywheelMotorCurrent = flywheelSim.getCurrentDrawAmps();
 
-    inputs.pivotMotorPosition = pivotSim.getAngularPositionRotations() * Constants.OuttakeConstants.kSensorToDegrees;
+    inputs.pivotMotorPosition =
+        pivotSim.getAngularPositionRotations() * Constants.OuttakeConstants.kSensorToDegrees;
     inputs.pivotMotorVoltage = pVoltage;
     inputs.pivotMotorTemp = 0;
     inputs.pivotMotorCurrent = pivotSim.getCurrentDrawAmps();
-
   }
 
   @Override
@@ -52,7 +51,10 @@ public class OuttakeIO_Sim implements OuttakeIO {
 
   @Override
   public void runPivot(double angle) {
-    double pidEffort = pivotPID.calculate(pivotSim.getAngularPositionRotations() * Constants.OuttakeConstants.kSensorToDegrees, angle);
+    double pidEffort =
+        pivotPID.calculate(
+            pivotSim.getAngularPositionRotations() * Constants.OuttakeConstants.kSensorToDegrees,
+            angle);
     pVoltage = MathUtil.clamp(pidEffort, -12, 12);
     pivotSim.setInput(pVoltage);
   }

@@ -6,6 +6,7 @@ package frc.robot.subsystems.outtake;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
@@ -38,9 +39,9 @@ public class Outtake extends SubsystemBase {
 
   public Command changeAngle(double angle) {
     return this.runOnce(
-    () -> {
-      angleSetpoint = angle;
-    });
+        () -> {
+          angleSetpoint = angle;
+        });
   }
 
   public void setAngle(double angle) {
@@ -55,6 +56,6 @@ public class Outtake extends SubsystemBase {
 
   public Pose3d get3DPose() {
     return new Pose3d(
-        -0.32385, 0, 0.6312130886, new Rotation3d(0, outtakeInputs.pivotMotorPosition, 0));
+        -0.32385, 0, 0.6312130886, new Rotation3d(0, Units.degreesToRadians(outtakeInputs.pivotMotorPosition), 0));
   }
 }
