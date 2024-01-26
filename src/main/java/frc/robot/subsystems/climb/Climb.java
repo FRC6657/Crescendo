@@ -7,7 +7,6 @@ package frc.robot.subsystems.climb;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 
 public class Climb extends SubsystemBase {
 
@@ -16,9 +15,9 @@ public class Climb extends SubsystemBase {
 
   private double climbSetpoint;
 
-  public Climb(ClimberIO leftClimber, ClimberIO rightClimber) {
-    this.leftClimber = new Climber(leftClimber, Constants.ElevatorConstants.ClimberInformation.kLeftClimber);
-    this.rightClimber = new Climber(rightClimber, Constants.ElevatorConstants.ClimberInformation.kRightClimber);
+  public Climb(ClimberIO[] test) {
+    this.leftClimber = new Climber(test[0], "left ");
+    this.rightClimber = new Climber(test[1], "right ");
   }
 
   @Override

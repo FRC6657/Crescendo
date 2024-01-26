@@ -51,7 +51,6 @@ public class Constants {
 
     public static final int kRightClimber = 14;
     public static final int kLeftClimber = 15;
-
   }
 
   public static final class AutoConstants {
@@ -204,7 +203,6 @@ public class Constants {
     public static final double kGearing = 1 / 2d;
     public static final double kHoldingVoltage = 1;
     public static final double kCurrentLimit = 20; // Amps
-  
   }
 
   public static final class ElevatorConstants {
@@ -247,17 +245,17 @@ public class Constants {
 
     public static final class ClimberInformation {
       public final String name;
-      public final int id; 
+      public final int id;
 
-      public ClimberInformation(
-          String name, int id) {
+      public ClimberInformation(String name, int id) {
         this.name = name;
         this.id = id;
-      } 
+      }
 
-      public static final ClimberInformation kLeftClimber = new ClimberInformation("Left Climb", CANID.kLeftClimber);
-      public static final ClimberInformation kRightClimber = new ClimberInformation("Right Climber", CANID.kRightClimber);
-
+      public static final ClimberInformation kLeftClimber =
+          new ClimberInformation("Left Climb", CANID.kLeftClimber);
+      public static final ClimberInformation kRightClimber =
+          new ClimberInformation("Right Climber", CANID.kRightClimber);
     }
   }
 
