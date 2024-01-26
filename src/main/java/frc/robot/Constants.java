@@ -48,6 +48,10 @@ public class Constants {
     public static final int kLeftShooter = 12;
 
     public static final int kShooterPivot = 13;
+
+    public static final int kRightClimber = 14;
+    public static final int kLeftClimber = 15;
+
   }
 
   public static final class AutoConstants {
@@ -200,6 +204,7 @@ public class Constants {
     public static final double kGearing = 1 / 2d;
     public static final double kHoldingVoltage = 1;
     public static final double kCurrentLimit = 20; // Amps
+  
   }
 
   public static final class ElevatorConstants {
@@ -211,8 +216,8 @@ public class Constants {
     public static final double kAngle = Units.degreesToRadians(50);
     public static final double kSprocketPD = 1.751; // Inches
 
-    public static final double kSensorToVerticalInches =
-        kGearing * (1.751 * Math.PI) * kStages * Math.sin(kAngle);
+    public static final double kSensorToVerticalMeters =
+        Units.inchesToMeters(kGearing * (kSprocketPD * Math.PI) * kStages * Math.sin(kAngle));
 
     public static final double kStartingHeight = 9.6;
 
@@ -239,6 +244,21 @@ public class Constants {
             .withSupplyCurrentLimitEnable(true)
             .withSupplyCurrentThreshold(40)
             .withSupplyTimeThreshold(40);
+
+    public static final class ClimberInformation {
+      public final String name;
+      public final int id; 
+
+      public ClimberInformation(
+          String name, int id) {
+        this.name = name;
+        this.id = id;
+      } 
+
+      public static final ClimberInformation kLeftClimber = new ClimberInformation("Left Climb", CANID.kLeftClimber);
+      public static final ClimberInformation kRightClimber = new ClimberInformation("Right Climber", CANID.kRightClimber);
+
+    }
   }
 
   public static final class OuttakeConstants {

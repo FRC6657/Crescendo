@@ -6,21 +6,24 @@ package frc.robot.subsystems.climb;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import frc.robot.Constants.ElevatorConstants.ClimberInformation;
+
 import org.littletonrobotics.junction.Logger;
 
-public class Climber {
+public class Climber implements ClimberIO {
   private final ClimberIO io;
   private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
-  private String name;
 
-  public Climber(ClimberIO climberIO, String name) {
+  
+
+  public Climber(ClimberIO climberIO) {
     this.io = climberIO;
-    this.name = name;
+    
   }
 
   public void updateInputs() {
     io.updateInputs(inputs);
-    Logger.processInputs(name + " Climber", inputs);
+    Logger.processInputs(io.,inputs);
   }
 
   public void run(double height) {

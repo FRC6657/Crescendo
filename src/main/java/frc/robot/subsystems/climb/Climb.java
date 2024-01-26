@@ -5,22 +5,33 @@
 package frc.robot.subsystems.climb;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Climb extends SubsystemBase {
 
   private final Climber leftClimber;
   private final Climber rightClimber;
 
+  private double climbSetpoint;
+
   public Climb(ClimberIO leftClimber, ClimberIO rightClimber) {
-    this.leftClimber = new Climber(leftClimber, "Left");
-    this.rightClimber = new Climber(rightClimber, "Right");
+    this.leftClimber = new Climber(leftClimber, Constants.ElevatorConstants.ClimberInformation.kLeftClimber);
+    this.rightClimber = new Climber(rightClimber, Constants.ElevatorConstants.ClimberInformation.kRightClimber);
   }
 
   @Override
   public void periodic() {
     leftClimber.updateInputs();
     rightClimber.updateInputs();
+  }
+
+  public Command run() {
+    return this.run(
+        () -> {
+          leftClimber.run(climbSetpoint);
+        });
   }
 
   public Pose3d[] get3DPoses() {

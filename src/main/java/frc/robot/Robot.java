@@ -11,9 +11,13 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.MAXSwerveConstants;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.climb.Climber;
+import frc.robot.subsystems.climb.ClimberIO;
+import frc.robot.subsystems.climb.ClimberIO_Real;
 import frc.robot.subsystems.climb.ClimberIO_Sim;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIO_Real;
@@ -70,9 +74,16 @@ public class Robot extends LoggedRobot {
                 new MAXSwerveIO_Sim()
               });
 
+  private Climber climb = 
+    new Climber(
+      new ClimberIO[] {
+        new ClimberIO_Real(ElevatorConstants.ClimberInformation.mLeftClimber),
+        new ClimberIO_Real(ElevatorConstants.ClimberInformation.mRightClimber)
+      }
+      );
+
   private Outtake outtake = new Outtake(new OuttakeIO_Sim());
   private Intake intake = new Intake(new IntakeIO_Sim());
-  private Climb climb = new Climb(new ClimberIO_Sim(), new ClimberIO_Sim());
 
   private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
 
@@ -120,6 +131,8 @@ public class Robot extends LoggedRobot {
     outtake.setDefaultCommand(outtake.run());
 
     intake.setDefaultCommand(intake.run());
+
+    climb.setDefaultCommand(climb.run());
 
     autoChooser.addDefaultOption("None", null);
 
