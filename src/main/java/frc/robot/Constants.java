@@ -207,15 +207,15 @@ public class Constants {
 
   public static final class ElevatorConstants {
 
-    public static final double kMinHeight = 9.6;
-    public static final double kMaxHeight = 54;
+    public static final double kMinHeight = 0;
+    public static final double kMaxHeight = 15.25;
     public static final int kStages = 2;
     public static final double kGearing = 1 / 12d;
     public static final double kAngle = Units.degreesToRadians(50);
     public static final double kSprocketPD = 1.751; // Inches
 
     public static final double kSensorToVerticalMeters =
-        Units.inchesToMeters(kGearing * (kSprocketPD * Math.PI) * kStages * Math.sin(kAngle));
+        Units.inchesToMeters(kGearing * (kSprocketPD * Math.PI));
 
     public static final double kStartingHeight = 9.6;
 

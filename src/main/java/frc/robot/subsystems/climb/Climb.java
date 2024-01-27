@@ -4,9 +4,11 @@
 
 package frc.robot.subsystems.climb;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants.ClimberInformation;
 
 public class Climb extends SubsystemBase {
@@ -14,7 +16,7 @@ public class Climb extends SubsystemBase {
   private final Climber leftClimber;
   private final Climber rightClimber;
 
-  private double climbSetpoint;
+  private double climbSetpoint = 0;
 
   public Climb(ClimberIO[] climberIOs) {
     this.leftClimber = new Climber(climberIOs[0], ClimberInformation.kLeftClimber.name);
@@ -28,13 +30,18 @@ public class Climb extends SubsystemBase {
   }
 
   public void changeClimbSetpoint(double setpoint) {
-    setpoint = climbSetpoint;
+    setpoint =
+        MathUtil.clamp(
+            setpoint, Constants.ElevatorConstants.kMinHeight, Constants.ElevatorConstants.kMaxHeight);
+    
+    climbSetpoint = setpoint;
   }
 
   public Command run() {
     return this.run(
         () -> {
           leftClimber.run(climbSetpoint);
+          rightClimber.run(climbSetpoint);
         });
   }
 

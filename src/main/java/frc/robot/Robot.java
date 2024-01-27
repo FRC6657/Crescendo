@@ -121,13 +121,13 @@ public class Robot extends LoggedRobot {
                 new ChassisSpeeds(
                     -MathUtil.applyDeadband(controller.getLeftY(), 0.05)
                         * MAXSwerveConstants.kMaxDriveSpeed
-                        * 0.75,
+                        * 0.5,
                     -MathUtil.applyDeadband(controller.getLeftX(), 0.15)
                         * MAXSwerveConstants.kMaxDriveSpeed
-                        * 0.75,
+                        * 0.5,
                     -MathUtil.applyDeadband(controller.getRightX(), 0.15)
                         * DriveConstants.kMaxAngularVelocity
-                        * 0.75)));
+                        * 0.5)));
 
     outtake.setDefaultCommand(outtake.run());
 
@@ -147,7 +147,7 @@ public class Robot extends LoggedRobot {
 
     controller.y().onTrue(outtake.changeRPM(1000)).onFalse(outtake.changeRPM(0));
 
-    controller.x().onTrue(intake.changeAngle(-90));
+    //controller.x().onTrue(intake.changeAngle(-90));
 
     controller.leftBumper().onTrue(outtake.changeAngle(32));
     controller.rightBumper().onTrue(outtake.changeAngle(178));
@@ -156,7 +156,12 @@ public class Robot extends LoggedRobot {
         .y()
         .whileTrue(
             Commands.runOnce(() -> climb.changeClimbSetpoint(Units.inchesToMeters(20)), climb));
-  }
+
+  controller
+        .x()
+        .whileTrue(
+            Commands.runOnce(() -> climb.changeClimbSetpoint(Units.inchesToMeters(0)), climb));
+}
 
   @Override
   public void robotPeriodic() {
