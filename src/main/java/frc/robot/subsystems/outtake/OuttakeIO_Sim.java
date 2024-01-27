@@ -10,8 +10,8 @@ import frc.robot.Constants;
 import frc.robot.Constants.CodeConstants;
 
 public class OuttakeIO_Sim implements OuttakeIO {
-  private double sVoltage = 0;
-  private double pVoltage = 0;
+  private double shooterVoltage = 0;
+  private double pivotVoltage = 0;
 
   private FlywheelSim flywheelSim = new FlywheelSim(DCMotor.getFalcon500(2), 2, 0.00146376);
   private DCMotorSim pivotSim = new DCMotorSim(DCMotor.getFalcon500(1), 1 / Constants.OuttakeConstants.kGearing, 0.01);
@@ -29,13 +29,13 @@ public class OuttakeIO_Sim implements OuttakeIO {
     pivotSim.update(1 / CodeConstants.kMainLoopFrequency);
 
     inputs.currentRPM = flywheelSim.getAngularVelocityRPM();
-    inputs.flywheelMotorVoltage = sVoltage;
+    inputs.flywheelMotorVoltage = shooterVoltage;
     inputs.flywheelMotorTemp = 0;
     inputs.flywheelMotorCurrent = flywheelSim.getCurrentDrawAmps();
 
     inputs.pivotMotorPosition =
         pivotSim.getAngularPositionRotations() * 360;
-    inputs.pivotMotorVoltage = pVoltage;
+    inputs.pivotMotorVoltage = pivotVoltage;
     inputs.pivotMotorTemp = 0;
     inputs.pivotMotorCurrent = pivotSim.getCurrentDrawAmps();
   }
@@ -45,8 +45,8 @@ public class OuttakeIO_Sim implements OuttakeIO {
     rpm = MathUtil.clamp(rpm, -3190, 3190);
     double ffEffort = flyWheelFeedForward.calculate(rpm);
     double pidEffort = flyWheelPID.calculate(flywheelSim.getAngularVelocityRPM(), rpm);
-    sVoltage = MathUtil.clamp(ffEffort + pidEffort, -12, 12);
-    flywheelSim.setInput(sVoltage);
+    shooterVoltage = MathUtil.clamp(ffEffort + pidEffort, -12, 12);
+    flywheelSim.setInput(shooterVoltage);
   }
 
   @Override
@@ -55,7 +55,7 @@ public class OuttakeIO_Sim implements OuttakeIO {
         pivotPID.calculate(
             pivotSim.getAngularPositionRotations() * 360,
             angle);
-    pVoltage = MathUtil.clamp(pidEffort, -12, 12);
-    pivotSim.setInput(pVoltage);
+    pivotVoltage = MathUtil.clamp(pidEffort, -12, 12);
+    pivotSim.setInput(pivotVoltage);
   }
 }

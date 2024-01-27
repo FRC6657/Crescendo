@@ -149,8 +149,6 @@ public class Robot extends LoggedRobot {
 
     controller.y().onTrue(outtake.changeRPM(1000)).onFalse(outtake.changeRPM(0));
 
-    // controller.x().onTrue(intake.changeAngle(-90));
-
     controller.leftBumper().onTrue(outtake.changeAngle(-10));
     controller.rightBumper().onTrue(outtake.changeAngle(178));
 
