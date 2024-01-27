@@ -14,13 +14,13 @@ public class OuttakeIO_Sim implements OuttakeIO {
   private double pVoltage = 0;
 
   private FlywheelSim flywheelSim = new FlywheelSim(DCMotor.getFalcon500(2), 2, 0.00146376);
-  private DCMotorSim pivotSim = new DCMotorSim(DCMotor.getFalcon500(1), 12, 0.01);
+  private DCMotorSim pivotSim = new DCMotorSim(DCMotor.getFalcon500(1), 1 / Constants.OuttakeConstants.kGearing, 0.01);
 
   private SimpleMotorFeedforward flyWheelFeedForward =
       new SimpleMotorFeedforward(0.1, 0.00374064837); // 0.003639801
-  private PIDController flyWheelPID = new PIDController(0.0032, 0, 0);
+  private PIDController flyWheelPID = new PIDController(0.032, 0, 0);
 
-  private PIDController pivotPID = new PIDController(0.001, 0, 0);
+  private PIDController pivotPID = new PIDController(12d / 360, 0, 0);
 
   @Override
   public void updateInputs(OuttakeIOInputs inputs) {
@@ -34,7 +34,7 @@ public class OuttakeIO_Sim implements OuttakeIO {
     inputs.flywheelMotorCurrent = flywheelSim.getCurrentDrawAmps();
 
     inputs.pivotMotorPosition =
-        pivotSim.getAngularPositionRotations() * Constants.OuttakeConstants.kSensorToDegrees;
+        pivotSim.getAngularPositionRotations() * 360;
     inputs.pivotMotorVoltage = pVoltage;
     inputs.pivotMotorTemp = 0;
     inputs.pivotMotorCurrent = pivotSim.getCurrentDrawAmps();
@@ -53,7 +53,7 @@ public class OuttakeIO_Sim implements OuttakeIO {
   public void runPivot(double angle) {
     double pidEffort =
         pivotPID.calculate(
-            pivotSim.getAngularPositionRotations() * Constants.OuttakeConstants.kSensorToDegrees,
+            pivotSim.getAngularPositionRotations() * 360,
             angle);
     pVoltage = MathUtil.clamp(pidEffort, -12, 12);
     pivotSim.setInput(pVoltage);

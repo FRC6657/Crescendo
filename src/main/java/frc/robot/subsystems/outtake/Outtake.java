@@ -59,6 +59,6 @@ public class Outtake extends SubsystemBase {
         -0.32385,
         0,
         0.6312130886,
-        new Rotation3d(0, Units.degreesToRadians(outtakeInputs.pivotMotorPosition), 0));
+        new Rotation3d(0, -Units.degreesToRadians(outtakeInputs.pivotMotorPosition), 0));
   }
 }

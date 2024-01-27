@@ -4,7 +4,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import frc.robot.Constants;
 import frc.robot.Constants.CodeConstants;
 
 public class IntakeIO_Sim implements IntakeIO {
@@ -21,7 +20,7 @@ public class IntakeIO_Sim implements IntakeIO {
     pivotSim.update(1 / CodeConstants.kMainLoopFrequency);
 
     inputs.pivotMotorPosition =
-        pivotSim.getAngularPositionRotations() * Constants.OuttakeConstants.kSensorToDegrees;
+        pivotSim.getAngularPositionRotations() * 360;
     inputs.pivotMotorVoltage = voltage;
     inputs.pivotMotorTemp = 0;
     inputs.pivotMotorCurrent = pivotSim.getCurrentDrawAmps();
@@ -31,7 +30,7 @@ public class IntakeIO_Sim implements IntakeIO {
   public void runPivot(double angle) {
     double pidEffort =
         pivotPID.calculate(
-            pivotSim.getAngularPositionRotations() * Constants.OuttakeConstants.kSensorToDegrees,
+            pivotSim.getAngularPositionRotations() * 360,
             angle);
     voltage = MathUtil.clamp(pidEffort, -12, 12);
     pivotSim.setInput(voltage);
