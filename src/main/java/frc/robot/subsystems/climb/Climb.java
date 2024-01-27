@@ -27,6 +27,10 @@ public class Climb extends SubsystemBase {
     rightClimber.updateInputs();
   }
 
+  public void changeClimbSetpoint(double setpoint) {
+    setpoint = climbSetpoint;
+  }
+
   public Command run() {
     return this.run(
         () -> {

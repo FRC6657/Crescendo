@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,6 +18,7 @@ import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimberIO;
 import frc.robot.subsystems.climb.ClimberIO_Real;
+import frc.robot.subsystems.climb.ClimberIO_Sim;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIO_Real;
 import frc.robot.subsystems.drive.MAXSwerve;
@@ -74,10 +76,12 @@ public class Robot extends LoggedRobot {
 
   private Climb climb =
       new Climb(
-          new ClimberIO[] {
-            new ClimberIO_Real(ClimberInformation.kLeftClimber),
-            new ClimberIO_Real(ClimberInformation.kRightClimber)
-          });
+          mode == RobotMode.REAL
+              ? new ClimberIO[] {
+                new ClimberIO_Real(ClimberInformation.kLeftClimber),
+                new ClimberIO_Real(ClimberInformation.kRightClimber)
+              }
+              : new ClimberIO[] {new ClimberIO_Sim(), new ClimberIO_Sim()});
 
   private Outtake outtake = new Outtake(new OuttakeIO_Sim());
   private Intake intake = new Intake(new IntakeIO_Sim());
@@ -117,13 +121,13 @@ public class Robot extends LoggedRobot {
                 new ChassisSpeeds(
                     -MathUtil.applyDeadband(controller.getLeftY(), 0.05)
                         * MAXSwerveConstants.kMaxDriveSpeed
-                        * 0.25,
+                        * 0.75,
                     -MathUtil.applyDeadband(controller.getLeftX(), 0.15)
                         * MAXSwerveConstants.kMaxDriveSpeed
-                        * 0.25,
+                        * 0.75,
                     -MathUtil.applyDeadband(controller.getRightX(), 0.15)
                         * DriveConstants.kMaxAngularVelocity
-                        * 0.25)));
+                        * 0.75)));
 
     outtake.setDefaultCommand(outtake.run());
 
@@ -138,14 +142,20 @@ public class Robot extends LoggedRobot {
         .whileTrue(
             Commands.runOnce(
                 () -> drivebase.setPose(new Pose2d(0, 0, new Rotation2d(0))), drivebase));
+
     controller.b().whileTrue(drivebase.goToPose(new Pose2d(0, 0, new Rotation2d(0))));
 
     controller.y().onTrue(outtake.changeRPM(1000)).onFalse(outtake.changeRPM(0));
 
-    controller.x().onTrue(intake.changeAngle(90));
+    controller.x().onTrue(intake.changeAngle(-90));
 
     controller.leftBumper().onTrue(outtake.changeAngle(32));
     controller.rightBumper().onTrue(outtake.changeAngle(178));
+
+    controller
+        .y()
+        .whileTrue(
+            Commands.runOnce(() -> climb.changeClimbSetpoint(Units.inchesToMeters(20)), climb));
   }
 
   @Override
