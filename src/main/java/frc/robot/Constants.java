@@ -263,6 +263,8 @@ public class Constants {
 
     public static final double kGearing = 1d / 12 * 16d / 36;
     public static final double kSensorToRotations = 1 / kGearing;
+
+    public static final double kCurrentLimit = 40;
   }
 
   public static final record ScoringSetpoint(
