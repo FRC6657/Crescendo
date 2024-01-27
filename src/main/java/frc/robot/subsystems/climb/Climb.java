@@ -32,8 +32,10 @@ public class Climb extends SubsystemBase {
   public void changeClimbSetpoint(double setpoint) {
     setpoint =
         MathUtil.clamp(
-            setpoint, Constants.ElevatorConstants.kMinHeight, Constants.ElevatorConstants.kMaxHeight);
-    
+            setpoint,
+            Constants.ElevatorConstants.kMinHeight,
+            Constants.ElevatorConstants.kMaxHeight);
+
     climbSetpoint = setpoint;
   }
 

@@ -1,13 +1,12 @@
 package frc.robot.subsystems.climb;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
 import frc.robot.Constants.CodeConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class ClimberIO_Sim implements ClimberIO {
 

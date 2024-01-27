@@ -27,6 +27,7 @@ import frc.robot.subsystems.drive.MAXSwerveIO_Real;
 import frc.robot.subsystems.drive.MAXSwerveIO_Sim;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO_Sim;
+import frc.robot.subsystems.led.Led;
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -85,6 +86,7 @@ public class Robot extends LoggedRobot {
 
   private Outtake outtake = new Outtake(new OuttakeIO_Sim());
   private Intake intake = new Intake(new IntakeIO_Sim());
+  private Led led = new Led(10,255,10);
 
   private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
 
@@ -147,7 +149,7 @@ public class Robot extends LoggedRobot {
 
     controller.y().onTrue(outtake.changeRPM(1000)).onFalse(outtake.changeRPM(0));
 
-    //controller.x().onTrue(intake.changeAngle(-90));
+    // controller.x().onTrue(intake.changeAngle(-90));
 
     controller.leftBumper().onTrue(outtake.changeAngle(32));
     controller.rightBumper().onTrue(outtake.changeAngle(178));
@@ -157,11 +159,11 @@ public class Robot extends LoggedRobot {
         .whileTrue(
             Commands.runOnce(() -> climb.changeClimbSetpoint(Units.inchesToMeters(20)), climb));
 
-  controller
+    controller
         .x()
         .whileTrue(
             Commands.runOnce(() -> climb.changeClimbSetpoint(Units.inchesToMeters(0)), climb));
-}
+  }
 
   @Override
   public void robotPeriodic() {
