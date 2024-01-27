@@ -8,22 +8,30 @@ import frc.robot.Constants.CodeConstants;
 
 public class IntakeIO_Sim implements IntakeIO {
 
-  private double voltage = 0;
+  private double pivotVoltage = 0;
+  private double rollerSpeed = 0;
 
-  private DCMotorSim pivotSim = new DCMotorSim(DCMotor.getFalcon500(1), 12, 0.01);
+  private DCMotorSim pivotSim = new DCMotorSim(DCMotor.getFalcon500(1), 12, 0.01);//double check gearing when the gearboxes are finalised
+  private DCMotorSim rollerSim = new DCMotorSim(DCMotor.getFalcon500(1), 24.0/11.0, 0.01);
 
   private PIDController pivotPID = new PIDController(0.001, 0, 0);
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-
+//pivot
     pivotSim.update(1 / CodeConstants.kMainLoopFrequency);
 
     inputs.pivotMotorPosition =
         pivotSim.getAngularPositionRotations() * 360;
-    inputs.pivotMotorVoltage = voltage;
+    inputs.pivotMotorVoltage = pivotVoltage;
     inputs.pivotMotorTemp = 0;
     inputs.pivotMotorCurrent = pivotSim.getCurrentDrawAmps();
+    
+//roller
+    inputs.currentSpeed = rollerSpeed;
+    inputs.rollerMotorTemp = 0.0;
+    inputs.rollerMotorVoltage = rollerSpeed * 12;
+    inputs.rollerMotorCurrent = rollerSim.getCurrentDrawAmps();
   }
 
   @Override
@@ -32,7 +40,13 @@ public class IntakeIO_Sim implements IntakeIO {
         pivotPID.calculate(
             pivotSim.getAngularPositionRotations() * 360,
             angle);
-    voltage = MathUtil.clamp(pidEffort, -12, 12);
-    pivotSim.setInput(voltage);
+    pivotVoltage = MathUtil.clamp(pidEffort, -12, 12);
+    pivotSim.setInput(pivotVoltage);
+  }
+
+  @Override
+  public void runRollers(double speed){
+    rollerSpeed = speed;
+    rollerSim.setInput(MathUtil.clamp(rollerSpeed, -1, 1) * 12);
   }
 }
