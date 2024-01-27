@@ -51,6 +51,8 @@ public class Constants {
 
     public static final int kRightClimber = 14;
     public static final int kLeftClimber = 15;
+
+    public static final int kIntakeMotor;
   }
 
   public static final class AutoConstants {
