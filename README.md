@@ -14,4 +14,4 @@ This project uses the WPILib command-based structure, with an [Advantage Kit](ht
   - [REV MAXSwerve Template](https://github.com/REVrobotics/MAXSwerve-Java-Template): The rough reference for our swerve code.
   - [PhotonVision](https://github.com/PhotonVision/photonvision): Vision Software running on our OrangePi5 for AprilTag detection.
   - [Choreo](https://github.com/SleipnirGroup/Choreo): Pathplanning software used for autonomous pathing.
-  - [8033 Highlander Robotics](https://github.com/HighlanderRobotics/Charged-Up): Wonderful training resources, and has provided code help to us on numerous occations.
+  - [8033 Highlander Robotics](https://github.com/HighlanderRobotics/): Wonderful training resources, and has provided code help to us on numerous occations.
