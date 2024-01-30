@@ -16,11 +16,18 @@ public class Led extends SubsystemBase {
   int startBlue = 1;
   /** Creates a new Led. */
   public Led() {
-    led = new AddressableLED(1);//PWM port 1
-    ledBuffer = new AddressableLEDBuffer(150);
+
+    led = new AddressableLED(2);//PWM port 
+    ledBuffer = new AddressableLEDBuffer(15);
+    led.setLength(ledBuffer.getLength());
+
+  }
+
+  public void startLED(){
     changeColor(startRed, startGreen, startBlue);
     led.setData(ledBuffer);
-    led.start();
+    led.start();    
+
   }
 
   public void changeColor(int red, int green, int blue){
@@ -32,7 +39,6 @@ public class Led extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
     led.setData(ledBuffer);
   }
 }

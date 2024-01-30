@@ -1,13 +1,9 @@
 package frc.robot.subsystems.intake;
 
-import org.littletonrobotics.junction.AutoLog;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
-import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.MathUtil;
 import frc.robot.Constants;
 import frc.robot.Constants.CodeConstants;
