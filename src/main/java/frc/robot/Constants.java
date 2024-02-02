@@ -53,7 +53,6 @@ public class Constants {
     public static final int kLeftClimber = 15;
 
     public static final int kIntakeMotor = 16;
-    public static final int kIntakePivot = 17;
   }
 
   public static final class AutoConstants {
