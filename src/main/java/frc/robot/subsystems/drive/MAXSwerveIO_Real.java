@@ -85,11 +85,7 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
     turnMotor.setPeriodicFramePeriod(
         PeriodicFrame.kStatus2, (int) (1000 / CodeConstants.kMainLoopFrequency));
 
-    // Timer.delay(1);
-
     driveMotor.burnFlash();
-
-    // Timer.delay(1);
 
     turnMotor.burnFlash();
   }
