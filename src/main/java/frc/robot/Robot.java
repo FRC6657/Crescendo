@@ -131,8 +131,6 @@ public class Robot extends LoggedRobot {
                         * DriveConstants.kMaxAngularVelocity
                         * 0.5)));
 
-    outtake.setDefaultCommand(outtake.run());
-
     intake.setDefaultCommand(intake.run());
 
     climb.setDefaultCommand(climb.run());
