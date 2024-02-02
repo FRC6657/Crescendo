@@ -5,9 +5,6 @@ import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.google.flatbuffers.Constants;
-
-import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.ElevatorConstants.ClimberInformation;
 import frc.robot.Constants.OuttakeConstants;
 
