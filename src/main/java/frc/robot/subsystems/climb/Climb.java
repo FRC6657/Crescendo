@@ -19,8 +19,8 @@ public class Climb extends SubsystemBase {
   private double climbSetpoint = 0;
 
   public Climb(ClimberIO[] climberIOs) {
-    this.leftClimber = new Climber(climberIOs[0], ClimberInformation.kLeftClimber.name);
-    this.rightClimber = new Climber(climberIOs[1], ClimberInformation.kRightClimber.name);
+    this.leftClimber = new Climber(climberIOs[0], ClimberInformation.kLeftClimber);
+    this.rightClimber = new Climber(climberIOs[1], ClimberInformation.kRightClimber);
   }
 
   @Override

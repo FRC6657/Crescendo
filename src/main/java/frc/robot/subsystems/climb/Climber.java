@@ -6,6 +6,8 @@ package frc.robot.subsystems.climb;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import frc.robot.Constants.ElevatorConstants.ClimberInformation;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Climber implements ClimberIO {
@@ -13,9 +15,9 @@ public class Climber implements ClimberIO {
   private final String name;
   private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
 
-  public Climber(ClimberIO climberIO, String inputName) {
+  public Climber(ClimberIO climberIO, ClimberInformation info) {
     this.io = climberIO;
-    name = inputName;
+    name = info.name;
   }
 
   public void updateInputs() {
