@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ElevatorConstants.ClimberInformation;
@@ -137,10 +136,6 @@ public class Robot extends LoggedRobot {
     intake.setDefaultCommand(intake.run());
 
     climb.setDefaultCommand(climb.run());
-
-    led.setDefaultCommand(
-      new InstantCommand(led::startLED, led)
-    );
 
     autoChooser.addDefaultOption("None", null);
 

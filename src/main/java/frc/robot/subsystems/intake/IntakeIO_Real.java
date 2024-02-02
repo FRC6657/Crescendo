@@ -10,8 +10,12 @@ import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.IntakeConstants;
 
 public class IntakeIO_Real implements IntakeIO {
+  
   private TalonFX intakeMotor;
   private double intakeMotorSpeed;
+  double lastVelocity = 0; 
+  double currentVelocity = 0;
+
   public IntakeIO_Real() {
     intakeMotor = new TalonFX(Constants.CANID.kIntakeMotor);
 
@@ -45,6 +49,10 @@ public class IntakeIO_Real implements IntakeIO {
     inputs.rollerMotorTemp = intakeMotor.getDeviceTemp().getValueAsDouble();
     inputs.rollerMotorVoltage = intakeMotor.getMotorVoltage().getValueAsDouble();
     inputs.rollerMotorCurrent = intakeMotor.getSupplyCurrent().getValueAsDouble();
+    
+    currentVelocity = intakeMotor.getVelocity().getValueAsDouble();
+    inputs.rollerMotorAcceleration = (currentVelocity - lastVelocity) * CodeConstants.kMainLoopFrequency;
+    lastVelocity = currentVelocity;
 
   }
 
