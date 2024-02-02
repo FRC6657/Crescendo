@@ -11,13 +11,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Led extends SubsystemBase {
   AddressableLED led;
   AddressableLEDBuffer ledBuffer;
-  int startRed = 17;
-  int startGreen = 160;
-  int startBlue = 1;
+  int startRed = 255;
+  int startGreen = 0;
+  int startBlue = 0;
   /** Creates a new Led. */
   public Led() {
 
-    led = new AddressableLED(2);//PWM port 
+    led = new AddressableLED(1);//PWM port 
     ledBuffer = new AddressableLEDBuffer(15);
     led.setLength(ledBuffer.getLength());
 
@@ -33,7 +33,7 @@ public class Led extends SubsystemBase {
   public void changeColor(int red, int green, int blue){
 
     for(int i = 0; i<ledBuffer.getLength(); i++){
-      ledBuffer.setRGB(i,red,green,blue);
+      ledBuffer.setRGB(i,255,0,0);
     }
   }
 

@@ -10,6 +10,7 @@ public interface IntakeIO {
     public double rollerMotorTemp = 0.0;
     public double rollerMotorVoltage = 0.0;
     public double rollerMotorCurrent = 0.0;
+    public double rollerMotorAcceleration = 0.0; //in motor rotations per second /s
 
     public double pivotMotorPosition = 0.0;
     public double pivotMotorTemp = 0.0;

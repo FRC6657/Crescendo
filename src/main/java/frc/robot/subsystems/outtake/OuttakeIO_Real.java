@@ -33,6 +33,7 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     var flywheelConfigs = new TalonFXConfiguration();
 
+    //check this
     shooterPivotConfigs.Feedback.SensorToMechanismRatio =
         Constants.OuttakeConstants.kSensorToRotations;
 
@@ -107,5 +108,15 @@ public class OuttakeIO_Real implements OuttakeIO {
     inputs.flywheelMotorCurrent = leftShooter.getSupplyCurrent().getValueAsDouble();
 
     pivot.getPosition();
+  }
+
+  @Override 
+  public void runFlywheel(double rpm) {
+    flywheelRequest = new MotionMagicVelocityVoltage(rpm);
+  }
+
+  @Override 
+  public void runPivot(double angle) {
+    pivotRequest = new MotionMagicVoltage(angle);
   }
 }
