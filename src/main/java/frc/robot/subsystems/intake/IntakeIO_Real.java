@@ -1,10 +1,12 @@
 package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.IntakeConstants;
@@ -15,9 +17,17 @@ public class IntakeIO_Real implements IntakeIO {
   private double intakeMotorSpeed;
   double lastVelocity = 0; 
   double currentVelocity = 0;
+  private TalonFX pivot;
+
+   private double angle = 0.0;
+
+  private MotionMagicVoltage pivotRequest = new MotionMagicVoltage(Units.degreesToRotations(-10 /*change this number to correct degrees*/)); 
+  //sets degrees to aim for right away
+
 
   public IntakeIO_Real() {
     intakeMotor = new TalonFX(Constants.CANID.kIntakeMotor);
+    pivot = new TalonFX(Constants.CANID.kIntakePivot);
 
     var intakeMotorConfigurator = intakeMotor.getConfigurator();
     var intakeMotorConfigs = new TalonFXConfiguration();
