@@ -11,23 +11,26 @@ public class IntakeIO_Sim implements IntakeIO {
   private double pivotVoltage = 0;
   private double rollerSpeed = 0;
 
-  private DCMotorSim pivotSim = new DCMotorSim(DCMotor.getFalcon500(1), 12, 0.01);//double check gearing when the gearboxes are finalised
-  private DCMotorSim rollerSim = new DCMotorSim(DCMotor.getFalcon500(1), 24.0/11.0, 0.01);
+  private DCMotorSim pivotSim =
+      new DCMotorSim(
+          DCMotor.getFalcon500(1),
+          12,
+          0.01); // double check gearing when the gearboxes are finalised
+  private DCMotorSim rollerSim = new DCMotorSim(DCMotor.getFalcon500(1), 24.0 / 11.0, 0.01);
 
   private PIDController pivotPID = new PIDController(0.001, 0, 0);
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-//pivot
+    // pivot
     pivotSim.update(1 / CodeConstants.kMainLoopFrequency);
 
-    inputs.pivotMotorPosition =
-        pivotSim.getAngularPositionRotations() * 360;
+    inputs.pivotMotorPosition = pivotSim.getAngularPositionRotations() * 360;
     inputs.pivotMotorVoltage = pivotVoltage;
     inputs.pivotMotorTemp = 0;
     inputs.pivotMotorCurrent = pivotSim.getCurrentDrawAmps();
-    
-//roller
+
+    // roller
     inputs.currentSpeed = rollerSpeed;
     inputs.rollerMotorTemp = 0.0;
     inputs.rollerMotorVoltage = rollerSpeed * 12;
@@ -36,16 +39,13 @@ public class IntakeIO_Sim implements IntakeIO {
 
   @Override
   public void runPivot(double angle) {
-    double pidEffort =
-        pivotPID.calculate(
-            pivotSim.getAngularPositionRotations() * 360,
-            angle);
+    double pidEffort = pivotPID.calculate(pivotSim.getAngularPositionRotations() * 360, angle);
     pivotVoltage = MathUtil.clamp(pidEffort, -12, 12);
     pivotSim.setInput(pivotVoltage);
   }
 
   @Override
-  public void runRollers(double speed){
+  public void runRollers(double speed) {
     rollerSpeed = speed;
     rollerSim.setInput(MathUtil.clamp(rollerSpeed, -1, 1) * 12);
   }

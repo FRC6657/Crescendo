@@ -20,11 +20,7 @@ public class Outtake extends SubsystemBase {
   }
 
   public Command run() {
-    return this.run(
-        () -> {
-          
-          
-        });
+    return this.run(() -> {});
   }
 
   public Command changeRPM(double rpm) {

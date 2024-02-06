@@ -21,7 +21,7 @@ public class OuttakeIO_Real implements OuttakeIO {
 
   private double angle = 0.0;
 
-  private MotionMagicVoltage pivotRequest = new MotionMagicVoltage(Units.degreesToRotations(-10)); 
+  private MotionMagicVoltage pivotRequest = new MotionMagicVoltage(Units.degreesToRotations(-10));
   private MotionMagicVelocityVoltage flywheelRequest = new MotionMagicVelocityVoltage(0);
 
   public OuttakeIO_Real() {
@@ -33,7 +33,7 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     var flywheelConfigs = new TalonFXConfiguration();
 
-    //check this
+    // check this
     shooterPivotConfigs.Feedback.SensorToMechanismRatio =
         Constants.OuttakeConstants.kSensorToRotations;
 
@@ -55,7 +55,7 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     var motionMagicConfigs = flywheelConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicAcceleration = 400;
-    motionMagicConfigs.MotionMagicJerk = 4000; //4000 rps/s/s or 0.1 seconds
+    motionMagicConfigs.MotionMagicJerk = 4000; // 4000 rps/s/s or 0.1 seconds
 
     leftShooter.getConfigurator().apply(flywheelConfigs);
 
@@ -65,8 +65,8 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     shooterPivotConfigurator.apply(shooterPivotConfigs);
 
-    //Motor Configurations
-    shooterPivotConfigs.CurrentLimits.StatorCurrentLimit = OuttakeConstants.kCurrentLimit; 
+    // Motor Configurations
+    shooterPivotConfigs.CurrentLimits.StatorCurrentLimit = OuttakeConstants.kCurrentLimit;
     shooterPivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
 
     flywheelConfigs.CurrentLimits.StatorCurrentLimit = OuttakeConstants.kCurrentLimit;
@@ -74,26 +74,25 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     var tempSignalS = leftShooter.getDeviceTemp();
     var currentSignalS = leftShooter.getSupplyCurrent();
-    
+
     var tempSignalP = leftShooter.getDeviceTemp();
     var currentSignalP = leftShooter.getSupplyCurrent();
 
     tempSignalS.setUpdateFrequency(CodeConstants.kMainLoopFrequency / 4);
     currentSignalS.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
-        
+
     tempSignalP.setUpdateFrequency(CodeConstants.kMainLoopFrequency / 4);
     currentSignalP.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
 
     leftShooter.optimizeBusUtilization();
     pivot.optimizeBusUtilization();
-    
   }
 
   @Override
   public void updateInputs(OuttakeIOInputs inputs) {
 
     pivot.setControl(pivotRequest);
-    
+
     leftShooter.setControl(flywheelRequest);
 
     inputs.pivotMotorPosition = angle;
@@ -110,12 +109,12 @@ public class OuttakeIO_Real implements OuttakeIO {
     pivot.getPosition();
   }
 
-  @Override 
+  @Override
   public void runFlywheel(double rpm) {
     flywheelRequest = new MotionMagicVelocityVoltage(rpm);
   }
 
-  @Override 
+  @Override
   public void runPivot(double angle) {
     pivotRequest = new MotionMagicVoltage(angle);
   }

@@ -12,18 +12,19 @@ import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.IntakeConstants;
 
 public class IntakeIO_Real implements IntakeIO {
-  
+
   private TalonFX intakeMotor;
   private double intakeMotorSpeed;
-  double lastVelocity = 0; 
+  double lastVelocity = 0;
   double currentVelocity = 0;
   private TalonFX pivot;
 
   private double angle = 0.0;
 
-  private MotionMagicVoltage pivotRequest = new MotionMagicVoltage(Units.degreesToRotations(-10 /*change this number to correct degrees*/)); 
-  //sets degrees to aim for right away
-
+  private MotionMagicVoltage pivotRequest =
+      new MotionMagicVoltage(
+          Units.degreesToRotations(-10 /*change this number to correct degrees*/));
+  // sets degrees to aim for right away
 
   public IntakeIO_Real() {
     intakeMotor = new TalonFX(Constants.CANID.kIntakeMotor);
@@ -35,9 +36,9 @@ public class IntakeIO_Real implements IntakeIO {
     intakeMotorConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     intakeMotorConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    intakeMotorConfigs.CurrentLimits.StatorCurrentLimit = IntakeConstants.kCurrentLimit;
+    intakeMotorConfigs.CurrentLimits.StatorCurrentLimit = IntakeConstants.kMotorCurrentLimit;
     intakeMotorConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
-    intakeMotorConfigs.CurrentLimits.SupplyCurrentLimit = IntakeConstants.kCurrentLimit;
+    intakeMotorConfigs.CurrentLimits.SupplyCurrentLimit = IntakeConstants.kMotorCurrentLimit;
     intakeMotorConfigs.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     var dutyCycleSignal = intakeMotor.getDutyCycle();
@@ -50,22 +51,20 @@ public class IntakeIO_Real implements IntakeIO {
 
     intakeMotorConfigurator.apply(intakeMotorConfigs);
     intakeMotor.optimizeBusUtilization();
-    
   }
 
   @Override
-  public void updateInputs(IntakeIOInputs inputs){
+  public void updateInputs(IntakeIOInputs inputs) {
     inputs.currentSpeed = intakeMotorSpeed;
     inputs.rollerMotorTemp = intakeMotor.getDeviceTemp().getValueAsDouble();
     inputs.rollerMotorVoltage = intakeMotor.getMotorVoltage().getValueAsDouble();
     inputs.rollerMotorCurrent = intakeMotor.getSupplyCurrent().getValueAsDouble();
-    
+
     currentVelocity = intakeMotor.getVelocity().getValueAsDouble();
-    inputs.rollerMotorAcceleration = (currentVelocity - lastVelocity) * CodeConstants.kMainLoopFrequency;
+    inputs.rollerMotorAcceleration =
+        (currentVelocity - lastVelocity) * CodeConstants.kMainLoopFrequency;
     lastVelocity = currentVelocity;
-
   }
-
 
   @Override
   public void runRollers(double speed) {

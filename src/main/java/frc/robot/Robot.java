@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MAXSwerveConstants;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.climb.Climb;
@@ -154,13 +154,13 @@ public class Robot extends LoggedRobot {
         .whileTrue(
             Commands.runOnce(() -> climb.changeClimbSetpoint(Units.inchesToMeters(20)), climb));
 
-  controller
+    controller
         .x()
         .whileTrue(
             Commands.runOnce(() -> climb.changeClimbSetpoint(Units.inchesToMeters(0)), climb));
 
-  led.startLED();
-}
+    led.startLED();
+  }
 
   @Override
   public void robotPeriodic() {

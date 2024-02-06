@@ -17,22 +17,20 @@ public class Led extends SubsystemBase {
   /** Creates a new Led. */
   public Led() {
 
-    led = new AddressableLED(1);//PWM port 
+    led = new AddressableLED(1); // PWM port
     ledBuffer = new AddressableLEDBuffer(15);
     led.setLength(ledBuffer.getLength());
-
   }
 
-  public void startLED(){
+  public void startLED() {
     changeColor(startRed, startGreen, startBlue);
     led.setData(ledBuffer);
-    led.start();    
-
+    led.start();
   }
 
-  public void changeColor(int red, int green, int blue){
-    for(int i = 0; i<ledBuffer.getLength(); i++){
-      ledBuffer.setRGB(i,255,0,0);
+  public void changeColor(int red, int green, int blue) {
+    for (int i = 0; i < ledBuffer.getLength(); i++) {
+      ledBuffer.setRGB(i, 255, 0, 0);
     }
   }
 

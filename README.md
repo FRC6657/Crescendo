@@ -7,7 +7,7 @@ This project uses the WPILib command-based structure, with an [Advantage Kit](ht
   - [Outtake](src/main/java/frc/robot/subsystems/outtake) Our note shooter for scoring in the Amp and Speaker.
   - [Climb](src/main/java/frc/robot/subsystems/climb) Dual single stage elevators for a simple robust climb.
   - [LEDs](src/main/java/frc/robot/subsystems/intake) Used to send information to the drivers or human player.
-  - [Superstructure](src/main/java/frc/robot/subsystems/Superstructure.java) Coordinates movement between subsystems. 
+  - [Superstructure](src/main/java/frc/robot/subsystems/Superstructure.java) Coordinates movement between subsystems.
 
 ### **Credits**
   - [Advantage Kit](https://github.com/Mechanical-Advantage/AdvantageKit): The library we use to log and structure our codebase.

@@ -21,8 +21,7 @@ public class ClimberIO_Sim implements ClimberIO {
     climberSim.update(1 / CodeConstants.kMainLoopFrequency);
 
     inputs.position =
-        climberSim.getAngularPositionRotations()
-            * Constants.ClimbConstants.kSensorToVerticalMeters;
+        climberSim.getAngularPositionRotations() * Constants.ClimbConstants.kSensorToVerticalMeters;
 
     inputs.appliedVoltage = voltage;
   }

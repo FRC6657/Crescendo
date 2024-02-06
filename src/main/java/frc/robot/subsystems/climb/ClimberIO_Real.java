@@ -12,7 +12,6 @@ public class ClimberIO_Real implements ClimberIO {
   private TalonFX climbMoter;
   private double setpoint = 0.0;
 
-
   private Slot0Configs climbSlot0;
   private Slot1Configs climbSlot1;
 
@@ -31,7 +30,6 @@ public class ClimberIO_Real implements ClimberIO {
     climbSlot0.kI = 0; // no output for integrated error
     climbSlot0.kD = 0; // A velocity error of 1 rps results in 0.1 V output
 
-
     climbSlot1 = new Slot1Configs();
     climbSlot1.kS = 0.25; // Add 0.25 V output to overcome static friction
     climbSlot1.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
@@ -40,19 +38,17 @@ public class ClimberIO_Real implements ClimberIO {
     climbSlot1.kD = 0; // A velocity error of 1 rps results in 0.1 V output
 
     motorConfigs.Feedback.SensorToMechanismRatio = 10; // TOTALY NOT CORRECT PLEASE FIX
-    motorConfigs.CurrentLimits.StatorCurrentLimit = OuttakeConstants.kCurrentLimit; // TOTALY NOT CORRECT PLEASE FIX
+    motorConfigs.CurrentLimits.StatorCurrentLimit =
+        OuttakeConstants.kCurrentLimit; // TOTALY NOT CORRECT PLEASE FIX
     motorConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
-
 
     motorConfigurator.apply(motorConfigs);
     motorConfigurator.apply(climbSlot0);
     motorConfigurator.apply(climbSlot1);
-
   }
 
   @Override
   public void run(double height) {
     climbMoter.setControl(climbRequest);
-    
   }
 }

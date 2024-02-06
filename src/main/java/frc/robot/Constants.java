@@ -194,27 +194,29 @@ public class Constants {
 
   public static final class IntakeConstants {
 
-    //Pivot
-    public static final double kPivotGearing = 1d / 12 * 16d/36;
-    public static final double kPivotCurrentLimit = 20; // Amps
+    // Pivot
+    public static final double kPivotGearing = 1d / 12 * 16d / 36;
     public static final double kPivotMinAngle = -27.5;
     public static final double kPivotMaxAngle = 152.25;
 
+    //Rollers
+    public static final double kMotorCurrentLimit = 20; // Amps
   }
 
   public static final class ClimbConstants {
 
     public static final double kMinHeight = 0;
-    public static final double kMaxHeight = 15.25; //Inches
+    public static final double kMaxHeight = 15.25; // Inches
     public static final double kGearing = 1 / 20d;
     public static final double kSprocketPD = 1.790; // Inches
 
-    public static final double kSensorToVerticalMeters = (kGearing * kSprocketPD * Math.PI); //Motor Rotations to Climber Inches
+    public static final double kSensorToVerticalMeters =
+        (kGearing * kSprocketPD * Math.PI); // Motor Rotations to Climber Inches
 
     public static final double kCurrentLimit = 40; // Amps
 
-    public static final double kP_U = 12d/15.25;
-    public static final double kP_D = 24d/15.25;
+    public static final double kP_U = 12d / 15.25;
+    public static final double kP_D = 24d / 15.25;
 
     public static final CurrentLimitsConfigs kCurrentConfigs =
         new CurrentLimitsConfigs()
@@ -248,5 +250,4 @@ public class Constants {
 
     public static final double kCurrentLimit = 40;
   }
-
 }
