@@ -206,6 +206,10 @@ public class Constants {
     public static final double kGearing = 1 / 2d;
     public static final double kHoldingVoltage = 1;
     public static final double kCurrentLimit = 20; // Amps
+
+    public static final double kMinAngle = -27.5;
+    public static final double kMaxAngle = 152.25;
+
   }
 
   public static final class ElevatorConstants {

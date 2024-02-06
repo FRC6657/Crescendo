@@ -19,7 +19,7 @@ public class IntakeIO_Real implements IntakeIO {
   double currentVelocity = 0;
   private TalonFX pivot;
 
-   private double angle = 0.0;
+  private double angle = 0.0;
 
   private MotionMagicVoltage pivotRequest = new MotionMagicVoltage(Units.degreesToRotations(-10 /*change this number to correct degrees*/)); 
   //sets degrees to aim for right away

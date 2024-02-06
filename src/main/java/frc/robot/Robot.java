@@ -132,7 +132,6 @@ public class Robot extends LoggedRobot {
                         * 0.5)));
 
     intake.setDefaultCommand(intake.run());
-
     climb.setDefaultCommand(climb.run());
 
     autoChooser.addDefaultOption("None", null);
