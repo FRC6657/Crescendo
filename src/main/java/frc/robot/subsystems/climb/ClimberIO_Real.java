@@ -5,7 +5,7 @@ import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import frc.robot.Constants.ElevatorConstants.ClimberInformation;
+import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.Constants.OuttakeConstants;
 
 public class ClimberIO_Real implements ClimberIO {

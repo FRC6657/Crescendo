@@ -31,7 +31,6 @@ public class Led extends SubsystemBase {
   }
 
   public void changeColor(int red, int green, int blue){
-
     for(int i = 0; i<ledBuffer.getLength(); i++){
       ledBuffer.setRGB(i,255,0,0);
     }

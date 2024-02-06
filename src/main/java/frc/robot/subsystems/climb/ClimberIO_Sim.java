@@ -22,7 +22,7 @@ public class ClimberIO_Sim implements ClimberIO {
 
     inputs.position =
         climberSim.getAngularPositionRotations()
-            * Constants.ElevatorConstants.kSensorToVerticalMeters;
+            * Constants.ClimbConstants.kSensorToVerticalMeters;
 
     inputs.appliedVoltage = voltage;
   }
@@ -33,7 +33,7 @@ public class ClimberIO_Sim implements ClimberIO {
     double pidEffort =
         climberPID.calculate(
             climberSim.getAngularPositionRotations()
-                * Constants.ElevatorConstants.kSensorToVerticalMeters,
+                * Constants.ClimbConstants.kSensorToVerticalMeters,
             height);
 
     voltage = MathUtil.clamp(pidEffort, -12, 12);

@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.ElevatorConstants.ClimberInformation;
+import frc.robot.Constants.ClimbConstants.ClimberInformation;
 
 public class Climb extends SubsystemBase {
 
@@ -33,8 +33,8 @@ public class Climb extends SubsystemBase {
     setpoint =
         MathUtil.clamp(
             setpoint,
-            Constants.ElevatorConstants.kMinHeight,
-            Constants.ElevatorConstants.kMaxHeight);
+            Constants.ClimbConstants.kMinHeight,
+            Constants.ClimbConstants.kMaxHeight);
 
     climbSetpoint = setpoint;
   }

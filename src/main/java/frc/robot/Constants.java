@@ -1,8 +1,6 @@
 package frc.robot;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -11,7 +9,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import frc.robot.Constants.IntakeConstants.IntakeDirection;
 
 public class Constants {
 
@@ -44,20 +41,19 @@ public class Constants {
 
     public static final int kPigeon = 10;
 
-    public static final int kRightShooter = 11;
-    public static final int kLeftShooter = 12;
+    public static final int kLeftShooter = 11;
+    public static final int kRightShooter = 12;
 
     public static final int kShooterPivot = 13;
 
-    public static final int kRightClimber = 14;
-    public static final int kLeftClimber = 15;
+    public static final int kLeftClimber = 14;
+    public static final int kRightClimber = 15;
 
     public static final int kIntakeMotor = 16;
     public static final int kIntakePivot = 17;
   }
 
   public static final class AutoConstants {
-
     // Choreo
     public static final double kChor_P_X = 1;
     public static final double kChor_P_Y = 1;
@@ -198,57 +194,36 @@ public class Constants {
 
   public static final class IntakeConstants {
 
-    public static enum IntakeDirection {
-      IN,
-      OUT
-    }
-
-    public static final double kGearing = 1 / 2d;
-    public static final double kHoldingVoltage = 1;
-    public static final double kCurrentLimit = 20; // Amps
-
-    public static final double kMinAngle = -27.5;
-    public static final double kMaxAngle = 152.25;
+    //Pivot
+    public static final double kPivotGearing = 1d / 12 * 16d/36;
+    public static final double kPivotCurrentLimit = 20; // Amps
+    public static final double kPivotMinAngle = -27.5;
+    public static final double kPivotMaxAngle = 152.25;
 
   }
 
-  public static final class ElevatorConstants {
+  public static final class ClimbConstants {
 
     public static final double kMinHeight = 0;
-    public static final double kMaxHeight = 15.25;
-    public static final int kStages = 2;
-    public static final double kGearing = 1 / 12d;
-    public static final double kAngle = Units.degreesToRadians(50);
-    public static final double kSprocketPD = 1.751; // Inches
+    public static final double kMaxHeight = 15.25; //Inches
+    public static final double kGearing = 1 / 20d;
+    public static final double kSprocketPD = 1.790; // Inches
 
-    public static final double kSensorToVerticalMeters =
-        Units.inchesToMeters(kGearing * (kSprocketPD * Math.PI));
-
-    public static final double kStartingHeight = 9.6;
+    public static final double kSensorToVerticalMeters = (kGearing * kSprocketPD * Math.PI); //Motor Rotations to Climber Inches
 
     public static final double kCurrentLimit = 40; // Amps
 
-    public static final double kP = 1 / 5d;
-    public static final double kI = 0;
-    public static final double kD = 0;
-    public static final double kG = 0;
-
-    // Control Constants
-    public static final Slot0Configs kPIDConfigs =
-        new Slot0Configs()
-            .withKS(0.05)
-            .withKV(0.12)
-            .withKP(0.11)
-            .withGravityType(GravityTypeValue.Elevator_Static);
+    public static final double kP_U = 12d/15.25;
+    public static final double kP_D = 24d/15.25;
 
     public static final CurrentLimitsConfigs kCurrentConfigs =
         new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(40)
-            .withSupplyCurrentLimit(40)
+            .withStatorCurrentLimit(kCurrentLimit)
+            .withSupplyCurrentLimit(kCurrentLimit)
             .withStatorCurrentLimitEnable(true)
             .withSupplyCurrentLimitEnable(true)
-            .withSupplyCurrentThreshold(40)
-            .withSupplyTimeThreshold(40);
+            .withSupplyCurrentThreshold(kCurrentLimit)
+            .withSupplyTimeThreshold(0);
 
     public static final class ClimberInformation {
       public final String name;
@@ -260,9 +235,9 @@ public class Constants {
       }
 
       public static final ClimberInformation kLeftClimber =
-          new ClimberInformation("Left Climb", CANID.kLeftClimber);
+          new ClimberInformation("Left", CANID.kLeftClimber);
       public static final ClimberInformation kRightClimber =
-          new ClimberInformation("Right Climber", CANID.kRightClimber);
+          new ClimberInformation("Right", CANID.kRightClimber);
     }
   }
 
@@ -274,20 +249,4 @@ public class Constants {
     public static final double kCurrentLimit = 40;
   }
 
-  public static final record ScoringSetpoint(
-      String name,
-      double coneHeight,
-      double cubeHeight,
-      IntakeDirection intakeDirection,
-      double coneSpeed,
-      double cubeSpeed) {}
-
-  public static final class ScoringSetpoints {
-    public static final ScoringSetpoint kZero =
-        new ScoringSetpoint("Zero", 9.6, 9.6, IntakeDirection.IN, 0, 0);
-    public static final ScoringSetpoint kCarry =
-        new ScoringSetpoint("Carry", 9.6, 10, IntakeDirection.IN, 0.2, 0.4);
-    public static final ScoringSetpoint kUp =
-        new ScoringSetpoint("Up", 54, 21, IntakeDirection.OUT, 0.3, 0.5);
-  }
 }

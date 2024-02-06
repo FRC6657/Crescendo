@@ -6,7 +6,7 @@ package frc.robot.subsystems.climb;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import frc.robot.Constants.ElevatorConstants.ClimberInformation;
+import frc.robot.Constants.ClimbConstants.ClimberInformation;
 
 import org.littletonrobotics.junction.Logger;
 
