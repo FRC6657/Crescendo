@@ -102,10 +102,6 @@ public class OuttakeIO_Real implements OuttakeIO {
   @Override
   public void updateInputs(OuttakeIOInputs inputs) {
 
-    // pivot.setControl(pivotRequest);
-
-    // leftShooter.setControl(flywheelRequest); I think it would be better to set this once when we set the angle
-
     inputs.pivotMotorPosition = angle;
 
     inputs.pivotMotorVoltage = pivot.getSupplyVoltage().getValueAsDouble();

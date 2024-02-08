@@ -19,7 +19,9 @@ public interface OuttakeIO {
 
   public default void updateInputs(OuttakeIOInputs inputs) {}
 
-  public default void runFlywheel(double rpm) {}
+  public default void changeFlywheel(double rpm) {}
 
-  public default void runPivot(double angle) {}
+  public default void changePivot(double angle) {}
+
+
 }

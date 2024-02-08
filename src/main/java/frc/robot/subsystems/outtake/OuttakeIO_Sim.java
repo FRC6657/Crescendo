@@ -15,7 +15,7 @@ public class OuttakeIO_Sim implements OuttakeIO {
 
   private FlywheelSim flywheelSim = new FlywheelSim(DCMotor.getFalcon500(2), 2, 0.00146376);
   private DCMotorSim pivotSim =
-      new DCMotorSim(DCMotor.getFalcon500(1), 1 / Constants.OuttakeConstants.kGearing, 0.01);
+      new DCMotorSim(DCMotor.getFalcon500(1), 1 / Constants.OuttakeConstants.kGearingPivot, 0.01);
 
   private SimpleMotorFeedforward flyWheelFeedForward =
       new SimpleMotorFeedforward(0.1, 0.00374064837); // 0.003639801
@@ -41,7 +41,7 @@ public class OuttakeIO_Sim implements OuttakeIO {
   }
 
   @Override
-  public void runFlywheel(double rpm) {
+  public void changeFlywheel(double rpm) {
     rpm = MathUtil.clamp(rpm, -3190, 3190);
     double ffEffort = flyWheelFeedForward.calculate(rpm);
     double pidEffort = flyWheelPID.calculate(flywheelSim.getAngularVelocityRPM(), rpm);
@@ -50,7 +50,7 @@ public class OuttakeIO_Sim implements OuttakeIO {
   }
 
   @Override
-  public void runPivot(double angle) {
+  public void changePivot(double angle) {
     double pidEffort = pivotPID.calculate(pivotSim.getAngularPositionRotations() * 360, angle);
     pivotVoltage = MathUtil.clamp(pidEffort, -12, 12);
     pivotSim.setInput(pivotVoltage);
