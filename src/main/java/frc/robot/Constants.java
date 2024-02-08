@@ -2,6 +2,8 @@ package frc.robot;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.revrobotics.CANSparkBase.IdleMode;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -209,6 +211,7 @@ public class Constants {
     public static final double kMaxHeight = 15.25; // Inches
     public static final double kGearing = 1 / 20d;
     public static final double kSprocketPD = 1.790; // Inches
+    public static final PIDController kClimbPID = new PIDController(0.1, 0, 0);
 
     public static final double kSensorToVerticalMeters =
         (kGearing * kSprocketPD * Math.PI); // Motor Rotations to Climber Inches
@@ -245,8 +248,13 @@ public class Constants {
 
   public static final class OuttakeConstants {
 
-    public static final double kGearing = 1d / 12 * 16d / 36;
-    public static final double kSensorToRotations = 1 / kGearing;
+    public static final double kGearingPivot = 1d / 12 * 16d / 36;
+    public static final double kGearingFlyWheel = 1d / 12 * 16d / 36; // not actual gearing for flywheel
+    public static final double kMinAngle = -10;
+    public static final double kMaxAngle = 133;
+    public static final double kMinRpm = 0; // Please Set an actual min and max lol
+    public static final double kMaxRpm = 1000;
+
 
     public static final double kCurrentLimit = 40;
   }

@@ -24,8 +24,8 @@ public class Climber implements ClimberIO {
     Logger.processInputs(name + " ", inputs);
   }
 
-  public void run(double height) {
-    io.run(height);
+  public void run() {
+    io.run();
   }
 
   public Pose3d get3DPose() {

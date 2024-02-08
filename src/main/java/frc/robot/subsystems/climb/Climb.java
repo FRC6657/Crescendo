@@ -27,6 +27,18 @@ public class Climb extends SubsystemBase {
   public void periodic() {
     leftClimber.updateInputs();
     rightClimber.updateInputs();
+    
+    leftClimber.run();
+    rightClimber.run();
+
+  }
+
+    public Command changeSetpoint(double setpoint){
+    return this.runOnce(
+      ()->{
+        leftClimber.changeSetpoint(setpoint);
+        rightClimber.changeSetpoint(setpoint);
+      });
   }
 
   public void changeClimbSetpoint(double setpoint) {
@@ -40,8 +52,6 @@ public class Climb extends SubsystemBase {
   public Command run() {
     return this.run(
         () -> {
-          leftClimber.run(climbSetpoint);
-          rightClimber.run(climbSetpoint);
         });
   }
 

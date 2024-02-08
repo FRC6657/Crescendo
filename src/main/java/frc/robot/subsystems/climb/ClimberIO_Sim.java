@@ -14,6 +14,7 @@ public class ClimberIO_Sim implements ClimberIO {
   private PIDController climberPID = new PIDController(30, 0, 0);
 
   double voltage = 0.0;
+  double setpoint = 0.0;
 
   @Override
   public void updateInputs(ClimberIOInputs inputs) {
@@ -27,17 +28,22 @@ public class ClimberIO_Sim implements ClimberIO {
   }
 
   @Override
-  public void run(double height) {
+  public void changeSetpoint(double height){
+    setpoint = height;
+  }
+
+  @Override
+  public void run() {
 
     double pidEffort =
         climberPID.calculate(
             climberSim.getAngularPositionRotations()
                 * Constants.ClimbConstants.kSensorToVerticalMeters,
-            height);
+            setpoint);
 
     voltage = MathUtil.clamp(pidEffort, -12, 12);
     climberSim.setInputVoltage(pidEffort);
 
-    Logger.recordOutput("setpoint", height);
+    Logger.recordOutput("setpoint", setpoint);
   }
 }

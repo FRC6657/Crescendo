@@ -1,11 +1,13 @@
 package frc.robot.subsystems.outtake;
 
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
@@ -21,8 +23,8 @@ public class OuttakeIO_Real implements OuttakeIO {
 
   private double angle = 0.0;
 
-  private MotionMagicVoltage pivotRequest = new MotionMagicVoltage(Units.degreesToRotations(-10));
-  private MotionMagicVelocityVoltage flywheelRequest = new MotionMagicVelocityVoltage(0);
+  private MotionMagicVoltage pivotAngle = new MotionMagicVoltage(Units.degreesToRotations(-10));
+  private MotionMagicVelocityVoltage flywheelVelocity = new MotionMagicVelocityVoltage(0);
 
   public OuttakeIO_Real() {
 
@@ -35,7 +37,10 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     // check this
     shooterPivotConfigs.Feedback.SensorToMechanismRatio =
-        Constants.OuttakeConstants.kSensorToRotations;
+        1.0/Constants.OuttakeConstants.kGearingPivot;
+
+    flywheelConfigs.Feedback.SensorToMechanismRatio =
+        1.0/Constants.OuttakeConstants.kGearingFlyWheel;
 
     var pivotSlot0 = new Slot0Configs();
     pivotSlot0.kS = 0.25; // Add 0.25 V output to overcome static friction
@@ -57,13 +62,7 @@ public class OuttakeIO_Real implements OuttakeIO {
     motionMagicConfigs.MotionMagicAcceleration = 400;
     motionMagicConfigs.MotionMagicJerk = 4000; // 4000 rps/s/s or 0.1 seconds
 
-    leftShooter.getConfigurator().apply(flywheelConfigs);
-
-    pivot.getConfigurator().apply(pivotSlot0);
-
-    pivot.setPosition(Units.degreesToRotations(-10));
-
-    shooterPivotConfigurator.apply(shooterPivotConfigs);
+    
 
     // Motor Configurations
     shooterPivotConfigs.CurrentLimits.StatorCurrentLimit = OuttakeConstants.kCurrentLimit;
@@ -86,14 +85,26 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     leftShooter.optimizeBusUtilization();
     pivot.optimizeBusUtilization();
+
+    leftShooter.getConfigurator().apply(flywheelConfigs);
+    leftShooter.getConfigurator().apply(flywheelSlot0);
+
+    shooterPivotConfigurator.apply(pivotSlot0);
+    shooterPivotConfigurator.apply(shooterPivotConfigs);
+
+
+    pivot.setPosition(Units.degreesToRotations(-10));
+
+    pivot.setControl(pivotAngle);
+    leftShooter.setControl(flywheelVelocity);
   }
 
   @Override
   public void updateInputs(OuttakeIOInputs inputs) {
 
-    pivot.setControl(pivotRequest);
+    // pivot.setControl(pivotRequest);
 
-    leftShooter.setControl(flywheelRequest);
+    // leftShooter.setControl(flywheelRequest); I think it would be better to set this once when we set the angle
 
     inputs.pivotMotorPosition = angle;
 
@@ -110,12 +121,16 @@ public class OuttakeIO_Real implements OuttakeIO {
   }
 
   @Override
-  public void runFlywheel(double rpm) {
-    flywheelRequest = new MotionMagicVelocityVoltage(rpm);
+  public void changeFlywheel(double rpm) {
+    flywheelVelocity.withVelocity(rpm);
+    leftShooter.setControl(flywheelVelocity);
   }
 
   @Override
-  public void runPivot(double angle) {
-    pivotRequest = new MotionMagicVoltage(angle);
+  public void changePivot(double angle) {
+    pivotAngle.withPosition(angle);
+    pivot.setControl(pivotAngle);
   }
+
+
 }

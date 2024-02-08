@@ -1,54 +1,68 @@
 package frc.robot.subsystems.climb;
 
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.Slot1Configs;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.google.flatbuffers.Constants;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
-import frc.robot.Constants.OuttakeConstants;
+import frc.robot.Constants.ClimbConstants;
 
 public class ClimberIO_Real implements ClimberIO {
-  private TalonFX climbMoter;
+  private TalonFX mMotor;
+  private final PIDController mPID = ClimbConstants.kClimbPID;
   private double setpoint = 0.0;
+  private double voltage = 0.0;
 
-  private Slot0Configs climbSlot0;
-  private Slot1Configs climbSlot1;
 
   private MotionMagicVoltage climbRequest = new MotionMagicVoltage(0);
 
   public ClimberIO_Real(ClimberInformation info) {
-    climbMoter = new TalonFX(info.id);
+    mMotor = new TalonFX(info.id);
 
-    var motorConfigurator = climbMoter.getConfigurator();
+    var motorConfigurator = mMotor.getConfigurator();
     var motorConfigs = new TalonFXConfiguration();
 
-    climbSlot0 = new Slot0Configs();
-    climbSlot0.kS = 0.25; // Add 0.25 V output to overcome static friction
-    climbSlot0.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
-    climbSlot0.kP = 2; // A position error of 2.5 rotations results in 12 V output
-    climbSlot0.kI = 0; // no output for integrated error
-    climbSlot0.kD = 0; // A velocity error of 1 rps results in 0.1 V output
-
-    climbSlot1 = new Slot1Configs();
-    climbSlot1.kS = 0.25; // Add 0.25 V output to overcome static friction
-    climbSlot1.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
-    climbSlot1.kP = 2; // A position error of 2.5 rotations results in 12 V output
-    climbSlot1.kI = 0; // no output for integrated error
-    climbSlot1.kD = 0; // A velocity error of 1 rps results in 0.1 V output
-
-    motorConfigs.Feedback.SensorToMechanismRatio = 10; // TOTALY NOT CORRECT PLEASE FIX
-    motorConfigs.CurrentLimits.StatorCurrentLimit =
-        OuttakeConstants.kCurrentLimit; // TOTALY NOT CORRECT PLEASE FIX
-    motorConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+    motorConfigs.CurrentLimits = ClimbConstants.kCurrentConfigs;
+    motorConfigs.Feedback.SensorToMechanismRatio = ClimbConstants.kGearing;
+    
 
     motorConfigurator.apply(motorConfigs);
-    motorConfigurator.apply(climbSlot0);
-    motorConfigurator.apply(climbSlot1);
+  
+  }
+
+  private double getHight(){
+    return mMotor.getPosition().getValueAsDouble()*ClimbConstants.kSprocketPD;
   }
 
   @Override
-  public void run(double height) {
-    climbMoter.setControl(climbRequest);
+  public void changeSetpoint(double height){
+    setpoint = height;
   }
+
+  @Override
+  public void run() {
+    voltage = MathUtil.clamp(mPID.calculate(getHight(), setpoint), -12, 12);
+
+    if(setpoint >= getHight()){
+      voltage *= 0.5;
+    }
+    else{
+      mMotor.set(voltage*0.5);
+    }
+    
+  }
+
+  @Override
+  public void updateInputs(ClimberIOInputs inputs){
+    inputs.appliedVoltage = mMotor.getMotorVoltage().getValueAsDouble();
+    inputs.position = Units.inchesToMeters(getHight());
+    inputs.current = mMotor.getSupplyCurrent().getValueAsDouble();
+    inputs.velocity = mMotor.getVelocity().getValueAsDouble();
+  }
+
 }
