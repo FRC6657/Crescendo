@@ -34,40 +34,21 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     var flywheelConfigs = new TalonFXConfiguration();
 
-    pivotConfigs.Feedback.SensorToMechanismRatio =
-        1.0/Constants.OuttakeConstants.kGearingPivot;
+    pivotConfigs.Feedback.SensorToMechanismRatio = 1.0/Constants.OuttakeConstants.kGearingPivot;
 
-    flywheelConfigs.Feedback.SensorToMechanismRatio =
-        1.0/Constants.OuttakeConstants.kGearingFlyWheel;
+    flywheelConfigs.Feedback.SensorToMechanismRatio = 1.0/Constants.OuttakeConstants.kGearingFlyWheel;
 
-    var pivotSlot0 = pivotConfigs.Slot0;
-    pivotSlot0.kS = 0.25; // Add 0.25 V output to overcome static friction
-    pivotSlot0.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
-    pivotSlot0.kP = 2; // A position error of 2.5 rotations results in 12 V output
-    pivotSlot0.kI = 0; // no output for integrated error
-    pivotSlot0.kD = 0; // A velocity error of 1 rps results in 0.1 V output
+    pivotConfigs.Slot0 = OuttakeConstants.kPivotSlot0;
 
-    pivotSlot0.GravityType = GravityTypeValue.Arm_Cosine;
+    flywheelConfigs.Slot0 = OuttakeConstants.kFlyWheelSlot0;
 
-    var flywheelSlot0 = flywheelConfigs.Slot0;
-    flywheelSlot0.kS = 0.25;
-    flywheelSlot0.kV = 0.12;
-    flywheelSlot0.kP = 2;
-    flywheelSlot0.kI = 0;
-    flywheelSlot0.kD = 0;
-
-    var motionMagicConfigs = flywheelConfigs.MotionMagic;
-    motionMagicConfigs.MotionMagicAcceleration = 400;
-    motionMagicConfigs.MotionMagicJerk = 4000; // 4000 rps/s/s or 0.1 seconds
+    flywheelConfigs.MotionMagic = OuttakeConstants.kMotionMagicConfigsFlyWheel;
 
     
 
     // Motor Configurations
-    pivotConfigs.CurrentLimits.StatorCurrentLimit = OuttakeConstants.kCurrentLimit;
-    pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
-
-    flywheelConfigs.CurrentLimits.StatorCurrentLimit = OuttakeConstants.kCurrentLimit;
-    flywheelConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+    pivotConfigs.CurrentLimits = OuttakeConstants.kCurrentConfigs;
+    flywheelConfigs.CurrentLimits = OuttakeConstants.kCurrentConfigs;
 
     var tempSignalS = leftShooter.getDeviceTemp();
     var currentSignalS = leftShooter.getSupplyCurrent();

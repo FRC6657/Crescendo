@@ -1,6 +1,9 @@
 package frc.robot;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -254,8 +257,35 @@ public class Constants {
     public static final double kMaxAngle = 133;
     public static final double kMinRpm = 0;
     public static final double kMaxRpm = 3190;
-
-
     public static final double kCurrentLimit = 40;
+
+    public static Slot0Configs kPivotSlot0 = new Slot0Configs()
+    .withKS(0.25) // Add 0.25 V output to overcome static friction
+    .withKV(0.12) // A velocity target of 1 rps results in 0.12 V output
+    .withKP(2) // A position error of 2.5 rotations results in 12 V output
+    .withKI(0) // no output for integrated error
+    .withKD(0)
+    .withGravityType(GravityTypeValue.Arm_Cosine); // no d
+
+    public static Slot0Configs kFlyWheelSlot0 = new Slot0Configs()
+    .withKS(0.25) // Add 0.25 V output to overcome static friction
+    .withKV(0.12) // A velocity target of 1 rps results in 0.12 V output
+    .withKP(2) // A position error of 2.5 rotations results in 12 V output
+    .withKI(0) // no output for integrated error
+    .withKD(0); // no d
+
+    public static final MotionMagicConfigs kMotionMagicConfigsFlyWheel = new MotionMagicConfigs()
+    .withMotionMagicAcceleration(400)
+    .withMotionMagicJerk(4000);
+
+    public static final CurrentLimitsConfigs kCurrentConfigs = new CurrentLimitsConfigs()
+    .withStatorCurrentLimit(kCurrentLimit)
+    .withSupplyCurrentLimit(kCurrentLimit)
+    .withStatorCurrentLimitEnable(true)
+    .withSupplyCurrentLimitEnable(true)
+    .withSupplyCurrentThreshold(kCurrentLimit)
+    .withSupplyTimeThreshold(0);
+
+  
   }
 }
