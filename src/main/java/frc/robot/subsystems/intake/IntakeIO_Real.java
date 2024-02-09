@@ -16,6 +16,7 @@ public class IntakeIO_Real implements IntakeIO {
   private double intakeMotorSpeed;
 
   private MotionMagicVoltage pivotAngle = new MotionMagicVoltage(Units.degreesToRotations(IntakeConstants.kPivotMinAngle));
+  
 
 
   public IntakeIO_Real() {
@@ -77,6 +78,7 @@ public class IntakeIO_Real implements IntakeIO {
 
   @Override
   public void changePivot(double angle){
+    angle = MathUtil.clamp(angle, IntakeConstants.kPivotMinAngle, IntakeConstants.kPivotMaxAngle);
     pivotAngle.withPosition(angle);
     pivot.setControl(pivotAngle);
   }

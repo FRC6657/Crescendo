@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants;
 import frc.robot.Constants.CodeConstants;
+import frc.robot.Constants.OuttakeConstants;
 
 public class OuttakeIO_Sim implements OuttakeIO {
   private double shooterVoltage = 0;
@@ -42,7 +43,7 @@ public class OuttakeIO_Sim implements OuttakeIO {
 
   @Override
   public void changeFlywheel(double rpm) {
-    rpm = MathUtil.clamp(rpm, -3190, 3190);
+    rpm = MathUtil.clamp(rpm, OuttakeConstants.kMinRpm, OuttakeConstants.kMaxRpm);
     double ffEffort = flyWheelFeedForward.calculate(rpm);
     double pidEffort = flyWheelPID.calculate(flywheelSim.getAngularVelocityRPM(), rpm);
     shooterVoltage = MathUtil.clamp(ffEffort + pidEffort, -12, 12);

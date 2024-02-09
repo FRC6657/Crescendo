@@ -29,6 +29,7 @@ public class IntakeIO_Sim implements IntakeIO {
   public void updateInputs(IntakeIOInputs inputs) {
     // pivot
     pivotSim.update(1 / CodeConstants.kMainLoopFrequency);
+    rollerSim.update(1 / CodeConstants.kMainLoopFrequency);
     runPivot();
 
     inputs.pivotMotorPosition = pivotSim.getAngularPositionRotations() * 360;

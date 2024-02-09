@@ -4,7 +4,9 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StrictFollower;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
@@ -23,6 +25,7 @@ public class OuttakeIO_Real implements OuttakeIO {
 
   private MotionMagicVoltage pivotAngle = new MotionMagicVoltage(Units.degreesToRotations(OuttakeConstants.kMinAngle));
   private MotionMagicVelocityVoltage flywheelVelocity = new MotionMagicVelocityVoltage(0);
+  private final VelocityVoltage velocity = new VelocityVoltage(0).withSlot(0);
 
   public OuttakeIO_Real() {
 
@@ -33,9 +36,9 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     var flywheelConfigs = new TalonFXConfiguration();
 
-    pivotConfigs.Feedback.SensorToMechanismRatio = 1.0/Constants.OuttakeConstants.kGearingPivot;
+    pivotConfigs.Feedback.SensorToMechanismRatio = 1.0/OuttakeConstants.kGearingPivot;
 
-    flywheelConfigs.Feedback.SensorToMechanismRatio = 1.0/Constants.OuttakeConstants.kGearingFlyWheel;
+    flywheelConfigs.Feedback.SensorToMechanismRatio = 1.0/(OuttakeConstants.kGearingFlyWheel*OuttakeConstants.kRpsToRpm);
 
     pivotConfigs.Slot0 = OuttakeConstants.kPivotSlot0;
 
@@ -98,14 +101,14 @@ public class OuttakeIO_Real implements OuttakeIO {
 
   @Override
   public void changeFlywheel(double rpm) {
-    flywheelVelocity.withVelocity(rpm);
-    leftShooter.setControl(flywheelVelocity);
+    rpm = MathUtil.clamp(rpm, OuttakeConstants.kMinRpm, OuttakeConstants.kMaxRpm);
+    leftShooter.setControl(velocity.withVelocity(rpm).withFeedForward(OuttakeConstants.kFeedForwardMulitplier*rpm));
   }
 
   @Override
   public void changePivot(double angle) {
-    pivotAngle.withPosition(angle);
-    pivot.setControl(pivotAngle);
+    angle = MathUtil.clamp(angle, OuttakeConstants.kMinAngle, OuttakeConstants.kMaxAngle);
+    pivot.setControl(pivotAngle.withPosition(angle));
   }
 
 
