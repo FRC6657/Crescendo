@@ -14,8 +14,6 @@ public class IntakeIO_Real implements IntakeIO {
   private TalonFX intake;
   private TalonFX pivot;
   private double intakeMotorSpeed;
-  double lastVelocity = 0;
-  double currentVelocity = 0;
 
   private MotionMagicVoltage pivotAngle = new MotionMagicVoltage(Units.degreesToRotations(IntakeConstants.kPivotMinAngle));
 
