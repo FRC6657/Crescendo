@@ -211,7 +211,8 @@ public class Constants {
     public static final double kMaxHeight = 15.25; // Inches
     public static final double kGearing = 1 / 20d;
     public static final double kSprocketPD = 1.790; // Inches
-    public static final PIDController kClimbPID = new PIDController(0.1, 0, 0);
+    public static final PIDController kClimbUpPID = new PIDController(0.1, 0, 0);
+    public static final PIDController kClimbDownPID = new PIDController(0.15, 0, 0);
 
     public static final double kSensorToVerticalMeters =
         (kGearing * kSprocketPD * Math.PI); // Motor Rotations to Climber Inches
