@@ -23,7 +23,7 @@ public class IntakeIO_Real implements IntakeIO {
 
   private MotionMagicVoltage pivotRequest =
       new MotionMagicVoltage(
-          Units.degreesToRotations(-10 /*change this number to correct degrees*/));
+          Units.degreesToRotations(-10));
   // sets degrees to aim for right away
 
   public IntakeIO_Real() {
