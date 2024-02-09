@@ -10,8 +10,11 @@ public class IntakeIO_Sim implements IntakeIO {
 
   private double pivotVoltage = 0;
   private double rollerSpeed = 0;
-  double lastVelocity = 0;
-  double currentVelocity = 0;
+  private double lastVelocity = 0;
+  private double currentVelocity = 0;
+
+  private double angle = 0;
+  
 
   private DCMotorSim pivotSim =
       new DCMotorSim(
@@ -26,6 +29,7 @@ public class IntakeIO_Sim implements IntakeIO {
   public void updateInputs(IntakeIOInputs inputs) {
     // pivot
     pivotSim.update(1 / CodeConstants.kMainLoopFrequency);
+    runPivot();
 
     inputs.pivotMotorPosition = pivotSim.getAngularPositionRotations() * 360;
     inputs.pivotMotorVoltage = pivotVoltage;
@@ -46,12 +50,19 @@ public class IntakeIO_Sim implements IntakeIO {
 
   }
 
-  @Override
-  public void runPivot(double angle) {
+
+  public void runPivot() {
     double pidEffort = pivotPID.calculate(pivotSim.getAngularPositionRotations() * 360, angle);
     pivotVoltage = MathUtil.clamp(pidEffort, -12, 12);
     pivotSim.setInput(pivotVoltage);
   }
+
+  @Override
+  public void changePivot(double pivotAngle){
+    angle = pivotAngle;
+  }
+
+  
 
   @Override
   public void runRollers(double speed) {

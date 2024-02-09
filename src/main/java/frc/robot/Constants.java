@@ -203,9 +203,28 @@ public class Constants {
     public static final double kPivotGearing = 1d / 12 * 16d / 36;
     public static final double kPivotMinAngle = -27.5;
     public static final double kPivotMaxAngle = 152.25;
+    public static final double kCurrentLimit = 40;
 
     //Rollers
     public static final double kMotorCurrentLimit = 20; // Amps
+
+    public static Slot0Configs kPivotSlot0 = new Slot0Configs()
+    .withKS(0.25) // Add 0.25 V output to overcome static friction
+    .withKV(0.12) // A velocity target of 1 rps results in 0.12 V output
+    .withKP(2) // A position error of 2.5 rotations results in 12 V output
+    .withKI(0) // no output for integrated error
+    .withKD(0)
+    .withGravityType(GravityTypeValue.Arm_Cosine); // no d
+
+    public static final CurrentLimitsConfigs kCurrentConfigs =
+      new CurrentLimitsConfigs()
+      .withStatorCurrentLimit(kCurrentLimit)
+      .withSupplyCurrentLimit(kCurrentLimit)
+      .withStatorCurrentLimitEnable(true)
+      .withSupplyCurrentLimitEnable(true)
+      .withSupplyCurrentThreshold(kCurrentLimit)
+      .withSupplyTimeThreshold(0);
+
   }
 
   public static final class ClimbConstants {

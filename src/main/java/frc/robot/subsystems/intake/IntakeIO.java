@@ -22,5 +22,7 @@ public interface IntakeIO {
 
   public default void runRollers(double speed) {}
 
-  public default void runPivot(double angle) {}
+
+
+  public default void changePivot(double angle){}
 }

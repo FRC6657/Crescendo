@@ -5,7 +5,6 @@ import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
@@ -22,7 +21,7 @@ public class OuttakeIO_Real implements OuttakeIO {
 
   private double angle = 0.0;
 
-  private MotionMagicVoltage pivotAngle = new MotionMagicVoltage(Units.degreesToRotations(-10));
+  private MotionMagicVoltage pivotAngle = new MotionMagicVoltage(Units.degreesToRotations(OuttakeConstants.kMinAngle));
   private MotionMagicVelocityVoltage flywheelVelocity = new MotionMagicVelocityVoltage(0);
 
   public OuttakeIO_Real() {
@@ -53,8 +52,8 @@ public class OuttakeIO_Real implements OuttakeIO {
     var tempSignalS = leftShooter.getDeviceTemp();
     var currentSignalS = leftShooter.getSupplyCurrent();
 
-    var tempSignalP = leftShooter.getDeviceTemp();
-    var currentSignalP = leftShooter.getSupplyCurrent();
+    var tempSignalP = pivot.getDeviceTemp();
+    var currentSignalP = pivot.getSupplyCurrent();
 
     tempSignalS.setUpdateFrequency(CodeConstants.kMainLoopFrequency / 4);
     currentSignalS.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
@@ -69,7 +68,7 @@ public class OuttakeIO_Real implements OuttakeIO {
     pivotConfigurator.apply(pivotConfigs);
 
 
-    pivot.setPosition(Units.degreesToRotations(-10));
+    pivot.setPosition(Units.degreesToRotations(OuttakeConstants.kMinAngle));
 
     pivot.setControl(pivotAngle);
     leftShooter.setControl(flywheelVelocity);

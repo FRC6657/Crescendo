@@ -21,19 +21,20 @@ public class Intake extends SubsystemBase {
     this.intakeIO = intakeIO;
   }
 
-  public Command run() {
-    return this.run(
-        () -> {
-          intakeIO.runPivot(angleSetpoint);
-        });
-  }
-
   public Command changeAngle(double angle) {
     return this.runOnce(
         () -> {
-          angleSetpoint = angle;
+          intakeIO.changePivot(angle);
         });
   }
+
+  public Command changeRollers(double speed) {
+    return this.runOnce(
+        () -> {
+          intakeIO.runRollers(speed);
+        });
+  }
+
 
   @Override
   public void periodic() {
