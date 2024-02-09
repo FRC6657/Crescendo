@@ -16,8 +16,6 @@ public class Intake extends SubsystemBase {
   private final IntakeIO intakeIO;
   private final IntakeIOInputsAutoLogged intakeInputs = new IntakeIOInputsAutoLogged();
 
-  private double angleSetpoint = 0.0;
-
   public Intake(IntakeIO intakeIO) {
     this.intakeIO = intakeIO;
   }
