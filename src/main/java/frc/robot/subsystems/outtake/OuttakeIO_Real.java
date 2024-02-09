@@ -10,6 +10,10 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.OuttakeConstants;
@@ -20,6 +24,7 @@ public class OuttakeIO_Real implements OuttakeIO {
   TalonFX leftShooter = new TalonFX(Constants.CANID.kLeftShooter);
 
   TalonFX pivot = new TalonFX(Constants.CANID.kShooterPivot);
+  DigitalInput beambreak = new DigitalInput(0);
 
   private double angle = 0.0;
 
@@ -30,19 +35,18 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     rightShooter.setControl(new StrictFollower(Constants.CANID.kLeftShooter));
 
-    var shooterPivotConfigurator = pivot.getConfigurator();
-    var shooterPivotConfigs = new TalonFXConfiguration();
+    var pivotConfigurator = pivot.getConfigurator();
+    var pivotConfigs = new TalonFXConfiguration();
 
     var flywheelConfigs = new TalonFXConfiguration();
 
-    // check this
-    shooterPivotConfigs.Feedback.SensorToMechanismRatio =
+    pivotConfigs.Feedback.SensorToMechanismRatio =
         1.0/Constants.OuttakeConstants.kGearingPivot;
 
     flywheelConfigs.Feedback.SensorToMechanismRatio =
         1.0/Constants.OuttakeConstants.kGearingFlyWheel;
 
-    var pivotSlot0 = new Slot0Configs();
+    var pivotSlot0 = pivotConfigs.Slot0;
     pivotSlot0.kS = 0.25; // Add 0.25 V output to overcome static friction
     pivotSlot0.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
     pivotSlot0.kP = 2; // A position error of 2.5 rotations results in 12 V output
@@ -51,7 +55,7 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     pivotSlot0.GravityType = GravityTypeValue.Arm_Cosine;
 
-    var flywheelSlot0 = new Slot0Configs();
+    var flywheelSlot0 = flywheelConfigs.Slot0;
     flywheelSlot0.kS = 0.25;
     flywheelSlot0.kV = 0.12;
     flywheelSlot0.kP = 2;
@@ -65,8 +69,8 @@ public class OuttakeIO_Real implements OuttakeIO {
     
 
     // Motor Configurations
-    shooterPivotConfigs.CurrentLimits.StatorCurrentLimit = OuttakeConstants.kCurrentLimit;
-    shooterPivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+    pivotConfigs.CurrentLimits.StatorCurrentLimit = OuttakeConstants.kCurrentLimit;
+    pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
 
     flywheelConfigs.CurrentLimits.StatorCurrentLimit = OuttakeConstants.kCurrentLimit;
     flywheelConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -87,10 +91,7 @@ public class OuttakeIO_Real implements OuttakeIO {
     pivot.optimizeBusUtilization();
 
     leftShooter.getConfigurator().apply(flywheelConfigs);
-    leftShooter.getConfigurator().apply(flywheelSlot0);
-
-    shooterPivotConfigurator.apply(pivotSlot0);
-    shooterPivotConfigurator.apply(shooterPivotConfigs);
+    pivotConfigurator.apply(pivotConfigs);
 
 
     pivot.setPosition(Units.degreesToRotations(-10));
@@ -115,6 +116,11 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     pivot.getPosition();
   }
+
+  public boolean beambreak(){
+    return !beambreak.get();
+  }
+
 
   @Override
   public void changeFlywheel(double rpm) {

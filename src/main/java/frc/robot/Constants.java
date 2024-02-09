@@ -248,12 +248,12 @@ public class Constants {
 
   public static final class OuttakeConstants {
 
-    public static final double kGearingPivot = 1d / 12 * 16d / 36;
-    public static final double kGearingFlyWheel = 1d / 12 * 16d / 36; // not actual gearing for flywheel
+    public static final double kGearingPivot = (1d / 12) * (16d / 36);
+    public static final double kGearingFlyWheel = (1d / 12) * (16d / 36);
     public static final double kMinAngle = -10;
     public static final double kMaxAngle = 133;
-    public static final double kMinRpm = 0; // Please Set an actual min and max lol
-    public static final double kMaxRpm = 1000;
+    public static final double kMinRpm = 0;
+    public static final double kMaxRpm = 3190;
 
 
     public static final double kCurrentLimit = 40;
