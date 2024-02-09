@@ -16,8 +16,6 @@ public class Climb extends SubsystemBase {
   private final Climber leftClimber;
   private final Climber rightClimber;
 
-  private double climbSetpoint = 0;
-
   public Climb(ClimberIO[] climberIOs) {
     this.leftClimber = new Climber(climberIOs[0], ClimberInformation.kLeftClimber);
     this.rightClimber = new Climber(climberIOs[1], ClimberInformation.kRightClimber);
@@ -46,7 +44,6 @@ public class Climb extends SubsystemBase {
         MathUtil.clamp(
             setpoint, Constants.ClimbConstants.kMinHeight, Constants.ClimbConstants.kMaxHeight);
 
-    climbSetpoint = setpoint;
   }
 
   public Command run() {

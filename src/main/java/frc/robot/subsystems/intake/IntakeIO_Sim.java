@@ -10,13 +10,15 @@ public class IntakeIO_Sim implements IntakeIO {
 
   private double pivotVoltage = 0;
   private double rollerSpeed = 0;
+  double lastVelocity = 0;
+  double currentVelocity = 0;
 
   private DCMotorSim pivotSim =
       new DCMotorSim(
           DCMotor.getFalcon500(1),
           12,
           0.01); // double check gearing when the gearboxes are finalised
-  private DCMotorSim rollerSim = new DCMotorSim(DCMotor.getFalcon500(1), 24.0 / 11.0, 0.01);
+  private DCMotorSim rollerSim = new DCMotorSim(DCMotor.getFalcon500(1), 24.0 / 11.0, 0.048);
 
   private PIDController pivotPID = new PIDController(0.001, 0, 0);
 
@@ -35,6 +37,13 @@ public class IntakeIO_Sim implements IntakeIO {
     inputs.rollerMotorTemp = 0.0;
     inputs.rollerMotorVoltage = rollerSpeed * 12;
     inputs.rollerMotorCurrent = rollerSim.getCurrentDrawAmps();
+
+    //adjust conversion maybe possibly
+    currentVelocity = rollerSim.getAngularVelocityRPM();
+    inputs.rollerMotorAcceleration =
+        (currentVelocity - lastVelocity) * CodeConstants.kMainLoopFrequency;
+    lastVelocity = currentVelocity;
+
   }
 
   @Override

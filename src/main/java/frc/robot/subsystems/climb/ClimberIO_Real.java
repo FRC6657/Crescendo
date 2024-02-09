@@ -2,12 +2,8 @@ package frc.robot.subsystems.climb;
 
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.google.flatbuffers.Constants;
-
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.Constants.ClimbConstants;
@@ -18,8 +14,6 @@ public class ClimberIO_Real implements ClimberIO {
   private double setpoint = 0.0;
   private double voltage = 0.0;
 
-
-  private MotionMagicVoltage climbRequest = new MotionMagicVoltage(0);
 
   public ClimberIO_Real(ClimberInformation info) {
     mMotor = new TalonFX(info.id);
@@ -35,8 +29,8 @@ public class ClimberIO_Real implements ClimberIO {
   
   }
 
-  private double getHight(){
-    return mMotor.getPosition().getValueAsDouble()*ClimbConstants.kSprocketPD;
+  private double getHeight(){
+    return mMotor.getPosition().getValueAsDouble() * ClimbConstants.kSprocketPD;
   }
 
   @Override
@@ -46,9 +40,9 @@ public class ClimberIO_Real implements ClimberIO {
 
   @Override
   public void run() {
-    voltage = MathUtil.clamp(mPID.calculate(getHight(), setpoint), -12, 12);
+    voltage = MathUtil.clamp(mPID.calculate(getHeight(), setpoint), -12, 12);
 
-    if(setpoint >= getHight()){
+    if(setpoint >= getHeight()){
       voltage *= 0.5;
     }
     else{
@@ -60,7 +54,7 @@ public class ClimberIO_Real implements ClimberIO {
   @Override
   public void updateInputs(ClimberIOInputs inputs){
     inputs.appliedVoltage = mMotor.getMotorVoltage().getValueAsDouble();
-    inputs.position = Units.inchesToMeters(getHight());
+    inputs.position = getHeight();
     inputs.current = mMotor.getSupplyCurrent().getValueAsDouble();
     inputs.velocity = mMotor.getVelocity().getValueAsDouble();
   }
