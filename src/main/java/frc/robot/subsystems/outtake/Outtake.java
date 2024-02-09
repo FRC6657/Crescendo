@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.OuttakeConstants;
 
 import org.littletonrobotics.junction.Logger;
@@ -40,6 +41,7 @@ public class Outtake extends SubsystemBase {
         });
   }
 
+
   @Override
   public void periodic() {
     outtakeIO.updateInputs(outtakeInputs);
@@ -51,6 +53,8 @@ public class Outtake extends SubsystemBase {
         -0.32385,
         0,
         0.6312130886,
-        new Rotation3d(0, -Units.degreesToRadians(outtakeInputs.pivotMotorPosition), 0));
+        new Rotation3d(0, -Units.degreesToRadians(outtakeInputs.pivotMotorPosition+10), 0));
   }
+
+
 }

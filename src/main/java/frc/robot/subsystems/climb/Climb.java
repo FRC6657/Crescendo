@@ -41,13 +41,6 @@ public class Climb extends SubsystemBase {
       });
   }
 
-  public void changeClimbSetpoint(double setpoint) {
-    setpoint =
-        MathUtil.clamp(
-            setpoint, Constants.ClimbConstants.kMinHeight, Constants.ClimbConstants.kMaxHeight);
-
-    climbSetpoint = setpoint;
-  }
 
   public Command run() {
     return this.run(

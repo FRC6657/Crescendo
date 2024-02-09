@@ -23,5 +23,8 @@ public interface OuttakeIO {
 
   public default void changePivot(double angle) {}
 
+  public default boolean breakbeam(){return true;}
+
+
 
 }
