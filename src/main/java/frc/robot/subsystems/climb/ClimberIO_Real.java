@@ -1,6 +1,5 @@
 package frc.robot.subsystems.climb;
 
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.MathUtil;
@@ -10,7 +9,7 @@ import frc.robot.Constants.ClimbConstants;
 
 public class ClimberIO_Real implements ClimberIO {
   private TalonFX mMotor;
-  private final PIDController mPID = ClimbConstants.kClimbPID;
+  private final PIDController mPID = ClimbConstants.kClimbUpPID;
   private double setpoint = 0.0;
   private double voltage = 0.0;
 
@@ -40,14 +39,16 @@ public class ClimberIO_Real implements ClimberIO {
 
   @Override
   public void run() {
-    voltage = MathUtil.clamp(mPID.calculate(getHeight(), setpoint), -12, 12);
-
+    
     if(setpoint >= getHeight()){
-      voltage *= 0.5;
+      mPID.setP(ClimbConstants.kClimbDownPID.getP());
     }
     else{
-      mMotor.set(voltage*0.5);
+      mPID.setP(ClimbConstants.kClimbUpPID.getP());
     }
+
+    voltage = MathUtil.clamp(mPID.calculate(getHeight(), setpoint), -12, 12);
+    mMotor.setVoltage(voltage);
     
   }
 
@@ -57,6 +58,7 @@ public class ClimberIO_Real implements ClimberIO {
     inputs.position = getHeight();
     inputs.current = mMotor.getSupplyCurrent().getValueAsDouble();
     inputs.velocity = mMotor.getVelocity().getValueAsDouble();
+
   }
 
 }
