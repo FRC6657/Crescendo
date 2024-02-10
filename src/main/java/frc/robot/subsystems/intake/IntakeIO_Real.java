@@ -16,7 +16,7 @@ public class IntakeIO_Real implements IntakeIO {
   private double intakeMotorSpeed;
 
   private MotionMagicVoltage pivotAngle =
-      new MotionMagicVoltage(Units.degreesToRotations(IntakeConstants.kPivotMinAngle));
+      new MotionMagicVoltage(Units.degreesToRotations(IntakeConstants.kPivotMaxAngle));
 
   public IntakeIO_Real() {
     intake = new TalonFX(CANID.kIntakePivot);
@@ -49,7 +49,7 @@ public class IntakeIO_Real implements IntakeIO {
     intake.getConfigurator().apply(intakeConfigs);
     pivot.getConfigurator().apply(pivotConfigs);
 
-    pivot.setPosition(Units.degreesToRotations(IntakeConstants.kPivotMinAngle));
+    pivot.setPosition(Units.degreesToRotations(IntakeConstants.kPivotMaxAngle));
     pivot.setControl(pivotAngle);
   }
 
