@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -255,16 +256,19 @@ public class Constants {
     public static final class ClimberInformation {
       public final String name;
       public final int id;
+      public final InvertedValue inverted;
 
-      public ClimberInformation(String name, int id) {
+      public ClimberInformation(String name, int id, InvertedValue inverted) {
         this.name = name;
         this.id = id;
+        this.inverted = inverted;
       }
 
       public static final ClimberInformation kLeftClimber =
-          new ClimberInformation("Left", CANID.kLeftClimber);
+          new ClimberInformation("Left", CANID.kLeftClimber, InvertedValue.Clockwise_Positive);
       public static final ClimberInformation kRightClimber =
-          new ClimberInformation("Right", CANID.kRightClimber);
+          new ClimberInformation(
+              "Right", CANID.kRightClimber, InvertedValue.CounterClockwise_Positive);
     }
   }
 

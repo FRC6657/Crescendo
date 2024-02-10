@@ -21,6 +21,8 @@ public class ClimberIO_Real implements ClimberIO {
 
     motorConfigs.CurrentLimits = ClimbConstants.kCurrentConfigs;
     motorConfigs.Feedback.SensorToMechanismRatio = ClimbConstants.kGearing;
+    motorConfigs.CurrentLimits.StatorCurrentLimit = 40;
+    motorConfigs.MotorOutput.Inverted = info.inverted;
 
     motorConfigurator.apply(motorConfigs);
   }
