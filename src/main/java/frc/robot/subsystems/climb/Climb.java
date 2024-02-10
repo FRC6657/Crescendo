@@ -37,10 +37,6 @@ public class Climb extends SubsystemBase {
           leftClimber.changeSetpoint(setpoint);
           rightClimber.changeSetpoint(setpoint);
         });
-        () -> {
-          leftClimber.changeSetpoint(setpoint);
-          rightClimber.changeSetpoint(setpoint);
-        });
   }
 
   public void changeClimbSetpoint(double setpoint) {
