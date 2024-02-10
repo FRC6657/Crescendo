@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.choreo.lib.ChoreoTrajectory;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -85,6 +86,8 @@ public class Robot extends LoggedRobot {
   private Led led = new Led();
 
   private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
+
+  ChoreoTrajectory TestPath1;
 
   @SuppressWarnings(value = "resource")
   @Override
