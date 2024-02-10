@@ -12,8 +12,8 @@ public class Led extends SubsystemBase {
   AddressableLED led;
   AddressableLEDBuffer ledBuffer;
   int startRed = 255;
-  int startGreen = 0;
-  int startBlue = 0;
+  int startGreen = 100;
+  int startBlue = 50;
   /** Creates a new Led. */
   public Led() {
 
@@ -30,7 +30,7 @@ public class Led extends SubsystemBase {
 
   public void changeColor(int red, int green, int blue) {
     for (int i = 0; i < ledBuffer.getLength(); i++) {
-      ledBuffer.setRGB(i, 255, 0, 0);
+      ledBuffer.setRGB(i, red, green, blue);
     }
   }
 
