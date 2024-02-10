@@ -11,7 +11,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.OuttakeConstants;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Outtake extends SubsystemBase {
@@ -29,17 +28,18 @@ public class Outtake extends SubsystemBase {
   public Command changeRPM(double rpm) {
     return this.runOnce(
         () -> {
-          outtakeIO.changeFlywheel(MathUtil.clamp(rpm, OuttakeConstants.kMinRpm, OuttakeConstants.kMaxRpm));
+          outtakeIO.changeFlywheel(
+              MathUtil.clamp(rpm, OuttakeConstants.kMinRpm, OuttakeConstants.kMaxRpm));
         });
   }
 
   public Command changeAngle(double angle) {
     return this.runOnce(
         () -> {
-          outtakeIO.changePivot(MathUtil.clamp(angle, OuttakeConstants.kMinAngle, OuttakeConstants.kMaxAngle));
+          outtakeIO.changePivot(
+              MathUtil.clamp(angle, OuttakeConstants.kMinAngle, OuttakeConstants.kMaxAngle));
         });
   }
-
 
   @Override
   public void periodic() {
@@ -52,8 +52,6 @@ public class Outtake extends SubsystemBase {
         -0.32385,
         0,
         0.6312130886,
-        new Rotation3d(0, -Units.degreesToRadians(outtakeInputs.pivotMotorPosition+10), 0));
+        new Rotation3d(0, -Units.degreesToRadians(outtakeInputs.pivotMotorPosition + 10), 0));
   }
-
-
 }

@@ -28,7 +28,7 @@ public class ClimberIO_Sim implements ClimberIO {
   }
 
   @Override
-  public void changeSetpoint(double height){
+  public void changeSetpoint(double height) {
     setpoint = height;
   }
 

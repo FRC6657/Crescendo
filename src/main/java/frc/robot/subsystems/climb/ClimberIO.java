@@ -14,7 +14,7 @@ public interface ClimberIO {
 
   public default void updateInputs(ClimberIOInputs inputs) {}
 
-  public default void changeSetpoint(double height){}
+  public default void changeSetpoint(double height) {}
 
   public default void run() {}
 }

@@ -127,7 +127,6 @@ public class Robot extends LoggedRobot {
                         * DriveConstants.kMaxAngularVelocity
                         * 0.25)));
 
-
     autoChooser.addDefaultOption("None", null);
 
     controller.a().onTrue(superstructure.fireNote());

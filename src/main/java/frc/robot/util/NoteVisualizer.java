@@ -32,7 +32,8 @@ import org.littletonrobotics.junction.Logger;
 public class NoteVisualizer {
   private static final Translation3d blueSpeaker = new Translation3d(0.225, 5.55, 2.1);
   private static final Translation3d redSpeaker = new Translation3d(16.317, 5.55, 2.1);
-  private static final Transform3d launcherTransform = new Transform3d(-0.03, 0, 0.54, new Rotation3d(0.0, Units.degreesToRadians(53.0), 0.0));
+  private static final Transform3d launcherTransform =
+      new Transform3d(-0.03, 0, 0.54, new Rotation3d(0.0, Units.degreesToRadians(53.0), 0.0));
   private static final double shotSpeed = 5; // Meters per sec
   private static Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
 
