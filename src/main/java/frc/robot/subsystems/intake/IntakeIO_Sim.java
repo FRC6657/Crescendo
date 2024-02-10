@@ -3,8 +3,10 @@ package frc.robot.subsystems.intake;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants.CodeConstants;
+import frc.robot.Constants.IntakeConstants;
 
 public class IntakeIO_Sim implements IntakeIO {
 
@@ -13,7 +15,7 @@ public class IntakeIO_Sim implements IntakeIO {
   private double lastVelocity = 0;
   private double currentVelocity = 0;
 
-  private double angle = 0;
+  private double angle = IntakeConstants.kPivotMinAngle;
 
   private DCMotorSim pivotSim =
       new DCMotorSim(
@@ -22,7 +24,11 @@ public class IntakeIO_Sim implements IntakeIO {
           0.01); // double check gearing when the gearboxes are finalised
   private DCMotorSim rollerSim = new DCMotorSim(DCMotor.getFalcon500(1), 24.0 / 11.0, 0.048);
 
-  private PIDController pivotPID = new PIDController(0.001, 0, 0);
+  private PIDController pivotPID = new PIDController(0.1, 0, 0);
+
+  public IntakeIO_Sim() {
+    pivotSim.setState(Units.degreesToRadians(IntakeConstants.kPivotMaxAngle), 0);
+  }
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
