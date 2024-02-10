@@ -1,15 +1,11 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.Constants.DriveConstants;
@@ -129,33 +125,12 @@ public class Robot extends LoggedRobot {
                         * 0.5,
                     -MathUtil.applyDeadband(controller.getRightX(), 0.15)
                         * DriveConstants.kMaxAngularVelocity
-                        * 0.5)));
+                        * 0.25)));
 
 
     autoChooser.addDefaultOption("None", null);
 
-    controller
-        .a()
-        .whileTrue(
-            Commands.runOnce(
-                () -> drivebase.setPose(new Pose2d(0, 0, new Rotation2d(0))), drivebase));
-
-    controller.b().whileTrue(drivebase.goToPose(new Pose2d(0, 0, new Rotation2d(0))));
-
-    controller.y().onTrue(outtake.changeRPM(1000)).onFalse(outtake.changeRPM(0));
-
-    controller.leftBumper().onTrue(outtake.changeAngle(-10));
-    controller.rightBumper().onTrue(outtake.changeAngle(178));
-
-    controller
-        .y()
-        .whileTrue(
-            Commands.runOnce(() -> climb.changeClimbSetpoint(Units.inchesToMeters(20)), climb));
-
-    controller
-        .x()
-        .whileTrue(
-            Commands.runOnce(() -> climb.changeClimbSetpoint(Units.inchesToMeters(0)), climb));
+    controller.a().onTrue(superstructure.fireNote());
 
     led.startLED();
   }

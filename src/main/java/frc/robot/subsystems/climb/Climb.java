@@ -46,12 +46,6 @@ public class Climb extends SubsystemBase {
 
   }
 
-  public Command run() {
-    return this.run(
-        () -> {
-        });
-  }
-
   public Pose3d[] get3DPoses() {
     return new Pose3d[] {leftClimber.get3DPose(), rightClimber.get3DPose()};
   }
