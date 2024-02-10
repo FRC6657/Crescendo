@@ -131,7 +131,6 @@ public class Robot extends LoggedRobot {
                         * DriveConstants.kMaxAngularVelocity
                         * 0.5)));
 
-
     autoChooser.addDefaultOption("None", null);
 
     controller

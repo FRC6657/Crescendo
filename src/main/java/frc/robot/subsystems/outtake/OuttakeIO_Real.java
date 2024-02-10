@@ -23,7 +23,8 @@ public class OuttakeIO_Real implements OuttakeIO {
 
   private double angle = 0.0;
 
-  private MotionMagicVoltage pivotAngle = new MotionMagicVoltage(Units.degreesToRotations(OuttakeConstants.kMinAngle));
+  private MotionMagicVoltage pivotAngle =
+      new MotionMagicVoltage(Units.degreesToRotations(OuttakeConstants.kMinAngle));
   private MotionMagicVelocityVoltage flywheelVelocity = new MotionMagicVelocityVoltage(0);
   private final VelocityVoltage velocity = new VelocityVoltage(0).withSlot(0);
 
@@ -36,17 +37,16 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     var flywheelConfigs = new TalonFXConfiguration();
 
-    pivotConfigs.Feedback.SensorToMechanismRatio = 1.0/OuttakeConstants.kGearingPivot;
+    pivotConfigs.Feedback.SensorToMechanismRatio = 1.0 / OuttakeConstants.kGearingPivot;
 
-    flywheelConfigs.Feedback.SensorToMechanismRatio = 1.0/(OuttakeConstants.kGearingFlyWheel*OuttakeConstants.kRpsToRpm);
+    flywheelConfigs.Feedback.SensorToMechanismRatio =
+        1.0 / (OuttakeConstants.kGearingFlyWheel * OuttakeConstants.kRpsToRpm);
 
     pivotConfigs.Slot0 = OuttakeConstants.kPivotSlot0;
 
     flywheelConfigs.Slot0 = OuttakeConstants.kFlyWheelSlot0;
 
     flywheelConfigs.MotionMagic = OuttakeConstants.kMotionMagicConfigsFlyWheel;
-
-    
 
     // Motor Configurations
     pivotConfigs.CurrentLimits = OuttakeConstants.kCurrentConfigs;
@@ -69,7 +69,6 @@ public class OuttakeIO_Real implements OuttakeIO {
 
     leftShooter.getConfigurator().apply(flywheelConfigs);
     pivotConfigurator.apply(pivotConfigs);
-
 
     pivot.setPosition(Units.degreesToRotations(OuttakeConstants.kMinAngle));
 
@@ -94,15 +93,15 @@ public class OuttakeIO_Real implements OuttakeIO {
     pivot.getPosition();
   }
 
-  public boolean beambreak(){
+  public boolean beambreak() {
     return !beambreak.get();
   }
-
 
   @Override
   public void changeFlywheel(double rpm) {
     rpm = MathUtil.clamp(rpm, OuttakeConstants.kMinRpm, OuttakeConstants.kMaxRpm);
-    leftShooter.setControl(velocity.withVelocity(rpm).withFeedForward(OuttakeConstants.kFeedForwardMulitplier*rpm));
+    leftShooter.setControl(
+        velocity.withVelocity(rpm).withFeedForward(OuttakeConstants.kFeedForwardMulitplier * rpm));
   }
 
   @Override
@@ -110,6 +109,4 @@ public class OuttakeIO_Real implements OuttakeIO {
     angle = MathUtil.clamp(angle, OuttakeConstants.kMinAngle, OuttakeConstants.kMaxAngle);
     pivot.setControl(pivotAngle.withPosition(angle));
   }
-
-
 }

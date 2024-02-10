@@ -25,31 +25,27 @@ public class Climb extends SubsystemBase {
   public void periodic() {
     leftClimber.updateInputs();
     rightClimber.updateInputs();
-    
+
     leftClimber.run();
     rightClimber.run();
-
   }
 
-    public Command changeSetpoint(double setpoint){
+  public Command changeSetpoint(double setpoint) {
     return this.runOnce(
-      ()->{
-        leftClimber.changeSetpoint(setpoint);
-        rightClimber.changeSetpoint(setpoint);
-      });
+        () -> {
+          leftClimber.changeSetpoint(setpoint);
+          rightClimber.changeSetpoint(setpoint);
+        });
   }
 
   public void changeClimbSetpoint(double setpoint) {
     setpoint =
         MathUtil.clamp(
             setpoint, Constants.ClimbConstants.kMinHeight, Constants.ClimbConstants.kMaxHeight);
-
   }
 
   public Command run() {
-    return this.run(
-        () -> {
-        });
+    return this.run(() -> {});
   }
 
   public Pose3d[] get3DPoses() {

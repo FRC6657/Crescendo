@@ -15,9 +15,8 @@ public class IntakeIO_Real implements IntakeIO {
   private TalonFX pivot;
   private double intakeMotorSpeed;
 
-  private MotionMagicVoltage pivotAngle = new MotionMagicVoltage(Units.degreesToRotations(IntakeConstants.kPivotMinAngle));
-  
-
+  private MotionMagicVoltage pivotAngle =
+      new MotionMagicVoltage(Units.degreesToRotations(IntakeConstants.kPivotMinAngle));
 
   public IntakeIO_Real() {
     intake = new TalonFX(CANID.kIntakePivot);
@@ -26,7 +25,7 @@ public class IntakeIO_Real implements IntakeIO {
     var pivotConfigs = new TalonFXConfiguration();
     var intakeConfigs = new TalonFXConfiguration();
 
-    pivotConfigs.Feedback.SensorToMechanismRatio = 1.0/IntakeConstants.kPivotGearing;
+    pivotConfigs.Feedback.SensorToMechanismRatio = 1.0 / IntakeConstants.kPivotGearing;
     pivotConfigs.Slot0 = IntakeConstants.kPivotSlot0;
 
     pivotConfigs.CurrentLimits = IntakeConstants.kCurrentConfigs;
@@ -52,8 +51,6 @@ public class IntakeIO_Real implements IntakeIO {
 
     pivot.setPosition(Units.degreesToRotations(IntakeConstants.kPivotMinAngle));
     pivot.setControl(pivotAngle);
-
-
   }
 
   @Override
@@ -77,7 +74,7 @@ public class IntakeIO_Real implements IntakeIO {
   }
 
   @Override
-  public void changePivot(double angle){
+  public void changePivot(double angle) {
     angle = MathUtil.clamp(angle, IntakeConstants.kPivotMinAngle, IntakeConstants.kPivotMaxAngle);
     pivotAngle.withPosition(angle);
     pivot.setControl(pivotAngle);
