@@ -1614,12 +1614,6 @@
                     ],
                     "type": "MaxVelocity",
                     "velocity": 4
-                },
-                {
-                    "scope": [
-                        4
-                    ],
-                    "type": "StopPoint"
                 }
             ],
             "usesControlIntervalGuessing": true,

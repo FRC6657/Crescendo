@@ -200,7 +200,7 @@ public class Constants {
   public static final class IntakeConstants {
 
     // Pivot
-    public static final double kPivotGearing = 1d / 12 * 16d / 36;
+    public static final double kPivotGearing = 1d / 20 * 16d / 36;
     public static final double kPivotMinAngle = -27.5;
     public static final double kPivotMaxAngle = 152.25;
     public static final double kCurrentLimit = 40;

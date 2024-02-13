@@ -23,9 +23,11 @@ import frc.robot.subsystems.drive.MAXSwerveIO;
 import frc.robot.subsystems.drive.MAXSwerveIO_Real;
 import frc.robot.subsystems.drive.MAXSwerveIO_Sim;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO_Real;
 import frc.robot.subsystems.intake.IntakeIO_Sim;
 import frc.robot.subsystems.led.Led;
 import frc.robot.subsystems.outtake.Outtake;
+import frc.robot.subsystems.outtake.OuttakeIO_Real;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -80,9 +82,21 @@ public class Robot extends LoggedRobot {
                 new ClimberIO_Real(ClimberInformation.kRightClimber)
               }
               : new ClimberIO[] {new ClimberIO_Sim(), new ClimberIO_Sim()});
+     
+  private Outtake outtake = 
+    new Outtake(
+      mode == RobotMode.REAL 
+      ? new OuttakeIO_Real()
+      : new OuttakeIO_Sim()
+      );
 
-  private Outtake outtake = new Outtake(new OuttakeIO_Sim());
-  private Intake intake = new Intake(new IntakeIO_Sim());
+  private Intake intake = 
+    new Intake(
+      mode == RobotMode.REAL
+      ? new IntakeIO_Real()
+      : new IntakeIO_Sim()
+    );
+
   private Led led = new Led();
 
   private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
@@ -133,6 +147,8 @@ public class Robot extends LoggedRobot {
     autoChooser.addDefaultOption("None", null);
 
     controller.a().onTrue(superstructure.fireNote());
+
+    controller.b().onTrue(superstructure.queueCommand)
 
     led.startLED();
   }

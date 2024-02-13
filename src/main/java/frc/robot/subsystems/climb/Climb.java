@@ -26,7 +26,6 @@ public class Climb extends SubsystemBase {
     leftClimber.updateInputs();
     rightClimber.updateInputs();
 
-
     leftClimber.run();
     rightClimber.run();
   }
@@ -43,13 +42,10 @@ public class Climb extends SubsystemBase {
     setpoint =
         MathUtil.clamp(
             setpoint, Constants.ClimbConstants.kMinHeight, Constants.ClimbConstants.kMaxHeight);
-
   }
 
   public Command run() {
-    return this.run(
-        () -> {
-        });
+    return this.run(() -> {});
   }
 
   public Pose3d[] get3DPoses() {
