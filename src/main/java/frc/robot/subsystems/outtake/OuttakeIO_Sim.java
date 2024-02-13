@@ -22,10 +22,15 @@ public class OuttakeIO_Sim implements OuttakeIO {
       new SimpleMotorFeedforward(0.1, 0.00374064837); // 0.003639801
   private PIDController flyWheelPID = new PIDController(0.032, 0, 0);
 
-  private PIDController pivotPID = new PIDController(12d / 360, 0, 0);
+  private PIDController pivotPID = new PIDController(24d / 360, 0, 0);
+
+  private double rpmSetpoint = 0;
+  private double angleSetpoint = OuttakeConstants.kMinAngle;
 
   @Override
   public void updateInputs(OuttakeIOInputs inputs) {
+
+    run();
 
     flywheelSim.update(1 / CodeConstants.kMainLoopFrequency);
     pivotSim.update(1 / CodeConstants.kMainLoopFrequency);
@@ -52,8 +57,21 @@ public class OuttakeIO_Sim implements OuttakeIO {
 
   @Override
   public void changePivot(double angle) {
-    double pidEffort = pivotPID.calculate(pivotSim.getAngularPositionRotations() * 360, angle);
-    pivotVoltage = MathUtil.clamp(pidEffort, -12, 12);
+    angleSetpoint = MathUtil.clamp(angle, OuttakeConstants.kMinAngle, OuttakeConstants.kMaxAngle);
+  }
+
+  private void run() {
+    // Pivot
+    double pivotPIDEffort =
+        pivotPID.calculate(pivotSim.getAngularPositionRotations() * 360, angleSetpoint);
+    pivotVoltage = MathUtil.clamp(pivotPIDEffort, -12, 12);
     pivotSim.setInput(pivotVoltage);
+
+    // Flywheel
+    double rpm = MathUtil.clamp(rpmSetpoint, OuttakeConstants.kMinRpm, OuttakeConstants.kMaxRpm);
+    double ffEffort = flyWheelFeedForward.calculate(rpm);
+    double pidEffort = flyWheelPID.calculate(flywheelSim.getAngularVelocityRPM(), rpm);
+    shooterVoltage = MathUtil.clamp(ffEffort + pidEffort, -12, 12);
+    flywheelSim.setInput(shooterVoltage);
   }
 }

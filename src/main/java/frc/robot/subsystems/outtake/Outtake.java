@@ -21,10 +21,6 @@ public class Outtake extends SubsystemBase {
     this.outtakeIO = outtakeIO;
   }
 
-  public Command run() {
-    return this.run(() -> {});
-  }
-
   public Command changeRPM(double rpm) {
     return this.runOnce(
         () -> {

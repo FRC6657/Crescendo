@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MAXSwerveConstants;
+import frc.robot.Constants.OuttakeConstants;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimberIO;
@@ -29,6 +30,7 @@ import frc.robot.subsystems.led.Led;
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO_Real;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;
+import frc.robot.util.NoteVisualizerV2;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -82,24 +84,19 @@ public class Robot extends LoggedRobot {
                 new ClimberIO_Real(ClimberInformation.kRightClimber)
               }
               : new ClimberIO[] {new ClimberIO_Sim(), new ClimberIO_Sim()});
-     
-  private Outtake outtake = 
-    new Outtake(
-      mode == RobotMode.REAL 
-      ? new OuttakeIO_Real()
-      : new OuttakeIO_Sim()
-      );
 
-  private Intake intake = 
-    new Intake(
-      mode == RobotMode.REAL
-      ? new IntakeIO_Real()
-      : new IntakeIO_Sim()
-    );
+  private Outtake outtake =
+      new Outtake(mode == RobotMode.REAL ? new OuttakeIO_Real() : new OuttakeIO_Sim());
+
+  private Intake intake =
+      new Intake(mode == RobotMode.REAL ? new IntakeIO_Real() : new IntakeIO_Sim());
 
   private Led led = new Led();
 
   private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
+
+  NoteVisualizerV2 noteVisulaizer =
+      new NoteVisualizerV2(drivebase::getPose, intake::getExtended, superstructure::fakeNote);
 
   ChoreoTrajectory TestPath1;
 
@@ -146,9 +143,10 @@ public class Robot extends LoggedRobot {
 
     autoChooser.addDefaultOption("None", null);
 
-    controller.a().onTrue(superstructure.fireNote());
+    controller.a().onTrue(superstructure.queueCommand(superstructure.extendIntake));
+    controller.a().onFalse(superstructure.queueCommand(superstructure.retractIntake));
 
-    controller.b().onTrue(superstructure.queueCommand)
+    controller.b().onTrue(outtake.changeAngle(OuttakeConstants.kMaxAngle));
 
     led.startLED();
   }
@@ -157,6 +155,7 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     superstructure.update3DPose();
+    superstructure.processQueue();
   }
 
   @Override
@@ -194,4 +193,9 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopExit() {}
+
+  @Override
+  public void simulationPeriodic() {
+    noteVisulaizer.updateNotes();
+  }
 }

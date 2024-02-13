@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
-public class NoteVisualizer {
+public class NoteVisualizerV1 {
   private static final Translation3d blueSpeaker = new Translation3d(0.225, 5.55, 2.1);
   private static final Translation3d redSpeaker = new Translation3d(16.317, 5.55, 2.1);
   private static final Transform3d launcherTransform =

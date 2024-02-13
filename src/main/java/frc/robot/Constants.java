@@ -7,6 +7,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -19,6 +20,28 @@ public class Constants {
 
   public static final class CodeConstants {
     public static final double kMainLoopFrequency = 50; // Hz
+  }
+
+  public static final class NotePositions {
+    public static final Pose3d[] kNotesStartingMidline = {
+      new Pose3d(8.258, 7.462, 0.03018, new Rotation3d()),
+      new Pose3d(8.258, 5.785, 0.03018, new Rotation3d()),
+      new Pose3d(8.258, 4.109, 0.03018, new Rotation3d()),
+      new Pose3d(8.258, 2.432, 0.03018, new Rotation3d()),
+      new Pose3d(8.258, 0.756, 0.03018, new Rotation3d()),
+    };
+
+    public static final Pose3d[] kNotesStartingBlueWing = {
+      new Pose3d(2.884, 4.109, 0.03018, new Rotation3d()),
+      new Pose3d(2.884, 5.557, 0.03018, new Rotation3d()),
+      new Pose3d(2.884, 7.004, 0.03018, new Rotation3d()),
+    };
+
+    public static final Pose3d[] kNotesStartingRedWing = {
+      new Pose3d(13.63, 4.109, 0.03018, new Rotation3d()),
+      new Pose3d(13.63, 5.557, 0.03018, new Rotation3d()),
+      new Pose3d(13.63, 7.004, 0.03018, new Rotation3d()),
+    };
   }
 
   public static final class VisionConstants {

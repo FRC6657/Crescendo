@@ -41,6 +41,10 @@ public class Intake extends SubsystemBase {
     Logger.processInputs("Intake", intakeInputs);
   }
 
+  public boolean getExtended() {
+    return Math.abs(intakeInputs.pivotMotorPosition - IntakeConstants.kPivotMinAngle) < 2;
+  }
+
   public Pose3d get3DPose() {
     return new Pose3d(
         0.332169,

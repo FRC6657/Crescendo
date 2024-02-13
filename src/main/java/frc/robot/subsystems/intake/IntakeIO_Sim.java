@@ -15,7 +15,7 @@ public class IntakeIO_Sim implements IntakeIO {
   private double lastVelocity = 0;
   private double currentVelocity = 0;
 
-  private double angle = IntakeConstants.kPivotMinAngle;
+  private double angle = IntakeConstants.kPivotMaxAngle;
 
   private DCMotorSim pivotSim =
       new DCMotorSim(
@@ -24,7 +24,7 @@ public class IntakeIO_Sim implements IntakeIO {
           0.01); // double check gearing when the gearboxes are finalised
   private DCMotorSim rollerSim = new DCMotorSim(DCMotor.getFalcon500(1), 24.0 / 11.0, 0.048);
 
-  private PIDController pivotPID = new PIDController(0.1, 0, 0);
+  private PIDController pivotPID = new PIDController(0.05, 0, 0);
 
   public IntakeIO_Sim() {
     pivotSim.setState(Units.degreesToRadians(IntakeConstants.kPivotMaxAngle), 0);
