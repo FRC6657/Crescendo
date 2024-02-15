@@ -307,25 +307,15 @@ public class Constants {
     public static final double kCurrentLimit = 40;
 
     public static Slot0Configs kPivotSlot0 =
-        new Slot0Configs()
-            .withKS(0)
-            .withKV(0)
-            .withKP(12d/Math.PI)
-            .withKI(0)
-            .withKD(0);
+        new Slot0Configs().withKS(0).withKV(0).withKP(12d / Math.PI).withKI(0).withKD(0);
 
     public static MotionMagicConfigs kPivotMotionMagicConfig =
         new MotionMagicConfigs()
-        .withMotionMagicCruiseVelocity(Units.degreesToRotations(50))
-        .withMotionMagicAcceleration(Units.degreesToRotations(50));
+            .withMotionMagicCruiseVelocity(Units.degreesToRotations(50))
+            .withMotionMagicAcceleration(Units.degreesToRotations(50));
 
     public static Slot0Configs kFlyWheelSlot0 =
-        new Slot0Configs()
-            .withKS(0)
-            .withKV(12d/(6380d/60))
-            .withKP(0)
-            .withKI(0)
-            .withKD(0);
+        new Slot0Configs().withKS(0).withKV(12d / (6380d / 60)).withKP(0).withKI(0).withKD(0);
 
     public static final CurrentLimitsConfigs kCurrentConfigs =
         new CurrentLimitsConfigs()

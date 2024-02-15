@@ -2,11 +2,7 @@ package frc.robot;
 
 import com.choreo.lib.ChoreoTrajectory;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -154,7 +150,6 @@ public class Robot extends LoggedRobot {
     controller.b().onFalse(outtake.changePivotSetpoint(OuttakeConstants.kMinAngle));
 
     led.startLED();
-                                            
   }
 
   @Override
@@ -163,7 +158,7 @@ public class Robot extends LoggedRobot {
     superstructure.update3DPose();
     superstructure.processQueue();
   }
-  
+
   @Override
   public void disabledInit() {}
 

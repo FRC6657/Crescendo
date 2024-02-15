@@ -43,7 +43,7 @@ public class Superstructure {
     this.climb = climb;
     NoteVisualizerV1.setRobotPoseSupplier(drivebase::getPose);
 
-    //noteProcessing = new Trigger(intake::noteDetected);
+    // noteProcessing = new Trigger(intake::noteDetected);
 
     extendIntake =
         Commands.sequence(

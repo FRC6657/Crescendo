@@ -143,8 +143,8 @@ public class MAXSwerve extends SubsystemBase {
     }
 
     Logger.recordOutput(
-        "FrontCameraPos", new Pose3d(getPose()).transformBy(VisionConstants.kSideCameraPose));  
-    }
+        "FrontCameraPos", new Pose3d(getPose()).transformBy(VisionConstants.kSideCameraPose));
+  }
 
   /**
    * Runs the drivebase using a continuous Chassis Speed Input
