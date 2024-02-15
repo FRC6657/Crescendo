@@ -69,9 +69,8 @@ public class Constants {
 
     public static final int kPigeon = 10;
 
-    public static final int kLeftShooter = 11;
-    public static final int kRightShooter = 12;
-
+    public static final int kLeftFlywheel = 11;
+    public static final int kRightFlywheel = 12;
     public static final int kShooterPivot = 13;
 
     public static final int kLeftClimber = 14;
@@ -298,7 +297,7 @@ public class Constants {
   public static final class OuttakeConstants {
 
     public static final double kGearingPivot = (1d / 12) * (16d / 36);
-    public static final double kGearingFlyWheel = (1d / 12) * (16d / 36);
+    public static final double kGearingFlywheel = (1d / 12) * (16d / 36);
     public static final double kRpsToRpm = 60;
     public static final double kMinAngle = -10;
     public static final double kMaxAngle = 133;
@@ -309,23 +308,24 @@ public class Constants {
 
     public static Slot0Configs kPivotSlot0 =
         new Slot0Configs()
-            .withKS(0.25) // Add 0.25 V output to overcome static friction
-            .withKV(0.12) // A velocity target of 1 rps results in 0.12 V output
-            .withKP(2) // A position error of 2.5 rotations results in 12 V output
-            .withKI(0) // no output for integrated error
-            .withKD(0)
-            .withGravityType(GravityTypeValue.Arm_Cosine); // no d
+            .withKS(0)
+            .withKV(0)
+            .withKP(12d/Math.PI)
+            .withKI(0)
+            .withKD(0);
+
+    public static MotionMagicConfigs kPivotMotionMagicConfig =
+        new MotionMagicConfigs()
+        .withMotionMagicCruiseVelocity(Units.degreesToRotations(50))
+        .withMotionMagicAcceleration(Units.degreesToRotations(50));
 
     public static Slot0Configs kFlyWheelSlot0 =
         new Slot0Configs()
-            .withKS(0.25) // Add 0.25 V output to overcome static friction
-            .withKV(0.12) // A velocity target of 1 rps results in 0.12 V output
-            .withKP(0.2) // A position error of 5 rotations results in 1 V output
-            .withKI(0) // no output for integrated error
-            .withKD(0); // no d
-
-    public static final MotionMagicConfigs kMotionMagicConfigsFlyWheel =
-        new MotionMagicConfigs().withMotionMagicAcceleration(400).withMotionMagicJerk(4000);
+            .withKS(0)
+            .withKV(12d/(6380d/60))
+            .withKP(0)
+            .withKI(0)
+            .withKD(0);
 
     public static final CurrentLimitsConfigs kCurrentConfigs =
         new CurrentLimitsConfigs()

@@ -43,7 +43,7 @@ public class Superstructure {
     this.climb = climb;
     NoteVisualizerV1.setRobotPoseSupplier(drivebase::getPose);
 
-    // noteProcessing = new Trigger(intake::noteDetected);
+    //noteProcessing = new Trigger(intake::noteDetected);
 
     extendIntake =
         Commands.sequence(
@@ -62,8 +62,8 @@ public class Superstructure {
                 Commands.waitSeconds(1d / 16),
                 intake.changeRollers(0),
                 intake.changeAngle(IntakeConstants.kPivotMaxAngle),
-                outtake.changeRPM(0),
-                outtake.changeAngle(OuttakeConstants.kMinAngle),
+                outtake.changeRPMSetpoint(0),
+                outtake.changePivotSetpoint(OuttakeConstants.kMinAngle),
                 Commands.waitSeconds(1),
                 Commands.print("Note Processed"),
                 Commands.parallel(unlockIntake(), unlockOuttake()))

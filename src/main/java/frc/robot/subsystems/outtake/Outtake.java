@@ -4,37 +4,46 @@
 
 package frc.robot.subsystems.outtake;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.OuttakeConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class Outtake extends SubsystemBase {
+  
+  //IO
   private final OuttakeIO outtakeIO;
   private final OuttakeIOInputsAutoLogged outtakeInputs = new OuttakeIOInputsAutoLogged();
 
+  /**
+   * The Robot's Outtake Subsystem
+   */
   public Outtake(OuttakeIO outtakeIO) {
     this.outtakeIO = outtakeIO;
   }
 
-  public Command changeRPM(double rpm) {
-    return this.runOnce(
-        () -> {
-          outtakeIO.changeFlywheel(
-              MathUtil.clamp(rpm, OuttakeConstants.kMinRpm, OuttakeConstants.kMaxRpm));
-        });
+  /**
+   * Change the setpoint of the shooter pivot
+   * @param angleDegrees The new setpoint in degrees
+   * 
+   * Acceptable Range: [-27.5, 152.25]
+   * Increase in angle moves the pivot towards the back of the robot
+   */
+  public Command changePivotSetpoint(double angleDegrees) {
+    return this.runOnce(() -> outtakeIO.changePivotSetpoint(angleDegrees));
   }
 
-  public Command changeAngle(double angle) {
-    return this.runOnce(
-        () -> {
-          outtakeIO.changePivot(
-              MathUtil.clamp(angle, OuttakeConstants.kMinAngle, OuttakeConstants.kMaxAngle));
-        });
+  /**
+   * Change the setpoint of the flywheel
+   * @param rpm The new setpoint in RPM (Rotations per minute)
+   * 
+   * Aceptable range: [-3190, 3190]
+   * Positive RPM the note towards the back of the robot
+   */
+  public Command changeRPMSetpoint(double rpm) {
+    return this.runOnce(() ->outtakeIO.changeFlywheelSetpoint(rpm));
   }
 
   @Override
@@ -43,6 +52,10 @@ public class Outtake extends SubsystemBase {
     Logger.processInputs("Outtake", outtakeInputs);
   }
 
+  /**
+   * Get the 3D pose of the outtake's pivot
+   * @return The 3D pose of the outtake
+   */
   public Pose3d get3DPose() {
     return new Pose3d(
         -0.32385,
