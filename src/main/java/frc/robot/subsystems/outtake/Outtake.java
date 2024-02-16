@@ -37,7 +37,7 @@ public class Outtake extends SubsystemBase {
    * Change the setpoint of the flywheel
    *
    * @param rpm The new setpoint in RPM (Rotations per minute)
-   *     <p>Aceptable range: [-3190, 3190] Positive RPM the note towards the back of the robot
+   *     <p>Aceptable range: [-3190, 3190] Positive RPM moves the note towards the back of the robot
    */
   public Command changeRPMSetpoint(double rpm) {
     return this.runOnce(() -> outtakeIO.changeFlywheelSetpoint(rpm));

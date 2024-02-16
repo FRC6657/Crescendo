@@ -15,25 +15,25 @@ import org.littletonrobotics.junction.AutoLogOutput;
 
 public class OuttakeIO_Real implements OuttakeIO {
 
+  // Pivot Motor Controller
+  TalonFX pivotMotor = new TalonFX(Constants.CANID.kShooterPivot);
+
   // Flywheel Motor Controllers
   TalonFX followerFlywheel = new TalonFX(Constants.CANID.kRightFlywheel);
   TalonFX leaderFlywheel = new TalonFX(Constants.CANID.kLeftFlywheel);
 
-  // Pivot Motor Controller
-  TalonFX pivotMotor = new TalonFX(Constants.CANID.kShooterPivot);
-
   // Chamber Beam Break Sensor
   DigitalInput beambreak = new DigitalInput(0);
-
-  // Variables to store/log the setpoints
-  @AutoLogOutput(key = "Outtake/RPM Setpoint")
-  private double rpmSetpoint = 0;
 
   @AutoLogOutput(key = "Outtake/Raw Angle Setpoint")
   private double rawAngleSetpoint = OuttakeConstants.kMinAngle;
 
   @AutoLogOutput(key = "Outtake/Profiled Angle Setpoint")
   private double profiledAngleSetpoint = OuttakeConstants.kMinAngle;
+
+  // Variables to store/log the setpoints
+  @AutoLogOutput(key = "Outtake/RPM Setpoint")
+  private double rpmSetpoint = 0;
 
   public OuttakeIO_Real() {
 
@@ -129,20 +129,6 @@ public class OuttakeIO_Real implements OuttakeIO {
   }
 
   /**
-   * Change the setpoint of the flywheel
-   *
-   * @param rpm The new setpoint in RPM (Rotations per minute)
-   *     <p>Aceptable range: [-3190, 3190] Positive RPM the note towards the back of the robot
-   */
-  @Override
-  public void changeFlywheelSetpoint(double rpm) {
-    leaderFlywheel.setControl(
-        new VelocityVoltage(
-            MathUtil.clamp(rpmSetpoint, OuttakeConstants.kMinRpm, OuttakeConstants.kMaxRpm)
-                / 60)); // RPM to Native Rotations per second
-  }
-
-  /**
    * Change the setpoint of the shooter pivot
    *
    * @param angleDegrees The new setpoint in degrees
@@ -156,5 +142,19 @@ public class OuttakeIO_Real implements OuttakeIO {
     pivotMotor.setControl(
         new MotionMagicVoltage(
             Units.degreesToRotations(rawAngleSetpoint))); // Degrees to Native Rotations
+  }
+
+  /**
+   * Change the setpoint of the flywheel
+   *
+   * @param rpm The new setpoint in RPM (Rotations per minute)
+   *     <p>Aceptable range: [-3190, 3190] Positive RPM the note towards the back of the robot
+   */
+  @Override
+  public void changeFlywheelSetpoint(double rpm) {
+    leaderFlywheel.setControl(
+        new VelocityVoltage(
+            MathUtil.clamp(rpmSetpoint, OuttakeConstants.kMinRpm, OuttakeConstants.kMaxRpm)
+                / 60)); // RPM to Native Rotations per second
   }
 }
