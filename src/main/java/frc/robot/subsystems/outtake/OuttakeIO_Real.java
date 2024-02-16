@@ -5,6 +5,9 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -12,6 +15,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.OuttakeConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class OuttakeIO_Real implements OuttakeIO {
 
@@ -23,7 +27,7 @@ public class OuttakeIO_Real implements OuttakeIO {
   TalonFX leaderFlywheel = new TalonFX(Constants.CANID.kLeftFlywheel);
 
   // Chamber Beam Break Sensor
-  DigitalInput beambreak = new DigitalInput(0);
+  DigitalInput beambreak = new DigitalInput(2);
 
   @AutoLogOutput(key = "Outtake/Raw Angle Setpoint")
   private double rawAngleSetpoint = OuttakeConstants.kMinAngle;
@@ -34,6 +38,9 @@ public class OuttakeIO_Real implements OuttakeIO {
   // Variables to store/log the setpoints
   @AutoLogOutput(key = "Outtake/RPM Setpoint")
   private double rpmSetpoint = 0;
+
+  private VelocityVoltage flywheelSetpoint = new VelocityVoltage(0).withSlot(0);
+  private MotionMagicVoltage pivotSetpoint = new MotionMagicVoltage(OuttakeConstants.kMinAngle);
 
   public OuttakeIO_Real() {
 
@@ -50,6 +57,8 @@ public class OuttakeIO_Real implements OuttakeIO {
     pivotConfigs.Slot0 = OuttakeConstants.kPivotSlot0; // PID Constants
     pivotConfigs.CurrentLimits = OuttakeConstants.kCurrentConfigs; // Current Limits
     pivotConfigs.MotionMagic = OuttakeConstants.kPivotMotionMagicConfig; // Motion Magic Constants
+    pivotConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    pivotConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     pivotConfigurator.apply(pivotConfigs);
 
     // Pivot Status Signals
@@ -123,9 +132,11 @@ public class OuttakeIO_Real implements OuttakeIO {
     inputs.beamBroken = !beambreak.get();
 
     // Updated profiled angle setpoint
-    profiledAngleSetpoint =
-        Units.rotationsToDegrees(pivotMotor.getClosedLoopReference().getValueAsDouble()); // Degrees
-    rpmSetpoint = leaderFlywheel.getClosedLoopReference().getValueAsDouble() * 60; // RPM
+    //profiledAngleSetpoint = Units.rotationsToDegrees(pivotMotor.getClosedLoopReference().getValueAsDouble()); // Degrees
+
+    leaderFlywheel.setControl(flywheelSetpoint.withVelocity(rpmSetpoint/60).withSlot(0)); // RPM to Native Rotations per second
+    pivotMotor.setControl(pivotSetpoint.withPosition(Units.degreesToRotations(rawAngleSetpoint))); // Degrees to Native Rotations
+
   }
 
   /**
@@ -137,11 +148,7 @@ public class OuttakeIO_Real implements OuttakeIO {
    */
   @Override
   public void changePivotSetpoint(double angleDegrees) {
-    rawAngleSetpoint =
-        MathUtil.clamp(angleDegrees, OuttakeConstants.kMinAngle, OuttakeConstants.kMaxAngle);
-    pivotMotor.setControl(
-        new MotionMagicVoltage(
-            Units.degreesToRotations(rawAngleSetpoint))); // Degrees to Native Rotations
+    rawAngleSetpoint = MathUtil.clamp(angleDegrees, OuttakeConstants.kMinAngle, OuttakeConstants.kMaxAngle);
   }
 
   /**
@@ -152,9 +159,6 @@ public class OuttakeIO_Real implements OuttakeIO {
    */
   @Override
   public void changeFlywheelSetpoint(double rpm) {
-    leaderFlywheel.setControl(
-        new VelocityVoltage(
-            MathUtil.clamp(rpmSetpoint, OuttakeConstants.kMinRpm, OuttakeConstants.kMaxRpm)
-                / 60)); // RPM to Native Rotations per second
+    rpmSetpoint = MathUtil.clamp(rpm, OuttakeConstants.kMinRpm, OuttakeConstants.kMaxRpm);
   }
 }
