@@ -308,7 +308,7 @@ public class Constants {
   public static final class OuttakeConstants {
 
     public static final double kGearingPivot = (1d / 12) * (16d / 36);
-    public static final double kGearingFlywheel = (1d / 12) * (16d / 36);
+    public static final double kGearingFlywheel = (1d / 2);
     public static final double kRpsToRpm = 60;
     public static final double kMinAngle = -10;
     public static final double kMaxAngle = 133;
@@ -318,15 +318,17 @@ public class Constants {
     public static final double kCurrentLimit = 40;
 
     public static Slot0Configs kPivotSlot0 =
-        new Slot0Configs().withKS(0).withKV(0).withKP(12d / Math.PI).withKI(0).withKD(0);
+        new Slot0Configs().withKS(0).withKV(12d/((6380d/60)*kGearingPivot)).withKP(150).withKI(0).withKD(0);
 
     public static MotionMagicConfigs kPivotMotionMagicConfig =
         new MotionMagicConfigs()
-            .withMotionMagicCruiseVelocity(Units.degreesToRotations(50))
-            .withMotionMagicAcceleration(Units.degreesToRotations(50));
+            .withMotionMagicCruiseVelocity(Units.degreesToRotations(300))
+            .withMotionMagicAcceleration(Units.degreesToRotations(400));
 
     public static Slot0Configs kFlyWheelSlot0 =
-        new Slot0Configs().withKS(0).withKV(12d / (6380d / 60)).withKP(0).withKI(0).withKD(0);
+        new Slot0Configs().withKS(30 * (12d/6380)).withKV(12d/((6380d/60)*kGearingFlywheel)).withKP(0).withKI(0).withKD(0);
+
+        //RPS/Volts
 
     public static final CurrentLimitsConfigs kCurrentConfigs =
         new CurrentLimitsConfigs()
