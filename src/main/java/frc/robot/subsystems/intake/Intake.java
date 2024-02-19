@@ -31,12 +31,8 @@ public class Intake extends SubsystemBase {
     return this.runOnce(() -> intakeIO.changeRollerSpeed(MathUtil.clamp(speed, -1,1)));
   }
 
-  public Command pieceIntook () {
+  public Command waitUntilIntookPiece () {
     return Commands.waitUntil(() -> (intakeInputs.rollerMotorAcceleration < -100) && (intakeInputs.rollerMotorCurrent > 10));
-  }
-
-  public boolean pieceIntookBoolean () {
-    return ((intakeInputs.rollerMotorAcceleration < -100) && (intakeInputs.rollerMotorCurrent > 10));
   }
 
   @Override
