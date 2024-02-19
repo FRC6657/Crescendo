@@ -5,6 +5,7 @@
 
 package frc.robot.subsystems.intake;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
@@ -21,28 +22,18 @@ public class Intake extends SubsystemBase {
     this.intakeIO = intakeIO;
   }
 
-  public Command changeAngle(double angle) {
-    return this.runOnce(
-        () -> {
-          intakeIO.changePivot(angle);
-        });
+  public Command changePivotSetpoint(double angleDegrees) {
+    return this.runOnce(() -> intakeIO.changePivotSetpoint(MathUtil.clamp(angleDegrees, IntakeConstants.kMinPivotAngle, IntakeConstants.kMaxPivotAngle)));
   }
 
-  public Command changeRollers(double speed) {
-    return this.runOnce(
-        () -> {
-          intakeIO.runRollers(speed);
-        });
+  public Command changeRollerSpeed(double speed) {
+    return this.runOnce(() -> intakeIO.changeRollerSpeed(MathUtil.clamp(speed, -1,1)));
   }
 
   @Override
   public void periodic() {
     intakeIO.updateInputs(intakeInputs);
     Logger.processInputs("Intake", intakeInputs);
-  }
-
-  public boolean getExtended() {
-    return Math.abs(intakeInputs.pivotMotorPosition - IntakeConstants.kPivotMinAngle) < 2;
   }
 
   public Pose3d get3DPose() {
@@ -53,7 +44,7 @@ public class Intake extends SubsystemBase {
         new Rotation3d(
             0,
             -Units.degreesToRadians(
-                intakeInputs.pivotMotorPosition - IntakeConstants.kPivotMinAngle),
+                intakeInputs.pivotMotorPosition - IntakeConstants.kMinPivotAngle),
             0));
   }
 }

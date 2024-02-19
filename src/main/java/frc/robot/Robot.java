@@ -2,27 +2,29 @@ package frc.robot;
 
 import com.choreo.lib.ChoreoTrajectory;
 
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.SynchronousInterrupt.WaitResult;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OuttakeConstants;
+import frc.robot.Constants.ClimbConstants.ClimberInformation;
+import frc.robot.subsystems.Superstructure;
+import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.climb.ClimberIO;
+import frc.robot.subsystems.climb.ClimberIO_Real;
+import frc.robot.subsystems.climb.ClimberIO_Sim;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIO_Real;
 import frc.robot.subsystems.drive.MAXSwerve;
 import frc.robot.subsystems.drive.MAXSwerveIO;
 import frc.robot.subsystems.drive.MAXSwerveIO_Real;
 import frc.robot.subsystems.drive.MAXSwerveIO_Sim;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO_Real;
+import frc.robot.subsystems.intake.IntakeIO_Sim;
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO_Real;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;
@@ -72,28 +74,25 @@ public class Robot extends LoggedRobot {
                 new MAXSwerveIO_Sim()
               });
 
-  // private Climb climb =
-  //     new Climb(
-  //         mode == RobotMode.REAL
-  //             ? new ClimberIO[] {
-  //               new ClimberIO_Real(ClimberInformation.kLeftClimber),
-  //               new ClimberIO_Real(ClimberInformation.kRightClimber)
-  //             }
-  //             : new ClimberIO[] {new ClimberIO_Sim(), new ClimberIO_Sim()});
+  private Climb climb =
+      new Climb(
+          mode == RobotMode.REAL
+              ? new ClimberIO[] {
+                new ClimberIO_Real(ClimberInformation.kLeftClimber),
+                new ClimberIO_Real(ClimberInformation.kRightClimber)
+              }
+              : new ClimberIO[] {new ClimberIO_Sim(), new ClimberIO_Sim()});
 
   private Outtake outtake =
       new Outtake(mode == RobotMode.REAL ? new OuttakeIO_Real() : new OuttakeIO_Sim());
 
-  // private Intake intake =
-  //     new Intake(mode == RobotMode.REAL ? new IntakeIO_Real() : new IntakeIO_Sim());
+  private Intake intake =
+      new Intake(mode == RobotMode.REAL ? new IntakeIO_Real() : new IntakeIO_Sim());
 
   // private Led led = new Led();
 
-  // private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
-
-  // NoteVisualizerV2 noteVisulaizer =
-  //     new NoteVisualizerV2(drivebase::getPose, intake::getExtended, superstructure::fakeNote);
-
+  private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
+  
   ChoreoTrajectory TestPath1;
 
   // Trigger stopTrigger = new Trigger(outtake::beamBroken).onTrue(outtake.changeRPMSetpoint(0));
@@ -170,16 +169,16 @@ public class Robot extends LoggedRobot {
     controller.leftTrigger().onFalse(outtake.changeRPMSetpoint(0));
 
 
-    controller.b().onTrue(outtake.changePivotSetpoint(90));
-    controller.x().onTrue(outtake.changePivotSetpoint(100));
-    controller.y().onTrue(outtake.changePivotSetpoint(OuttakeConstants.kMinAngle));
+    controller.b().onTrue(intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle));
+    controller.x().onTrue(intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
+    controller.y().onTrue(outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle));
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    // superstructure.update3DPose();
-    // superstructure.processQueue();
+    superstructure.update3DPose();
+    superstructure.processQueue();
   }
 
   @Override

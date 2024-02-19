@@ -4,13 +4,13 @@
 
 package frc.robot.subsystems.outtake;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Constants.OuttakeConstants;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -29,11 +29,11 @@ public class Outtake extends SubsystemBase {
    * Change the setpoint of the shooter pivot
    *
    * @param angleDegrees The new setpoint in degrees
-   *     <p>Acceptable Range: [-27.5, 152.25] Increase in angle moves the pivot towards the back of
+   *     <p>Acceptable Range: [-10, 133] Increase in angle moves the pivot towards the back of
    *     the robot
    */
   public Command changePivotSetpoint(double angleDegrees) {
-    return this.runOnce(() -> outtakeIO.changePivotSetpoint(angleDegrees));
+    return this.runOnce(() -> outtakeIO.changePivotSetpoint(MathUtil.clamp(angleDegrees, OuttakeConstants.kMinPivotAngle, OuttakeConstants.kMaxPivotAngle)));
   }
 
   /**
@@ -43,14 +43,16 @@ public class Outtake extends SubsystemBase {
    *     <p>Aceptable range: [-3190, 3190] Positive RPM moves the note towards the back of the robot
    */
   public Command changeRPMSetpoint(double rpm) {
-    return this.runOnce(() -> outtakeIO.changeFlywheelSetpoint(rpm));
+    return this.runOnce(() -> outtakeIO.changeFlywheelSetpoint(MathUtil.clamp(rpm, OuttakeConstants.kMinFlywheelRpm, OuttakeConstants.kMaxFlywheelRpm)));
   }
 
+  /**
+   * Get the current state of the beam break sensor
+   * @return True if the beam is broken
+   */
   public boolean beamBroken(){
     return outtakeInputs.beamBroken;
   }
-
-
 
   @Override
   public void periodic() {

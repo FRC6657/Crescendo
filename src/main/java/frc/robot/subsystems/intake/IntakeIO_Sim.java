@@ -1,74 +1,97 @@
 package frc.robot.subsystems.intake;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.IntakeConstants;
 
 public class IntakeIO_Sim implements IntakeIO {
 
+  // Variables to track voltage
   private double pivotVoltage = 0;
-  private double rollerSpeed = 0;
-  private double lastVelocity = 0;
-  private double currentVelocity = 0;
+  private double rollerVoltage = 0;
 
-  private double angle = IntakeConstants.kPivotMaxAngle;
+  // Variables to track setpoints
+  @AutoLogOutput(key = "Intake/Speed Setpoint")
+  private double speedSetpoint = 0;
 
-  private DCMotorSim pivotSim =
-      new DCMotorSim(
-          DCMotor.getFalcon500(1),
-          12,
-          0.01); // double check gearing when the gearboxes are finalised
-  private DCMotorSim rollerSim = new DCMotorSim(DCMotor.getFalcon500(1), 24.0 / 11.0, 0.048);
+  @AutoLogOutput(key = "Intake/Angle Setpoint")
+  private double angleSetpoint = IntakeConstants.kMaxPivotAngle;
 
-  private PIDController pivotPID = new PIDController(0.05, 0, 0);
+  // Simulated Motors
+  private DCMotorSim pivotSim = new DCMotorSim(DCMotor.getFalcon500(1), 1 / IntakeConstants.kGearingPivot, 0.04);
+  private DCMotorSim rollerSim = new DCMotorSim(DCMotor.getFalcon500(2), IntakeConstants.kGearingRollers, 0.00146376);
+
+  // Pivot PID
+  private PIDController pivotPID = new PIDController(24d / 360, 0, 0);
 
   public IntakeIO_Sim() {
-    pivotSim.setState(Units.degreesToRadians(IntakeConstants.kPivotMaxAngle), 0);
+    pivotSim.setState(Units.degreesToRadians(IntakeConstants.kMaxPivotAngle), 0);
   }
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    // pivot
+
+    updatePID(); // Update the PID controllers and their outputs
+
+    // Update Simulations
     pivotSim.update(1 / CodeConstants.kMainLoopFrequency);
     rollerSim.update(1 / CodeConstants.kMainLoopFrequency);
-    runPivot();
 
-    inputs.pivotMotorPosition = pivotSim.getAngularPositionRotations() * 360;
-    inputs.pivotMotorVoltage = pivotVoltage;
-    inputs.pivotMotorTemp = 0;
-    inputs.pivotMotorCurrent = pivotSim.getCurrentDrawAmps();
+    // Pivot Inputs
+    inputs.pivotMotorPosition = pivotSim.getAngularPositionRotations() * 360; // Degrees
+    inputs.pivotMotorVelocity = pivotSim.getAngularVelocityRPM() * (360d / 60); // Degrees per second
+    inputs.pivotMotorTemp = 0; // Celcius
+    inputs.pivotMotorVoltage = pivotVoltage; // Volts
+    inputs.pivotMotorCurrent = pivotSim.getCurrentDrawAmps(); // Amps
 
-    // roller
-    inputs.currentSpeed = rollerSpeed;
-    inputs.rollerMotorTemp = 0.0;
-    inputs.rollerMotorVoltage = rollerSpeed * 12;
-    inputs.rollerMotorCurrent = rollerSim.getCurrentDrawAmps();
-
-    // adjust conversion maybe possibly
-    currentVelocity = rollerSim.getAngularVelocityRPM();
-    inputs.rollerMotorAcceleration =
-        (currentVelocity - lastVelocity) * CodeConstants.kMainLoopFrequency;
-    lastVelocity = currentVelocity;
+    // Roller Inputs
+    inputs.rollerMotorVelocity = rollerSim.getAngularVelocityRPM(); // RPM
+    inputs.rollerMotorTemp = 0; // Celcius
+    inputs.rollerMotorVoltage = rollerVoltage; // Volts
+    inputs.rollerMotorCurrent = rollerSim.getCurrentDrawAmps(); // Amps
   }
 
-  public void runPivot() {
-    double pidEffort = pivotPID.calculate(pivotSim.getAngularPositionRotations() * 360, angle);
-    pivotVoltage = MathUtil.clamp(pidEffort, -12, 12);
+  /**
+   * Change the setpoint of the shooter pivot
+   *
+   * @param angleDegrees The new setpoint in degrees
+   *     <p>Acceptable Range: [-27.5, 152.25] Increase in angle moves the pivot towards the back of
+   *     the robot
+   */
+  @Override
+  public void changePivotSetpoint(double angleDegrees) {
+    angleSetpoint = angleDegrees;
+  }
+
+  /**
+   * Change the setpoint of the rollers
+   *
+   * @param rpm The new Duty Cycle setpoint for the rollers
+   *     <p>Aceptable range: [-1, 1] Positive RPM the note towards the back of the robot
+   */
+  @Override
+  public void changeRollerSpeed(double speed) {
+    rollerVoltage = speed;
+  }
+
+
+  /** Uses the current setpoints and the current states to calculate the output voltages. */
+  private void updatePID() {
+    // Pivot
+    double pivotPIDEffort =
+        pivotPID.calculate(pivotSim.getAngularPositionRotations() * 360, angleSetpoint);
+    pivotVoltage = MathUtil.clamp(pivotPIDEffort, -12, 12);
     pivotSim.setInput(pivotVoltage);
-  }
 
-  @Override
-  public void changePivot(double pivotAngle) {
-    angle = pivotAngle;
-  }
-
-  @Override
-  public void runRollers(double speed) {
-    rollerSpeed = speed;
-    rollerSim.setInput(MathUtil.clamp(rollerSpeed, -1, 1) * 12);
+    // Rollers
+    rollerVoltage = speedSetpoint;
+    rollerSim.setInput(speedSetpoint * RobotController.getBatteryVoltage());
   }
 }

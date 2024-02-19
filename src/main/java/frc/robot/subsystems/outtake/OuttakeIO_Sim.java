@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants;
@@ -22,7 +23,7 @@ public class OuttakeIO_Sim implements OuttakeIO {
   private double rpmSetpoint = 0;
 
   @AutoLogOutput(key = "Outtake/Angle Setpoint")
-  private double angleSetpoint = OuttakeConstants.kMinAngle;
+  private double angleSetpoint = OuttakeConstants.kMinPivotAngle;
 
   // Simulated Motors
   private FlywheelSim flywheelSim = new FlywheelSim(DCMotor.getFalcon500(2), 2, 0.00146376);
@@ -33,8 +34,12 @@ public class OuttakeIO_Sim implements OuttakeIO {
   private PIDController pivotPID = new PIDController(24d / 360, 0, 0);
 
   // Flywheel PID + FF
-  private SimpleMotorFeedforward flyWheelFeedForward = new SimpleMotorFeedforward(0.1, 12d / 3190);
-  private PIDController flyWheelPID = new PIDController(0.032, 0, 0);
+  private SimpleMotorFeedforward flyWheelFeedForward = new SimpleMotorFeedforward(0, 12d / 3190);
+  private PIDController flyWheelPID = new PIDController(0, 0, 0);
+
+  public OuttakeIO_Sim() {
+    pivotSim.setState(Units.degreesToRadians(OuttakeConstants.kMinPivotAngle), 0);
+  }
 
   @Override
   public void updateInputs(OuttakeIOInputs inputs) {
@@ -71,9 +76,8 @@ public class OuttakeIO_Sim implements OuttakeIO {
    */
   @Override
   public void changeFlywheelSetpoint(double rpm) {
-    rpmSetpoint = MathUtil.clamp(rpm, OuttakeConstants.kMinRpm, OuttakeConstants.kMaxRpm);
+    rpmSetpoint = rpm;
   }
-
   /**
    * Change the setpoint of the shooter pivot
    *
@@ -83,8 +87,7 @@ public class OuttakeIO_Sim implements OuttakeIO {
    */
   @Override
   public void changePivotSetpoint(double angleDegrees) {
-    angleSetpoint =
-        MathUtil.clamp(angleDegrees, OuttakeConstants.kMinAngle, OuttakeConstants.kMaxAngle);
+    angleSetpoint =  angleDegrees;
   }
 
   /** Uses the current setpoints and the current states to calculate the output voltages. */

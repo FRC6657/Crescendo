@@ -1,82 +1,141 @@
 package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.math.MathUtil;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.util.Units;
-import frc.robot.Constants.CANID;
+import frc.robot.Constants;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.IntakeConstants;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class IntakeIO_Real implements IntakeIO {
 
-  private TalonFX intake;
-  private TalonFX pivot;
-  private double intakeMotorSpeed;
+  // Pivot Motor Controller
+  TalonFX pivotMotor = new TalonFX(Constants.CANID.kShooterPivot);
 
-  private MotionMagicVoltage pivotAngle =
-      new MotionMagicVoltage(Units.degreesToRotations(IntakeConstants.kPivotMaxAngle));
+  // Roller Motor Controller
+  TalonFX rollerMotor = new TalonFX(Constants.CANID.kIntakeRollers);
+
+  // Variables to store/log the setpoints
+  @AutoLogOutput(key = "Intake/Angle Setpoint")
+  private double angleSetpoint = IntakeConstants.kMaxPivotAngle;
+  @AutoLogOutput(key = "Intake/Speed Setpoint")
+  private double speedSetpoint = 0;
+  private double lastVelocity = 0;
+
+  private DutyCycleOut rollerSetpoint = new DutyCycleOut(0);
+  private MotionMagicVoltage pivotSetpoint = new MotionMagicVoltage(IntakeConstants.kMaxPivotAngle);
 
   public IntakeIO_Real() {
-    intake = new TalonFX(CANID.kIntakePivot);
-    pivot = new TalonFX(CANID.kIntakePivot);
 
+    // Motor Controller Configurations
+
+    // Configure the pivot motor
+    var pivotConfigurator = pivotMotor.getConfigurator();
     var pivotConfigs = new TalonFXConfiguration();
-    var intakeConfigs = new TalonFXConfiguration();
+    pivotConfigs.Feedback.SensorToMechanismRatio = 1.0 / IntakeConstants.kGearingPivot; // Sets default output to pivot rotations
+    pivotConfigs.Slot0 = IntakeConstants.kPivotSlot0; // PID Constants
+    pivotConfigs.CurrentLimits = IntakeConstants.kPivotCurrentConfigs; // Current Limits
+    pivotConfigs.MotionMagic = IntakeConstants.kPivotMotionMagicConfig; // Motion Magic Constants
+    pivotConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    pivotConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    pivotConfigurator.apply(pivotConfigs);
 
-    pivotConfigs.Feedback.SensorToMechanismRatio = 1.0 / IntakeConstants.kPivotGearing;
-    pivotConfigs.Slot0 = IntakeConstants.kPivotSlot0;
+    // Pivot Status Signals
+    var pivotPositionSignal = pivotMotor.getPosition();
+    var pivotVelocitySignal = pivotMotor.getVelocity();
+    var pivotTempSignal = pivotMotor.getDeviceTemp();
+    var pivotVoltageSignal = pivotMotor.getMotorVoltage();
+    var pivotCurrentSignal = pivotMotor.getSupplyCurrent();
+    var pivotClosedLoopReferenceSignal = pivotMotor.getClosedLoopReference();
 
-    pivotConfigs.CurrentLimits = IntakeConstants.kCurrentConfigs;
-    intakeConfigs.CurrentLimits = IntakeConstants.kCurrentConfigs;
+    pivotPositionSignal.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
+    pivotVelocitySignal.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
+    pivotTempSignal.setUpdateFrequency(CodeConstants.kMainLoopFrequency / 4);
+    pivotVoltageSignal.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
+    pivotCurrentSignal.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
+    pivotClosedLoopReferenceSignal.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
 
-    var tempSignalS = intake.getDeviceTemp();
-    var currentSignalS = pivot.getSupplyCurrent();
+    pivotMotor.optimizeBusUtilization(); // Reduces CAN bus usage
 
-    var tempSignalP = pivot.getDeviceTemp();
-    var currentSignalP = pivot.getSupplyCurrent();
+    // Set the default pivot location
+    pivotMotor.setPosition(Units.degreesToRotations(IntakeConstants.kMaxPivotAngle));
 
-    tempSignalS.setUpdateFrequency(CodeConstants.kMainLoopFrequency / 4);
-    currentSignalS.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
+    // Configure the leading roller motor
+    var rollerConfigurator = rollerMotor.getConfigurator();
+    var rollerConfigs = new TalonFXConfiguration();
+    rollerConfigs.Feedback.SensorToMechanismRatio = 1.0 / IntakeConstants.kGearingRollers; // Sets default output to roller rotations
+    rollerConfigs.CurrentLimits = IntakeConstants.kRollersCurrentConfigs; // Current Limits
+    rollerConfigurator.apply(rollerConfigs);
 
-    tempSignalP.setUpdateFrequency(CodeConstants.kMainLoopFrequency / 4);
-    currentSignalP.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
+    // Roller Status Signals
+    var rollerVelocitySignal = rollerMotor.getVelocity();
+    var rollerTempSignal = rollerMotor.getDeviceTemp();
+    var rollerVoltageSignal = rollerMotor.getMotorVoltage();
+    var rollerCurrentSignal = rollerMotor.getSupplyCurrent();
 
-    intake.optimizeBusUtilization();
-    pivot.optimizeBusUtilization();
+    rollerVelocitySignal.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
+    rollerTempSignal.setUpdateFrequency(CodeConstants.kMainLoopFrequency / 4);
+    rollerVoltageSignal.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
+    rollerCurrentSignal.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
 
-    intake.getConfigurator().apply(intakeConfigs);
-    pivot.getConfigurator().apply(pivotConfigs);
+    rollerMotor.optimizeBusUtilization(); // Reduces CAN bus usage
 
-    pivot.setPosition(Units.degreesToRotations(IntakeConstants.kPivotMaxAngle));
-    pivot.setControl(pivotAngle);
+    // Feed the PID with default values
+    changePivotSetpoint(IntakeConstants.kMaxPivotAngle);
+    changeRollerSpeed(0);
   }
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    inputs.currentSpeed = intakeMotorSpeed;
-    inputs.rollerMotorTemp = intake.getDeviceTemp().getValueAsDouble();
-    inputs.rollerMotorVoltage = intake.getMotorVoltage().getValueAsDouble();
-    inputs.rollerMotorCurrent = intake.getSupplyCurrent().getValueAsDouble();
-    inputs.rollerMotorAcceleration = intake.getAcceleration().getValueAsDouble();
 
-    inputs.pivotMotorPosition = Units.rotationsToDegrees(pivot.getPosition().getValueAsDouble());
-    inputs.pivotMotorTemp = pivot.getDeviceTemp().getValueAsDouble();
-    inputs.pivotMotorVoltage = pivot.getMotorVoltage().getValueAsDouble();
-    inputs.pivotMotorCurrent = pivot.getSupplyCurrent().getValueAsDouble();
+    // Update the pivot inputs
+    inputs.pivotMotorPosition =
+        Units.rotationsToDegrees(pivotMotor.getPosition().getValueAsDouble()); // Degrees
+    inputs.pivotMotorVelocity =
+        Units.rotationsToDegrees(pivotMotor.getVelocity().getValueAsDouble()); // Degrees per second
+    inputs.pivotMotorTemp = pivotMotor.getDeviceTemp().getValueAsDouble(); // Celcius
+    inputs.pivotMotorVoltage = pivotMotor.getMotorVoltage().getValueAsDouble(); // Volts
+    inputs.pivotMotorCurrent = pivotMotor.getSupplyCurrent().getValueAsDouble(); // Amps
+
+    // Update the roller inputs
+    inputs.rollerMotorVelocity = rollerMotor.getVelocity().getValueAsDouble() * 60; // RPM
+    inputs.rollerMotorAcceleration = (inputs.rollerMotorVelocity - lastVelocity) * CodeConstants.kMainLoopFrequency; // RPM per second
+    inputs.rollerMotorTemp = rollerMotor.getDeviceTemp().getValueAsDouble(); // Celcius
+    inputs.rollerMotorVoltage = rollerMotor.getMotorVoltage().getValueAsDouble(); // Volts
+    inputs.rollerMotorCurrent = rollerMotor.getSupplyCurrent().getValueAsDouble(); // Amps
+
+    rollerMotor.setControl(rollerSetpoint.withOutput(speedSetpoint));
+    pivotMotor.setControl(pivotSetpoint.withPosition(Units.degreesToRotations(angleSetpoint))); // Degrees to Native Rotations
+
+    lastVelocity = inputs.rollerMotorVelocity;
+
   }
 
+  /**
+   * Change the setpoint of the shooter pivot
+   *
+   * @param angleDegrees The new setpoint in degrees
+   *     <p>Acceptable Range: [-27.5, 152.25] Increase in angle moves the pivot towards the back of
+   *     the robot
+   */
   @Override
-  public void runRollers(double speed) {
-    intakeMotorSpeed = MathUtil.clamp(speed, -1, 1);
-    intake.set(intakeMotorSpeed);
+  public void changePivotSetpoint(double angleDegrees) {
+    angleSetpoint = angleDegrees;
   }
 
+  /**
+   * Change the setpoint of the roller
+   *
+   * @param rpm The new setpoint in RPM (Rotations per minute)
+   *     <p>Aceptable range: [-1, 1] Positive speed moves the note towards the pivot point
+   */
   @Override
-  public void changePivot(double angle) {
-    angle = MathUtil.clamp(angle, IntakeConstants.kPivotMinAngle, IntakeConstants.kPivotMaxAngle);
-    pivotAngle.withPosition(angle);
-    pivot.setControl(pivotAngle);
+  public void changeRollerSpeed(double speed) {
+    speedSetpoint = speed;
   }
 }
