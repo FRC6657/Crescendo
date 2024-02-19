@@ -25,7 +25,6 @@ public class IntakeIO_Real implements IntakeIO {
   private double angleSetpoint = IntakeConstants.kMaxPivotAngle;
   @AutoLogOutput(key = "Intake/Speed Setpoint")
   private double speedSetpoint = 0;
-  private double lastVelocity = 0;
 
   private DutyCycleOut rollerSetpoint = new DutyCycleOut(0);
   private MotionMagicVoltage pivotSetpoint = new MotionMagicVoltage(IntakeConstants.kMaxPivotAngle);
@@ -104,7 +103,8 @@ public class IntakeIO_Real implements IntakeIO {
 
     // Update the roller inputs
     inputs.rollerMotorVelocity = rollerMotor.getVelocity().getValueAsDouble() * 60; // RPM
-    inputs.rollerMotorAcceleration = (inputs.rollerMotorVelocity - lastVelocity) * CodeConstants.kMainLoopFrequency; // RPM per second
+    inputs.rollerMotorAcceleration = rollerMotor.getAcceleration().getValueAsDouble() * 60; //RPM per second
+    // inputs.rollerMotorAcceleration = (inputs.rollerMotorVelocity - lastVelocity) * CodeConstants.kMainLoopFrequency; // RPM per second
     inputs.rollerMotorTemp = rollerMotor.getDeviceTemp().getValueAsDouble(); // Celcius
     inputs.rollerMotorVoltage = rollerMotor.getMotorVoltage().getValueAsDouble(); // Volts
     inputs.rollerMotorCurrent = rollerMotor.getSupplyCurrent().getValueAsDouble(); // Amps
@@ -112,7 +112,7 @@ public class IntakeIO_Real implements IntakeIO {
     rollerMotor.setControl(rollerSetpoint.withOutput(speedSetpoint));
     pivotMotor.setControl(pivotSetpoint.withPosition(Units.degreesToRotations(angleSetpoint))); // Degrees to Native Rotations
 
-    lastVelocity = inputs.rollerMotorVelocity;
+    // lastVelocity = inputs.rollerMotorVelocity;
 
   }
 
