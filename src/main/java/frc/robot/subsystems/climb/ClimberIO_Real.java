@@ -1,34 +1,39 @@
 package frc.robot.subsystems.climb;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.SparkAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
 
 public class ClimberIO_Real implements ClimberIO {
-  private TalonFX mMotor;
+  private CANSparkMax mMotor;
+  private AbsoluteEncoder mEncoder;
   private final PIDController mPID = ClimbConstants.kClimbUpPID;
   private double setpoint = 0.0;
   private double voltage = 0.0;
 
   public ClimberIO_Real(ClimberInformation info) {
-    mMotor = new TalonFX(info.id);
+    mMotor = new CANSparkMax(info.id, MotorType.kBrushless);
+    mEncoder = mMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
-    var motorConfigurator = mMotor.getConfigurator();
-    var motorConfigs = new TalonFXConfiguration();
+    mMotor.setSmartCurrentLimit(40);
 
-    motorConfigs.CurrentLimits = ClimbConstants.kCurrentConfigs;
-    motorConfigs.Feedback.SensorToMechanismRatio = ClimbConstants.kGearing;
-    motorConfigs.CurrentLimits.StatorCurrentLimit = 40;
-    motorConfigs.MotorOutput.Inverted = info.inverted;
+    if (info.name == "rightClimber") {
+        mMotor.setInverted(true);
+      } else {
+        mMotor.setInverted(false);
+      }
 
-    motorConfigurator.apply(motorConfigs);
+    mEncoder.setPositionConversionFactor(ClimbConstants.kGearing);
+
   }
 
   private double getHeight() {
-    return mMotor.getPosition().getValueAsDouble() * ClimbConstants.kSprocketPD;
+    return mEncoder.getPosition() * ClimbConstants.kSprocketPD;
   }
 
   @Override
@@ -51,9 +56,9 @@ public class ClimberIO_Real implements ClimberIO {
 
   @Override
   public void updateInputs(ClimberIOInputs inputs) {
-    inputs.appliedVoltage = mMotor.getMotorVoltage().getValueAsDouble();
+    inputs.appliedVoltage = mMotor.getBusVoltage();
     inputs.position = getHeight();
-    inputs.current = mMotor.getSupplyCurrent().getValueAsDouble();
-    inputs.velocity = mMotor.getVelocity().getValueAsDouble();
+    inputs.current = mMotor.getOutputCurrent();
+    inputs.velocity = mEncoder.getVelocity();
   }
 }

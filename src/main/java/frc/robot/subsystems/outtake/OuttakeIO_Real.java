@@ -7,6 +7,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
@@ -26,15 +27,17 @@ public class OuttakeIO_Real implements OuttakeIO {
   // Chamber Beam Break Sensor
   DigitalInput beambreak = new DigitalInput(2);
 
-  // Variables to store/log the setpoints
   @AutoLogOutput(key = "Outtake/Raw Angle Setpoint")
   private double rawAngleSetpoint = OuttakeConstants.kMinPivotAngle;
+
   @AutoLogOutput(key = "Outtake/Profiled Angle Setpoint")
   private double profiledAngleSetpoint = OuttakeConstants.kMinPivotAngle;
+
+  // Variables to store/log the setpoints
   @AutoLogOutput(key = "Outtake/RPM Setpoint")
   private double rpmSetpoint = 0;
 
-  private VelocityVoltage flywheelSetpoint = new VelocityVoltage(0);
+  private VelocityVoltage flywheelSetpoint = new VelocityVoltage(0).withSlot(0);
   private MotionMagicVoltage pivotSetpoint = new MotionMagicVoltage(OuttakeConstants.kMinPivotAngle);
 
   public OuttakeIO_Real() {
@@ -129,7 +132,7 @@ public class OuttakeIO_Real implements OuttakeIO {
     // Updated profiled angle setpoint
     //profiledAngleSetpoint = Units.rotationsToDegrees(pivotMotor.getClosedLoopReference().getValueAsDouble()); // Degrees
 
-    leaderFlywheel.setControl(flywheelSetpoint.withVelocity(rpmSetpoint/60)); // RPM to Native Rotations per second
+    leaderFlywheel.setControl(flywheelSetpoint.withVelocity(rpmSetpoint/60).withSlot(0)); // RPM to Native Rotations per second
     pivotMotor.setControl(pivotSetpoint.withPosition(Units.degreesToRotations(rawAngleSetpoint))); // Degrees to Native Rotations
 
   }
@@ -143,7 +146,7 @@ public class OuttakeIO_Real implements OuttakeIO {
    */
   @Override
   public void changePivotSetpoint(double angleDegrees) {
-    rawAngleSetpoint = angleDegrees;
+    rawAngleSetpoint = MathUtil.clamp(angleDegrees, OuttakeConstants.kMinPivotAngle, OuttakeConstants.kMaxPivotAngle);
   }
 
   /**
@@ -154,6 +157,6 @@ public class OuttakeIO_Real implements OuttakeIO {
    */
   @Override
   public void changeFlywheelSetpoint(double rpm) {
-    rpmSetpoint = rpm;
+    rpmSetpoint = MathUtil.clamp(rpm, OuttakeConstants.kMinFlywheelRpm, OuttakeConstants.kMaxFlywheelRpm);
   }
 }

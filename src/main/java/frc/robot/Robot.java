@@ -1,7 +1,6 @@
 package frc.robot;
 
 import com.choreo.lib.ChoreoTrajectory;
-
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -75,24 +74,24 @@ public class Robot extends LoggedRobot {
               });
 
   private Climb climb =
-      new Climb(
-          mode == RobotMode.REAL
-              ? new ClimberIO[] {
-                new ClimberIO_Real(ClimberInformation.kLeftClimber),
-                new ClimberIO_Real(ClimberInformation.kRightClimber)
-              }
+  new Climb(
+  mode == RobotMode.REAL
+  ? new ClimberIO[] {
+  new ClimberIO_Real(ClimberInformation.kLeftClimber),
+  new ClimberIO_Real(ClimberInformation.kRightClimber)
+  }
               : new ClimberIO[] {new ClimberIO_Sim(), new ClimberIO_Sim()});
 
   private Outtake outtake =
       new Outtake(mode == RobotMode.REAL ? new OuttakeIO_Real() : new OuttakeIO_Sim());
 
   private Intake intake =
-      new Intake(mode == RobotMode.REAL ? new IntakeIO_Real() : new IntakeIO_Sim());
+  new Intake(mode == RobotMode.REAL ? new IntakeIO_Real() : new IntakeIO_Sim());
 
   // private Led led = new Led();
 
   private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
-  
+
   ChoreoTrajectory TestPath1;
 
   // Trigger stopTrigger = new Trigger(outtake::beamBroken).onTrue(outtake.changeRPMSetpoint(0));
