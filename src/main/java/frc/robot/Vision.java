@@ -47,8 +47,8 @@ import org.photonvision.targeting.PhotonPipelineResult;
 public class Vision {
     private final PhotonCamera backCamera;
     private final PhotonCamera sideCamera;
-    private final PhotonPoseEstimator photonEstimator;
-    private final PhotonPoseEstimator photonEstimator2;
+    private final PhotonPoseEstimator backCameraEstimator;
+    private final PhotonPoseEstimator sideCameraEstimator;
     private double lastEstTimestamp = 0;
 
     // Simulation
@@ -60,15 +60,15 @@ public class Vision {
         backCamera = new PhotonCamera("Back Camera");
         sideCamera = new PhotonCamera("Side Camera");
 
-        photonEstimator = new PhotonPoseEstimator(
-                        VisionConstants.kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, backCamera, VisionConstants.kFrontCameraPose
+        backCameraEstimator = new PhotonPoseEstimator(
+                        VisionConstants.kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, backCamera, VisionConstants.kBackCameraPose
                     );
-        photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        backCameraEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
-        photonEstimator2 = new PhotonPoseEstimator(
-                        VisionConstants.kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, backCamera, VisionConstants.kSideCameraPose
+        sideCameraEstimator = new PhotonPoseEstimator(
+                        VisionConstants.kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, sideCamera, VisionConstants.kSideCameraPose
                     );
-        photonEstimator2.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        sideCameraEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
         // ----- Simulation
         if (Robot.isSimulation()) {
@@ -78,8 +78,8 @@ public class Vision {
             visionSim.addAprilTags(VisionConstants.kTagLayout);
             // Create simulated camera properties. These can be set to mimic your actual camera.
             var cameraProp = new SimCameraProperties();
-            cameraProp.setCalibration(960, 720, Rotation2d.fromDegrees(90));
-            cameraProp.setCalibError(0.35, 0.10);
+            cameraProp.setCalibration(1280, 800, Rotation2d.fromDegrees(90));
+            cameraProp.setCalibError(0.1, 0.1);
             cameraProp.setFPS(15);
             cameraProp.setAvgLatencyMs(50);
             cameraProp.setLatencyStdDevMs(15);
@@ -88,7 +88,7 @@ public class Vision {
             backCameraSim = new PhotonCameraSim(backCamera, cameraProp);
             sideCameraSim = new PhotonCameraSim(sideCamera, cameraProp);
             // Add the simulated camera to view the targets on this simulated field.
-            visionSim.addCamera(backCameraSim, VisionConstants.kFrontCameraPose);
+            visionSim.addCamera(backCameraSim, VisionConstants.kBackCameraPose);
             visionSim.addCamera(sideCameraSim, VisionConstants.kSideCameraPose);
 
             backCameraSim.enableDrawWireframe(true);
@@ -111,8 +111,8 @@ public class Vision {
      * @return An {@link EstimatedRobotPose} with an estimated pose, estimate timestamp, and targets
      *     used for estimation.
      */
-    public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-        var visionEst = photonEstimator.update();
+    public Optional<EstimatedRobotPose> getBackEstimatedGlobalPose() {
+        var visionEst = backCameraEstimator.update();
         double latestTimestamp = backCamera.getLatestResult().getTimestampSeconds();
         boolean newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
         if (Robot.isSimulation()) {
@@ -129,6 +129,25 @@ public class Vision {
         return visionEst;
     }
 
+    public Optional<EstimatedRobotPose> getSideEstimatedGlobalPose() {
+        var visionEst = sideCameraEstimator.update();
+        double latestTimestamp = sideCamera.getLatestResult().getTimestampSeconds();
+        boolean newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
+        if (Robot.isSimulation()) {
+            visionEst.ifPresentOrElse(
+                    est ->
+                            getSimDebugField()
+                                    .getObject("VisionEstimation")
+                                    .setPose(est.estimatedPose.toPose2d()),
+                    () -> {
+                        if (newResult) getSimDebugField().getObject("VisionEstimation").setPoses();
+                    });
+        }
+        if (newResult) lastEstTimestamp = latestTimestamp;
+        return visionEst;
+    }
+
+
     /**
      * The standard deviations of the estimated pose from {@link #getEstimatedGlobalPose()}, for use
      * with {@link edu.wpi.first.math.estimator.SwerveDrivePoseEstimator SwerveDrivePoseEstimator}.
@@ -136,13 +155,37 @@ public class Vision {
      *
      * @param estimatedPose The estimated pose to guess standard deviations for.
      */
-    public Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
+    public Matrix<N3, N1> getBackEstimationStdDevs(Pose2d estimatedPose) {
         var estStdDevs = VisionConstants.kSingleTagStdDevs;
         var targets = getBackLatestResult().getTargets();
         int numTags = 0;
         double avgDist = 0;
         for (var tgt : targets) {
-            var tagPose = photonEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+            var tagPose = backCameraEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+            if (tagPose.isEmpty()) continue;
+            numTags++;
+            avgDist +=
+                    tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
+        }
+        if (numTags == 0) return estStdDevs;
+        avgDist /= numTags;
+        // Decrease std devs if multiple targets are visible
+        if (numTags > 1) estStdDevs = VisionConstants.kMultiTagStdDevs;
+        // Increase std devs based on (average) distance
+        if (numTags == 1 && avgDist > 4)
+            estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+
+        return estStdDevs;
+    }
+
+    public Matrix<N3, N1> getSideEstimationStdDevs(Pose2d estimatedPose) {
+        var estStdDevs = VisionConstants.kSingleTagStdDevs;
+        var targets = getBackLatestResult().getTargets();
+        int numTags = 0;
+        double avgDist = 0;
+        for (var tgt : targets) {
+            var tagPose = sideCameraEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
             if (tagPose.isEmpty()) continue;
             numTags++;
             avgDist +=
