@@ -1,20 +1,12 @@
 package frc.robot;
 
-import com.choreo.lib.Choreo;
-import com.choreo.lib.ChoreoTrajectory;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IntakeConstants;
@@ -37,6 +29,7 @@ import frc.robot.subsystems.intake.IntakeIO_Sim;
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO_Real;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -106,8 +99,6 @@ public class Robot extends LoggedRobot {
 
   private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
 
-  ChoreoTrajectory traj;
-
   // Trigger stopTrigger = new Trigger(outtake::beamBroken).onTrue(outtake.changeRPMSetpoint(0));
 
   @SuppressWarnings(value = "resource")
@@ -151,7 +142,7 @@ public class Robot extends LoggedRobot {
                         * DriveConstants.kMaxAngularVelocity
                         * 0.25)));
 
-    autoChooser.addDefaultOption("None", superstructure.testAuto());
+    autoChooser.addDefaultOption("None", null);
     autoChooser.addOption("test", superstructure.testAuto());
 
     // controller.b().onTrue(outtake.changePivotSetpoint(OuttakeConstants.kMaxAngle));
