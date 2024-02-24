@@ -1,33 +1,31 @@
 package frc.robot.subsystems.drive;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Vision;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MAXSwerveConstants;
-import frc.robot.Constants.VisionConstants;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 public class MAXSwerve extends SubsystemBase {
 
@@ -73,30 +71,8 @@ public class MAXSwerve extends SubsystemBase {
     poseEstimator =
         new SwerveDrivePoseEstimator(
             kinematics, gyroInputs.yawPosition, getModulePositions(), new Pose2d());
+
   }
-
-  // Apirl tags for PhotonVision
-  AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
-
-  // Front Camera
-
-  PhotonCamera frontCam = new PhotonCamera("Front Cam");
-  PhotonPoseEstimator photonPoseEstimatorFrontCam =
-      new PhotonPoseEstimator(
-          aprilTagFieldLayout,
-          PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-          frontCam,
-          VisionConstants.kFrontCameraPose);
-
-  // Side Camera
-
-  PhotonCamera sideCam = new PhotonCamera("Side Cam");
-  PhotonPoseEstimator photonPoseEstimatorSideCam =
-      new PhotonPoseEstimator(
-          aprilTagFieldLayout,
-          PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-          frontCam,
-          VisionConstants.kSideCameraPose);
 
   /** This code runs at 50hz and is responsible for updating the IO and pose estimator */
   @Override
@@ -126,9 +102,6 @@ public class MAXSwerve extends SubsystemBase {
       poseEstimator.update(lastHeading, getModulePositions());
     }
 
-    // poseEstimator.addVisionMeasurement(getFrontCamEstimatedPose2d(), Timer.getFPGATimestamp());
-    // poseEstimator.addVisionMeasurement(getSideCamEstimatedPose2d(), Timer.getFPGATimestamp());
-
     // Stop moving when disabled
     if (DriverStation.isDisabled()) {
       for (var module : modules) {
@@ -142,8 +115,6 @@ public class MAXSwerve extends SubsystemBase {
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
 
-    Logger.recordOutput(
-        "FrontCameraPos", new Pose3d(getPose()).transformBy(VisionConstants.kSideCameraPose));
   }
 
   /**
@@ -233,6 +204,10 @@ public class MAXSwerve extends SubsystemBase {
     return poseEstimator.getEstimatedPosition();
   }
 
+  public void addVisionMeasurement(Pose2d visionMeasurement, double timestampSeconds, Matrix<N3,N1> stdDevs) {
+    poseEstimator.addVisionMeasurement(visionMeasurement, timestampSeconds, stdDevs);
+  }
+
   /** Returns the current odometry rotation. */
   public Rotation2d getRotation() {
     return getPose().getRotation();
@@ -245,14 +220,6 @@ public class MAXSwerve extends SubsystemBase {
     } else {
       poseEstimator.resetPosition(pose.getRotation(), getModulePositions(), pose);
     }
-  }
-
-  public Pose2d getFrontCamEstimatedPose2d() {
-    return photonPoseEstimatorFrontCam.update().get().estimatedPose.toPose2d();
-  }
-
-  public Pose2d getSideCamEstimatedPose2d() {
-    return photonPoseEstimatorSideCam.update().get().estimatedPose.toPose2d();
   }
 
   @SuppressWarnings("resource")

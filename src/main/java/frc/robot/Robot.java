@@ -2,7 +2,8 @@ package frc.robot;
 
 import com.choreo.lib.Choreo;
 import com.choreo.lib.ChoreoTrajectory;
-import edu.wpi.first.math.controller.PIDController;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -17,6 +18,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.MAXSwerveConstants;
 import frc.robot.Constants.OuttakeConstants;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.climb.Climb;
@@ -44,6 +46,9 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
+
+  Vision vision = new Vision();
+
 
   public static enum RobotMode {
     SIM,
@@ -132,19 +137,19 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     // Set the default command for the drivebase for TeleOP driving
-    // drivebase.setDefaultCommand(
-    //     drivebase.runVelocityFieldRelative(
-    //         () ->
-    //             new ChassisSpeeds(
-    //                 -MathUtil.applyDeadband(controller.getLeftY(), 0.05)
-    //                     * MAXSwerveConstants.kMaxDriveSpeed
-    //                     * 0.5,
-    //                 -MathUtil.applyDeadband(controller.getLeftX(), 0.15)
-    //                     * MAXSwerveConstants.kMaxDriveSpeed
-    //                     * 0.5,
-    //                 -MathUtil.applyDeadband(controller.getRightX(), 0.15)
-    //                     * DriveConstants.kMaxAngularVelocity
-    //                     * 0.25)));
+    drivebase.setDefaultCommand(
+        drivebase.runVelocityFieldRelative(
+            () ->
+                new ChassisSpeeds(
+                    -MathUtil.applyDeadband(controller.getLeftY(), 0.05)
+                        * MAXSwerveConstants.kMaxDriveSpeed
+                        * 0.5,
+                    -MathUtil.applyDeadband(controller.getLeftX(), 0.15)
+                        * MAXSwerveConstants.kMaxDriveSpeed
+                        * 0.5,
+                    -MathUtil.applyDeadband(controller.getRightX(), 0.15)
+                        * DriveConstants.kMaxAngularVelocity
+                        * 0.25)));
 
     autoChooser.addDefaultOption("None", superstructure.testAuto());
     autoChooser.addOption("test", superstructure.testAuto());
@@ -179,11 +184,7 @@ public class Robot extends LoggedRobot {
 
     controller.b().onTrue(intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle));
     controller.x().onTrue(intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
-    controller.y().onTrue(outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle));
-
-    // Choreo
-    traj = Choreo.getTrajectory("1Taxi");
-
+    controller.y().onTrue(outtake.changePivotSetpoint(OuttakeConstants.kMaxPivotAngle));
   }
 
   @Override
@@ -191,6 +192,31 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
     superstructure.update3DPose();
     superstructure.processQueue();
+   
+    var backVisionEst = vision.getBackEstimatedGlobalPose();
+    var sideVisionEst = vision.getSideEstimatedGlobalPose();
+
+    backVisionEst.ifPresent(
+      est -> {
+        var estPose = est.estimatedPose.toPose2d();
+        Logger.recordOutput("Vision/BackGlobalEstimate", estPose);
+
+        // var estStdDevs = vision.getBackEstimationStdDevs(estPose);
+        // drivebase.addVisionMeasurement(estPose, est.timestampSeconds, estStdDevs);
+
+      }
+    );
+
+    sideVisionEst.ifPresent(
+      est -> {
+        var estPose = est.estimatedPose.toPose2d();
+        Logger.recordOutput("Vision/SideGlobalEstimate", estPose);
+
+        // var estStdDevs = vision.getSideEstimationStdDevs(estPose);
+        // drivebase.addVisionMeasurement(estPose, est.timestampSeconds, estStdDevs);
+      }
+    );
+
   }
 
   @Override
@@ -237,6 +263,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void simulationPeriodic() {
-    // noteVisulaizer.updateNotes();
+    vision.simulationPeriodic(drivebase.getPose());
   }
 }

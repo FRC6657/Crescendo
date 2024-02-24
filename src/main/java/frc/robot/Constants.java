@@ -50,14 +50,14 @@ public class Constants {
   }
 
   public static final class VisionConstants {
-    public static final Transform3d kFrontCameraPose =
-        new Transform3d(new Translation3d(-0.336886, 0, 0.531201), new Rotation3d(0, 0.485314, 0));
+    public static final Transform3d kBackCameraPose =
+        new Transform3d(new Translation3d(-0.343236, 0, 0.531201), new Rotation3d(0, -0.485314, Math.PI));
     public static final Transform3d kSideCameraPose =
         new Transform3d(
-            new Translation3d(-0.242086, 0.170791, 0.511322),
-            new Rotation3d(0, 0.122173, -1.28248701081));
-    public static final AprilTagFieldLayout kTagLayout =
-        AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+            new Translation3d(-0.246587, 0.172519, 0.509174),
+            new Rotation3d(0, -0.122173, -1.28248701081+Math.PI));
+
+    public static final AprilTagFieldLayout kTagLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
 
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
