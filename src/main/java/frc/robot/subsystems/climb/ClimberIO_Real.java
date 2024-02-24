@@ -1,18 +1,23 @@
 package frc.robot.subsystems.climb;
 
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ClimberIO_Real implements ClimberIO {
   private CANSparkMax mMotor;
   private RelativeEncoder mEncoder;
   private final PIDController mPID = ClimbConstants.kClimbUpPID;
+
+  @AutoLogOutput(key = "climb setpoint")
   private double setpoint = 0.0;
+
   private double voltage = 0.0;
 
   public ClimberIO_Real(ClimberInformation info) {
@@ -21,14 +26,11 @@ public class ClimberIO_Real implements ClimberIO {
 
     mMotor.setSmartCurrentLimit(40);
 
-    if (info.name == "rightClimber") {
-        mMotor.setInverted(true);
-      } else {
-        mMotor.setInverted(false);
-      }
+    mMotor.setInverted(info.inverted);
 
-    mEncoder.setPositionConversionFactor(ClimbConstants.kGearing * ClimbConstants.kSprocketPD);
+    mEncoder.setPositionConversionFactor(ClimbConstants.kSensorToVerticalMeters);
 
+    mMotor.setIdleMode(IdleMode.kBrake);
   }
 
   @Override

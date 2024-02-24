@@ -91,5 +91,4 @@ public class Superstructure {
   public Command unlockOuttake() {
     return Commands.runOnce(() -> outtakeLock = false);
   }
-
 }

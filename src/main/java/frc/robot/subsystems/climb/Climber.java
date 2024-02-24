@@ -10,23 +10,27 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import org.littletonrobotics.junction.Logger;
 
-public class Climber implements ClimberIO {
+public class Climber {
   private final ClimberIO io;
   private final String name;
   private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
 
   public Climber(ClimberIO climberIO, ClimberInformation info) {
     this.io = climberIO;
-    name = info.name;
+    name = info.name + " Climber";
   }
 
   public void updateInputs() {
     io.updateInputs(inputs);
-    Logger.processInputs(name + " ", inputs);
+    Logger.processInputs(name, inputs);
   }
 
   public void run() {
     io.run();
+  }
+
+  public void changeSetpoint(double height) {
+    io.changeSetpoint(height);
   }
 
   public Pose3d get3DPose() {

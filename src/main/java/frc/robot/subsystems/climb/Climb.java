@@ -8,7 +8,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
 
 public class Climb extends SubsystemBase {
@@ -23,6 +23,7 @@ public class Climb extends SubsystemBase {
 
   @Override
   public void periodic() {
+
     leftClimber.updateInputs();
     rightClimber.updateInputs();
 
@@ -33,19 +34,11 @@ public class Climb extends SubsystemBase {
   public Command changeSetpoint(double setpoint) {
     return this.runOnce(
         () -> {
-          leftClimber.changeSetpoint(setpoint);
-          rightClimber.changeSetpoint(setpoint);
+          leftClimber.changeSetpoint(
+              MathUtil.clamp(setpoint, ClimbConstants.kMinHeight, ClimbConstants.kMaxHeight));
+          rightClimber.changeSetpoint(
+              MathUtil.clamp(setpoint, ClimbConstants.kMinHeight, ClimbConstants.kMaxHeight));
         });
-  }
-
-  public void changeClimbSetpoint(double setpoint) {
-    setpoint =
-        MathUtil.clamp(
-            setpoint, Constants.ClimbConstants.kMinHeight, Constants.ClimbConstants.kMaxHeight);
-  }
-
-  public Command run() {
-    return this.run(() -> {});
   }
 
   public Pose3d[] get3DPoses() {
