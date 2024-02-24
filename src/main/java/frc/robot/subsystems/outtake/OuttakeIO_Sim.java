@@ -87,7 +87,7 @@ public class OuttakeIO_Sim implements OuttakeIO {
    */
   @Override
   public void changePivotSetpoint(double angleDegrees) {
-    angleSetpoint =  angleDegrees;
+    angleSetpoint = angleDegrees;
   }
 
   /** Uses the current setpoints and the current states to calculate the output voltages. */

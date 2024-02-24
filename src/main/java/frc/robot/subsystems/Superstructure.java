@@ -4,16 +4,29 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drive.MAXSwerve;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.outtake.Outtake;
+
+import java.io.ObjectOutputStream.PutField;
 import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
+
+import com.choreo.lib.Choreo;
+import com.choreo.lib.ChoreoTrajectory;
 
 public class Superstructure {
 
@@ -92,4 +105,57 @@ public class Superstructure {
     return Commands.runOnce(() -> outtakeLock = false);
   }
 
+  public Command testAuto(){
+    return Commands.sequence(
+      createPath("1Taxi", true),
+      createPath("1Taxi.1", true)
+      // Commands.runOnce(() -> drivebase.setPose(new Pose2d(new Translation2d(5,5), new Rotation2d(0))), drivebase),
+      // Commands.runOnce(() -> drivebase.goToPose(new Pose2d(new Translation2d(6,5), new Rotation2d(0))), drivebase)
+    );
+  }
+
+  private Command createPath(String pathName, boolean side) {
+    ChoreoTrajectory traj = Choreo.getTrajectory(pathName);
+
+
+    var thetaController = new PIDController(AutoConstants.kPThetaController, 0, 0);
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+    Command swerveCommand = Choreo.choreoSwerveCommand(
+            traj, // Choreo trajectory from above
+            drivebase
+                ::getPose, // A function that returns the current field-relative pose of the robot:
+            // your
+            // wheel or vision odometry
+            new PIDController(
+                AutoConstants.kPXController,
+                0.0,
+                0.0), // PIDController for field-relative X
+            // translation (input: X error in meters,
+            // output: m/s).
+            new PIDController(
+                AutoConstants.kPYController,
+                0.0,
+                0.0), // PIDController for field-relative Y
+            // translation (input: Y error in meters,
+            // output: m/s).
+            thetaController, // PID constants to correct for rotation
+            // error
+            (ChassisSpeeds speeds) ->
+                drivebase.choreoDrive( // needs to be robot-relative
+                    speeds.vxMetersPerSecond,
+                    speeds.vyMetersPerSecond,
+                    speeds.omegaRadiansPerSecond),
+            () ->
+                side, // Whether or not to mirror the path based on alliance (this assumes the path
+            // is created for the blue alliance)
+            drivebase // The subsystem(s) to require, typically your drive subsystem only
+            );
+    return Commands.sequence(
+      Commands.runOnce(() -> drivebase.setPose(traj.getInitialPose())),
+        swerveCommand,
+        drivebase.run(() -> drivebase.choreoDrive(0, 0, 0))
+    );
+  } 
+  
 }

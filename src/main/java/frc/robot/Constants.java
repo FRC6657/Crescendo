@@ -5,7 +5,6 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.revrobotics.CANSparkBase.IdleMode;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
@@ -57,7 +56,8 @@ public class Constants {
         new Transform3d(
             new Translation3d(-0.242086, 0.170791, 0.511322),
             new Rotation3d(0, 0.122173, -1.28248701081));
-    public static final AprilTagFieldLayout kTagLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+    public static final AprilTagFieldLayout kTagLayout =
+        AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
 
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
@@ -92,9 +92,9 @@ public class Constants {
 
   public static final class AutoConstants {
     // Choreo
-    public static final double kChor_P_X = 1;
-    public static final double kChor_P_Y = 1;
-    public static final double kChor_P_Theta = 1;
+    public static final double kPXController = 1;
+    public static final double kPYController = 1;
+    public static final double kPThetaController = 1;
 
     // Auto Align
     public static final double kAA_P_X = 3;
@@ -277,7 +277,7 @@ public class Constants {
   public static final class IntakeConstants {
 
     public static final double kGearingPivot = (1d / 20) * (16d / 36);
-    public static final double kGearingRollers = (11d/24);
+    public static final double kGearingRollers = (11d / 24);
 
     public static final double kMinPivotAngle = -27.5;
     public static final double kMaxPivotAngle = 152.25;
@@ -286,35 +286,35 @@ public class Constants {
     public static final double kRollersCurrentLimit = 20;
 
     public static Slot0Configs kPivotSlot0 =
-      new Slot0Configs()
-        .withKS(0)
-        .withKV(12d/((6380d/60)*kGearingPivot)) //Volts/Mechanism RPS
-        .withKP(150)
-        .withKI(0)
-        .withKD(0);
-        
+        new Slot0Configs()
+            .withKS(0)
+            .withKV(12d / ((6380d / 60) * kGearingPivot)) // Volts/Mechanism RPS
+            .withKP(150)
+            .withKI(0)
+            .withKD(0);
+
     public static MotionMagicConfigs kPivotMotionMagicConfig =
-      new MotionMagicConfigs()
-        .withMotionMagicCruiseVelocity(Units.degreesToRotations(300))
-        .withMotionMagicAcceleration(Units.degreesToRotations(400));
+        new MotionMagicConfigs()
+            .withMotionMagicCruiseVelocity(Units.degreesToRotations(300))
+            .withMotionMagicAcceleration(Units.degreesToRotations(400));
 
     public static final CurrentLimitsConfigs kPivotCurrentConfigs =
-      new CurrentLimitsConfigs()
-        .withStatorCurrentLimit(kPivotCurrentLimit)
-        .withSupplyCurrentLimit(kPivotCurrentLimit)
-        .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimitEnable(true)
-        .withSupplyCurrentThreshold(kPivotCurrentLimit)
-        .withSupplyTimeThreshold(0);
+        new CurrentLimitsConfigs()
+            .withStatorCurrentLimit(kPivotCurrentLimit)
+            .withSupplyCurrentLimit(kPivotCurrentLimit)
+            .withStatorCurrentLimitEnable(true)
+            .withSupplyCurrentLimitEnable(true)
+            .withSupplyCurrentThreshold(kPivotCurrentLimit)
+            .withSupplyTimeThreshold(0);
 
     public static final CurrentLimitsConfigs kRollersCurrentConfigs =
-      new CurrentLimitsConfigs()
-        .withStatorCurrentLimit(kRollersCurrentLimit)
-        .withSupplyCurrentLimit(kRollersCurrentLimit)
-        .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimitEnable(true)
-        .withSupplyCurrentThreshold(kRollersCurrentLimit)
-        .withSupplyTimeThreshold(0);
+        new CurrentLimitsConfigs()
+            .withStatorCurrentLimit(kRollersCurrentLimit)
+            .withSupplyCurrentLimit(kRollersCurrentLimit)
+            .withStatorCurrentLimitEnable(true)
+            .withSupplyCurrentLimitEnable(true)
+            .withSupplyCurrentThreshold(kRollersCurrentLimit)
+            .withSupplyTimeThreshold(0);
   }
 
   public static final class OuttakeConstants {
@@ -331,42 +331,42 @@ public class Constants {
     public static final double kFlywheelCurrentLimit = 30;
 
     public static Slot0Configs kPivotSlot0 =
-      new Slot0Configs()
-        .withKS(0)
-        .withKV(12d/((6380d/60)*kGearingPivot)) //Volts/Mechanism RPS
-        .withKP(150)
-        .withKI(0)
-        .withKD(0);
+        new Slot0Configs()
+            .withKS(0)
+            .withKV(12d / ((6380d / 60) * kGearingPivot)) // Volts/Mechanism RPS
+            .withKP(150)
+            .withKI(0)
+            .withKD(0);
 
     public static MotionMagicConfigs kPivotMotionMagicConfig =
-      new MotionMagicConfigs()
-        .withMotionMagicCruiseVelocity(Units.degreesToRotations(300))
-        .withMotionMagicAcceleration(Units.degreesToRotations(400));
+        new MotionMagicConfigs()
+            .withMotionMagicCruiseVelocity(Units.degreesToRotations(300))
+            .withMotionMagicAcceleration(Units.degreesToRotations(400));
 
     public static Slot0Configs kFlyWheelSlot0 =
-      new Slot0Configs()
-        .withKS(.05)
-        .withKV(12d/((6380d/60)*kGearingFlywheel)) //Volts/Mechanism RPS
-        .withKP(0)
-        .withKI(0)
-        .withKD(0);
+        new Slot0Configs()
+            .withKS(.05)
+            .withKV(12d / ((6380d / 60) * kGearingFlywheel)) // Volts/Mechanism RPS
+            .withKP(0)
+            .withKI(0)
+            .withKD(0);
 
     public static final CurrentLimitsConfigs kPivotCurrentConfigs =
-      new CurrentLimitsConfigs()
-        .withStatorCurrentLimit(kPivotCurrentLimit)
-        .withSupplyCurrentLimit(kPivotCurrentLimit)
-        .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimitEnable(true)
-        .withSupplyCurrentThreshold(kPivotCurrentLimit)
-        .withSupplyTimeThreshold(0);
+        new CurrentLimitsConfigs()
+            .withStatorCurrentLimit(kPivotCurrentLimit)
+            .withSupplyCurrentLimit(kPivotCurrentLimit)
+            .withStatorCurrentLimitEnable(true)
+            .withSupplyCurrentLimitEnable(true)
+            .withSupplyCurrentThreshold(kPivotCurrentLimit)
+            .withSupplyTimeThreshold(0);
 
     public static final CurrentLimitsConfigs kFlywheelCurrentConfigs =
-      new CurrentLimitsConfigs()
-        .withStatorCurrentLimit(kFlywheelCurrentLimit)
-        .withSupplyCurrentLimit(kFlywheelCurrentLimit)
-        .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimitEnable(true)
-        .withSupplyCurrentThreshold(kFlywheelCurrentLimit)
-        .withSupplyTimeThreshold(0);
+        new CurrentLimitsConfigs()
+            .withStatorCurrentLimit(kFlywheelCurrentLimit)
+            .withSupplyCurrentLimit(kFlywheelCurrentLimit)
+            .withStatorCurrentLimitEnable(true)
+            .withSupplyCurrentLimitEnable(true)
+            .withSupplyCurrentThreshold(kFlywheelCurrentLimit)
+            .withSupplyTimeThreshold(0);
   }
 }

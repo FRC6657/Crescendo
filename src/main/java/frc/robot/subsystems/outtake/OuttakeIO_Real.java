@@ -38,7 +38,8 @@ public class OuttakeIO_Real implements OuttakeIO {
   private double rpmSetpoint = 0;
 
   private VelocityVoltage flywheelSetpoint = new VelocityVoltage(0).withSlot(0);
-  private MotionMagicVoltage pivotSetpoint = new MotionMagicVoltage(OuttakeConstants.kMinPivotAngle);
+  private MotionMagicVoltage pivotSetpoint =
+      new MotionMagicVoltage(OuttakeConstants.kMinPivotAngle);
 
   public OuttakeIO_Real() {
 
@@ -130,11 +131,16 @@ public class OuttakeIO_Real implements OuttakeIO {
     inputs.beamBroken = !beambreak.get();
 
     // Updated profiled angle setpoint
-    //profiledAngleSetpoint = Units.rotationsToDegrees(pivotMotor.getClosedLoopReference().getValueAsDouble()); // Degrees
+    // profiledAngleSetpoint =
+    // Units.rotationsToDegrees(pivotMotor.getClosedLoopReference().getValueAsDouble()); // Degrees
 
-    leaderFlywheel.setControl(flywheelSetpoint.withVelocity(rpmSetpoint/60).withSlot(0)); // RPM to Native Rotations per second
-    pivotMotor.setControl(pivotSetpoint.withPosition(Units.degreesToRotations(rawAngleSetpoint))); // Degrees to Native Rotations
-
+    leaderFlywheel.setControl(
+        flywheelSetpoint
+            .withVelocity(rpmSetpoint / 60)
+            .withSlot(0)); // RPM to Native Rotations per second
+    pivotMotor.setControl(
+        pivotSetpoint.withPosition(
+            Units.degreesToRotations(rawAngleSetpoint))); // Degrees to Native Rotations
   }
 
   /**
@@ -146,7 +152,9 @@ public class OuttakeIO_Real implements OuttakeIO {
    */
   @Override
   public void changePivotSetpoint(double angleDegrees) {
-    rawAngleSetpoint = MathUtil.clamp(angleDegrees, OuttakeConstants.kMinPivotAngle, OuttakeConstants.kMaxPivotAngle);
+    rawAngleSetpoint =
+        MathUtil.clamp(
+            angleDegrees, OuttakeConstants.kMinPivotAngle, OuttakeConstants.kMaxPivotAngle);
   }
 
   /**
@@ -157,6 +165,7 @@ public class OuttakeIO_Real implements OuttakeIO {
    */
   @Override
   public void changeFlywheelSetpoint(double rpm) {
-    rpmSetpoint = MathUtil.clamp(rpm, OuttakeConstants.kMinFlywheelRpm, OuttakeConstants.kMaxFlywheelRpm);
+    rpmSetpoint =
+        MathUtil.clamp(rpm, OuttakeConstants.kMinFlywheelRpm, OuttakeConstants.kMaxFlywheelRpm);
   }
 }

@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Outtake extends SubsystemBase {
@@ -44,11 +43,9 @@ public class Outtake extends SubsystemBase {
     return this.runOnce(() -> outtakeIO.changeFlywheelSetpoint(rpm));
   }
 
-  public boolean beamBroken(){
+  public boolean beamBroken() {
     return outtakeInputs.beamBroken;
   }
-
-
 
   @Override
   public void periodic() {

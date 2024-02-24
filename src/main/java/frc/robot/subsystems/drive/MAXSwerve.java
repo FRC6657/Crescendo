@@ -159,6 +159,17 @@ public class MAXSwerve extends SubsystemBase {
         });
   }
 
+  public void choreoDrive(double xSpeed, double ySpeed, double rot) {
+    var swerveModuleStates =
+        kinematics.toSwerveModuleStates(new ChassisSpeeds(xSpeed, ySpeed, rot));
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        swerveModuleStates, MAXSwerveConstants.kMaxDriveSpeed);
+    modules[0].run(swerveModuleStates[0]);
+    modules[0].run(swerveModuleStates[1]);
+    modules[0].run(swerveModuleStates[2]);
+    modules[0].run(swerveModuleStates[3]);
+  }
+
   /*
    * Stops the drivebase
    */

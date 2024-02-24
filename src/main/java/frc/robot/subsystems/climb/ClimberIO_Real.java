@@ -1,8 +1,8 @@
 package frc.robot.subsystems.climb;
 
 import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -23,13 +23,12 @@ public class ClimberIO_Real implements ClimberIO {
     mMotor.setSmartCurrentLimit(40);
 
     if (info.name == "rightClimber") {
-        mMotor.setInverted(true);
-      } else {
-        mMotor.setInverted(false);
-      }
+      mMotor.setInverted(true);
+    } else {
+      mMotor.setInverted(false);
+    }
 
     mEncoder.setPositionConversionFactor(ClimbConstants.kGearing);
-
   }
 
   private double getHeight() {

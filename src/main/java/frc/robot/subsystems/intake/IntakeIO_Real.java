@@ -23,6 +23,7 @@ public class IntakeIO_Real implements IntakeIO {
   // Variables to store/log the setpoints
   @AutoLogOutput(key = "Intake/Angle Setpoint")
   private double angleSetpoint = IntakeConstants.kMaxPivotAngle;
+
   @AutoLogOutput(key = "Intake/Speed Setpoint")
   private double speedSetpoint = 0;
 
@@ -36,7 +37,8 @@ public class IntakeIO_Real implements IntakeIO {
     // Configure the pivot motor
     var pivotConfigurator = pivotMotor.getConfigurator();
     var pivotConfigs = new TalonFXConfiguration();
-    pivotConfigs.Feedback.SensorToMechanismRatio = 1.0 / IntakeConstants.kGearingPivot; // Sets default output to pivot rotations
+    pivotConfigs.Feedback.SensorToMechanismRatio =
+        1.0 / IntakeConstants.kGearingPivot; // Sets default output to pivot rotations
     pivotConfigs.Slot0 = IntakeConstants.kPivotSlot0; // PID Constants
     pivotConfigs.CurrentLimits = IntakeConstants.kPivotCurrentConfigs; // Current Limits
     pivotConfigs.MotionMagic = IntakeConstants.kPivotMotionMagicConfig; // Motion Magic Constants
@@ -67,7 +69,8 @@ public class IntakeIO_Real implements IntakeIO {
     // Configure the leading roller motor
     var rollerConfigurator = rollerMotor.getConfigurator();
     var rollerConfigs = new TalonFXConfiguration();
-    rollerConfigs.Feedback.SensorToMechanismRatio = 1.0 / IntakeConstants.kGearingRollers; // Sets default output to roller rotations
+    rollerConfigs.Feedback.SensorToMechanismRatio =
+        1.0 / IntakeConstants.kGearingRollers; // Sets default output to roller rotations
     rollerConfigs.CurrentLimits = IntakeConstants.kRollersCurrentConfigs; // Current Limits
     rollerConfigurator.apply(rollerConfigs);
 
@@ -103,14 +106,18 @@ public class IntakeIO_Real implements IntakeIO {
 
     // Update the roller inputs
     inputs.rollerMotorVelocity = rollerMotor.getVelocity().getValueAsDouble() * 60; // RPM
-    inputs.rollerMotorAcceleration = rollerMotor.getAcceleration().getValueAsDouble() * 60; //RPM per second
-    // inputs.rollerMotorAcceleration = (inputs.rollerMotorVelocity - lastVelocity) * CodeConstants.kMainLoopFrequency; // RPM per second
+    inputs.rollerMotorAcceleration =
+        rollerMotor.getAcceleration().getValueAsDouble() * 60; // RPM per second
+    // inputs.rollerMotorAcceleration = (inputs.rollerMotorVelocity - lastVelocity) *
+    // CodeConstants.kMainLoopFrequency; // RPM per second
     inputs.rollerMotorTemp = rollerMotor.getDeviceTemp().getValueAsDouble(); // Celcius
     inputs.rollerMotorVoltage = rollerMotor.getMotorVoltage().getValueAsDouble(); // Volts
     inputs.rollerMotorCurrent = rollerMotor.getSupplyCurrent().getValueAsDouble(); // Amps
 
     rollerMotor.setControl(rollerSetpoint.withOutput(speedSetpoint));
-    pivotMotor.setControl(pivotSetpoint.withPosition(Units.degreesToRotations(angleSetpoint))); // Degrees to Native Rotations
+    pivotMotor.setControl(
+        pivotSetpoint.withPosition(
+            Units.degreesToRotations(angleSetpoint))); // Degrees to Native Rotations
 
     // lastVelocity = inputs.rollerMotorVelocity;
 

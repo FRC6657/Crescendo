@@ -1,7 +1,5 @@
 package frc.robot.subsystems.intake;
 
-import org.littletonrobotics.junction.AutoLogOutput;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -10,6 +8,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.IntakeConstants;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class IntakeIO_Sim implements IntakeIO {
 
@@ -25,8 +24,10 @@ public class IntakeIO_Sim implements IntakeIO {
   private double angleSetpoint = IntakeConstants.kMaxPivotAngle;
 
   // Simulated Motors
-  private DCMotorSim pivotSim = new DCMotorSim(DCMotor.getFalcon500(1), 1 / IntakeConstants.kGearingPivot, 0.04);
-  private DCMotorSim rollerSim = new DCMotorSim(DCMotor.getFalcon500(2), IntakeConstants.kGearingRollers, 0.00146376);
+  private DCMotorSim pivotSim =
+      new DCMotorSim(DCMotor.getFalcon500(1), 1 / IntakeConstants.kGearingPivot, 0.04);
+  private DCMotorSim rollerSim =
+      new DCMotorSim(DCMotor.getFalcon500(2), IntakeConstants.kGearingRollers, 0.00146376);
 
   // Pivot PID
   private PIDController pivotPID = new PIDController(24d / 360, 0, 0);
@@ -46,7 +47,8 @@ public class IntakeIO_Sim implements IntakeIO {
 
     // Pivot Inputs
     inputs.pivotMotorPosition = pivotSim.getAngularPositionRotations() * 360; // Degrees
-    inputs.pivotMotorVelocity = pivotSim.getAngularVelocityRPM() * (360d / 60); // Degrees per second
+    inputs.pivotMotorVelocity =
+        pivotSim.getAngularVelocityRPM() * (360d / 60); // Degrees per second
     inputs.pivotMotorTemp = 0; // Celcius
     inputs.pivotMotorVoltage = pivotVoltage; // Volts
     inputs.pivotMotorCurrent = pivotSim.getCurrentDrawAmps(); // Amps
@@ -80,7 +82,6 @@ public class IntakeIO_Sim implements IntakeIO {
   public void changeRollerSpeed(double speed) {
     rollerVoltage = speed;
   }
-
 
   /** Uses the current setpoints and the current states to calculate the output voltages. */
   private void updatePID() {

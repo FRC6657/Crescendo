@@ -1,15 +1,23 @@
 package frc.robot;
 
+import com.choreo.lib.Choreo;
 import com.choreo.lib.ChoreoTrajectory;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OuttakeConstants;
-import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimberIO;
@@ -51,10 +59,11 @@ public class Robot extends LoggedRobot {
   private final LoggedDashboardChooser<Command> autoChooser =
       new LoggedDashboardChooser<>("Auto Chooser");
 
+  private Command autoCommand;
+
   // Driver Controllers
   private CommandXboxController controller = new CommandXboxController(0);
 
-  
   // Subsystems
   private MAXSwerve drivebase =
       new MAXSwerve(
@@ -74,25 +83,25 @@ public class Robot extends LoggedRobot {
               });
 
   private Climb climb =
-  new Climb(
-  mode == RobotMode.REAL
-  ? new ClimberIO[] {
-  new ClimberIO_Real(ClimberInformation.kLeftClimber),
-  new ClimberIO_Real(ClimberInformation.kRightClimber)
-  }
+      new Climb(
+          mode == RobotMode.REAL
+              ? new ClimberIO[] {
+                new ClimberIO_Real(ClimberInformation.kLeftClimber),
+                new ClimberIO_Real(ClimberInformation.kRightClimber)
+              }
               : new ClimberIO[] {new ClimberIO_Sim(), new ClimberIO_Sim()});
 
   private Outtake outtake =
       new Outtake(mode == RobotMode.REAL ? new OuttakeIO_Real() : new OuttakeIO_Sim());
 
   private Intake intake =
-  new Intake(mode == RobotMode.REAL ? new IntakeIO_Real() : new IntakeIO_Sim());
+      new Intake(mode == RobotMode.REAL ? new IntakeIO_Real() : new IntakeIO_Sim());
 
   // private Led led = new Led();
 
   private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
 
-  ChoreoTrajectory TestPath1;
+  ChoreoTrajectory traj;
 
   // Trigger stopTrigger = new Trigger(outtake::beamBroken).onTrue(outtake.changeRPMSetpoint(0));
 
@@ -137,7 +146,8 @@ public class Robot extends LoggedRobot {
     //                     * DriveConstants.kMaxAngularVelocity
     //                     * 0.25)));
 
-    autoChooser.addDefaultOption("None", null);
+    autoChooser.addDefaultOption("None", superstructure.testAuto());
+    autoChooser.addOption("test", superstructure.testAuto());
 
     // controller.b().onTrue(outtake.changePivotSetpoint(OuttakeConstants.kMaxAngle));
     // controller.b().onFalse(outtake.changePivotSetpoint(OuttakeConstants.kMinAngle));
@@ -163,14 +173,17 @@ public class Robot extends LoggedRobot {
 
     // )
     // );
-    
+
     controller.leftTrigger().onTrue(outtake.changeRPMSetpoint(600));
     controller.leftTrigger().onFalse(outtake.changeRPMSetpoint(0));
-
 
     controller.b().onTrue(intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle));
     controller.x().onTrue(intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
     controller.y().onTrue(outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle));
+
+    // Choreo
+    traj = Choreo.getTrajectory("1Taxi");
+
   }
 
   @Override
@@ -191,8 +204,14 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    if (autoChooser.get() != null) {
-      CommandScheduler.getInstance().schedule(autoChooser.get());
+
+    autoCommand = autoChooser.get();
+
+
+ 
+ 
+    if (autoCommand != null) {
+      autoCommand.schedule();
     }
   }
 

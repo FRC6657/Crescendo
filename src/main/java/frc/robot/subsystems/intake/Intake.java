@@ -24,15 +24,22 @@ public class Intake extends SubsystemBase {
   }
 
   public Command changePivotSetpoint(double angleDegrees) {
-    return this.runOnce(() -> intakeIO.changePivotSetpoint(MathUtil.clamp(angleDegrees, IntakeConstants.kMinPivotAngle, IntakeConstants.kMaxPivotAngle)));
+    return this.runOnce(
+        () ->
+            intakeIO.changePivotSetpoint(
+                MathUtil.clamp(
+                    angleDegrees, IntakeConstants.kMinPivotAngle, IntakeConstants.kMaxPivotAngle)));
   }
 
   public Command changeRollerSpeed(double speed) {
-    return this.runOnce(() -> intakeIO.changeRollerSpeed(MathUtil.clamp(speed, -1,1)));
+    return this.runOnce(() -> intakeIO.changeRollerSpeed(MathUtil.clamp(speed, -1, 1)));
   }
 
-  public Command waitUntilIntookPiece () {
-    return Commands.waitUntil(() -> (intakeInputs.rollerMotorAcceleration < -100) && (intakeInputs.rollerMotorCurrent > 10));
+  public Command waitUntilIntookPiece() {
+    return Commands.waitUntil(
+        () ->
+            (intakeInputs.rollerMotorAcceleration < -100)
+                && (intakeInputs.rollerMotorCurrent > 10));
   }
 
   @Override
