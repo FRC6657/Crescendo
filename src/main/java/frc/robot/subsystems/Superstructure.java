@@ -106,8 +106,7 @@ public class Superstructure {
 
   public Command testAuto(){
     return Commands.sequence(
-      createPath("1Taxi", true),
-      createPath("1Taxi.1", true)
+      createPath("1Taxi", true)
       // Commands.runOnce(() -> drivebase.setPose(new Pose2d(new Translation2d(5,5), new Rotation2d(0))), drivebase),
       // Commands.runOnce(() -> drivebase.goToPose(new Pose2d(new Translation2d(6,5), new Rotation2d(0))), drivebase)
     );

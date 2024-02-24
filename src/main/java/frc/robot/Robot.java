@@ -142,7 +142,7 @@ public class Robot extends LoggedRobot {
                         * DriveConstants.kMaxAngularVelocity
                         * 0.25)));
 
-    autoChooser.addDefaultOption("None", null);
+    autoChooser.addDefaultOption("None", superstructure.testAuto());
     autoChooser.addOption("test", superstructure.testAuto());
 
     // controller.b().onTrue(outtake.changePivotSetpoint(OuttakeConstants.kMaxAngle));
