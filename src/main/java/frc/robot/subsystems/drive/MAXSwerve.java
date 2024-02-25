@@ -128,18 +128,6 @@ public class MAXSwerve extends SubsystemBase {
         });
   }
 
-  public void choreoDrive(double xSpeed, double ySpeed, double rot) {
-    var swerveModuleStates =
-        kinematics.toSwerveModuleStates(new ChassisSpeeds(xSpeed, ySpeed, rot));
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, MAXSwerveConstants.kMaxDriveSpeed);
-    
-    for(int i = 0; i<4; i++){
-      modules[i].run(swerveModuleStates[i]);
-    }
-    
-  }
-
   /*
    * Stops the drivebase
    */
@@ -163,7 +151,7 @@ public class MAXSwerve extends SubsystemBase {
    *
    * @param speeds desired chassis speed
    */
-  private void runChassisSpeeds(ChassisSpeeds speeds) {
+  public void runChassisSpeeds(ChassisSpeeds speeds) {
     speeds = ChassisSpeeds.discretize(speeds, 1 / CodeConstants.kMainLoopFrequency);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(speeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAXSwerveConstants.kMaxDriveSpeed);

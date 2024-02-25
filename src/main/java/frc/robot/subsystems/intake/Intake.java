@@ -44,7 +44,7 @@ public class Intake extends SubsystemBase {
     return Commands.waitUntil(() -> (intakeInputs.rollerMotorAcceleration < -100) && (intakeInputs.rollerMotorCurrent > 10));
   }
 
-  public boolean intookPiece(){
+  public boolean noteDetected(){
     return false;
     // return ((intakeInputs.rollerMotorAcceleration < -400) && (intakeInputs.pivotMotorPosition < 0));
   }
