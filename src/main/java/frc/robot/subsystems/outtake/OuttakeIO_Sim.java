@@ -39,7 +39,7 @@ public class OuttakeIO_Sim implements OuttakeIO {
 
   public OuttakeIO_Sim() {
     pivotPID.setTolerance(2);
-    flyWheelPID.setTolerance(2);
+    flyWheelPID.setTolerance(50);
     pivotSim.setState(Units.degreesToRadians(OuttakeConstants.kMinPivotAngle), 0);
   }
 

@@ -8,6 +8,7 @@ import com.choreo.lib.ChoreoTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -89,7 +90,7 @@ public class Superstructure {
     return Commands.sequence(
         intake.changeRollerSpeed(-0.6),
         outtake.changeRPMSetpoint(300),
-        Commands.waitUntil(outtake::beamBroken),
+        Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
         outtake.changeRPMSetpoint(0),
         intake.changeRollerSpeed(0));
   }
@@ -100,7 +101,7 @@ public class Superstructure {
         Commands.sequence(
             intake.changeRollerSpeed(0.4),
             outtake.changeRPMSetpoint(-300),
-            Commands.waitUntil(() -> !outtake.beamBroken()),
+            Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
             intake.changeRollerSpeed(0),
             outtake.changeRPMSetpoint(0),
             Commands.runOnce(() -> currentNoteState = noteState.Intake)),
@@ -113,7 +114,7 @@ public class Superstructure {
                 outtake.changePivotSetpoint(96),
                 outtake.waitUntilPivotAtSetpoint(), // we might not need this
                 outtake.changeRPMSetpoint(600),
-                Commands.waitUntil(() -> !outtake.beamBroken()),
+                Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
                 outtake.changeRPMSetpoint(0),
                 outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
                 Commands.runOnce(() -> currentNoteState = noteState.None)),
@@ -121,7 +122,7 @@ public class Superstructure {
                 outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
                 outtake.waitUntilFlywheelAtSetpoint(),
                 intake.changeRollerSpeed(-0.6),
-                Commands.waitUntil(outtake::beamBroken),
+                Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
                 outtake.changeRPMSetpoint(0),
                 intake.changeRollerSpeed(0),
                 Commands.runOnce(() -> currentNoteState = noteState.None)),
@@ -131,11 +132,11 @@ public class Superstructure {
 
   public Command testAuto() {
     return Commands.sequence(
-        // shootPiece(),
+        shootPiece(),
         extendIntake(),
-        runPath("testPath.1", false, true),
+        runPath("testPath.1", true, true),
         retractIntake(),
-        runPath("testPath.2", false, false),
+        runPath("testPath.2", true, false),
         Commands.waitUntil(() -> currentNoteState == noteState.Intake),
         shootPiece());
   }
