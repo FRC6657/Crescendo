@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -172,7 +171,7 @@ public class Robot extends LoggedRobot {
                 new WaitUntilCommand(outtake::beamBroken),
                 outtake.changeRPMSetpoint(0),
                 outtake.changePivotSetpoint(96),
-                new WaitCommand(1),
+                outtake.waitUntilPivotAtSetpoint(),
                 outtake.changeRPMSetpoint(1000),
                 new WaitUntilCommand(() -> !outtake.beamBroken()),
                 outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
@@ -184,7 +183,7 @@ public class Robot extends LoggedRobot {
         .whileTrue(
             new SequentialCommandGroup(
                 outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
-                new WaitCommand(1.5),
+                outtake.waitUntilFlywheelAtSetpoint(),
                 intake.changeRollerSpeed(-0.6)))
         .whileFalse(
             new SequentialCommandGroup(intake.changeRollerSpeed(0), outtake.changeRPMSetpoint(0)));

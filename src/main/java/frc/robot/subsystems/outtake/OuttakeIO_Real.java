@@ -122,12 +122,14 @@ public class OuttakeIO_Real implements OuttakeIO {
     inputs.pivotMotorTemp = pivotMotor.getDeviceTemp().getValueAsDouble(); // Celcius
     inputs.pivotMotorVoltage = pivotMotor.getMotorVoltage().getValueAsDouble(); // Volts
     inputs.pivotMotorCurrent = pivotMotor.getSupplyCurrent().getValueAsDouble(); // Amps
+    inputs.pivotAtSetpoint = MathUtil.isNear(rawAngleSetpoint, inputs.pivotMotorPosition, 2);
 
     // Update the flywheel inputs
     inputs.flywheelMotorVelocity = leaderFlywheel.getVelocity().getValueAsDouble() * 60; // RPM
     inputs.flywheelMotorTemp = leaderFlywheel.getDeviceTemp().getValueAsDouble(); // Celcius
     inputs.flywheelMotorVoltage = leaderFlywheel.getMotorVoltage().getValueAsDouble(); // Volts
     inputs.flywheelMotorCurrent = leaderFlywheel.getSupplyCurrent().getValueAsDouble(); // Amps
+    inputs.flywheelAtSetpoint = MathUtil.isNear(rpmSetpoint, inputs.flywheelMotorVelocity, 50);
 
     // Update beambreak state
     inputs.beamBroken = !beambreak.get();

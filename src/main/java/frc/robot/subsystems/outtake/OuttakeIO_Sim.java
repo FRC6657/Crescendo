@@ -38,6 +38,8 @@ public class OuttakeIO_Sim implements OuttakeIO {
   private PIDController flyWheelPID = new PIDController(0, 0, 0);
 
   public OuttakeIO_Sim() {
+    pivotPID.setTolerance(2);
+    flyWheelPID.setTolerance(2);
     pivotSim.setState(Units.degreesToRadians(OuttakeConstants.kMinPivotAngle), 0);
   }
 
@@ -57,12 +59,14 @@ public class OuttakeIO_Sim implements OuttakeIO {
     inputs.pivotMotorTemp = 0; // Celcius
     inputs.pivotMotorVoltage = pivotVoltage; // Volts
     inputs.pivotMotorCurrent = pivotSim.getCurrentDrawAmps(); // Amps
+    inputs.pivotAtSetpoint = pivotPID.atSetpoint();
 
     // Flywheel Inputs
     inputs.flywheelMotorVelocity = flywheelSim.getAngularVelocityRPM(); // RPM
     inputs.flywheelMotorTemp = 0; // Celcius
     inputs.flywheelMotorVoltage = shooterVoltage; // Volts
     inputs.flywheelMotorCurrent = flywheelSim.getCurrentDrawAmps(); // Amps
+    inputs.flywheelAtSetpoint = flyWheelPID.atSetpoint();
 
     // Beambreak state
     inputs.beamBroken = false; // Beambreak state

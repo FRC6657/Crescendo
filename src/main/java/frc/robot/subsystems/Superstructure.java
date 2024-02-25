@@ -110,7 +110,8 @@ public class Superstructure {
   public Command shootPiece() {
     return Commands.either(
             Commands.sequence(
-                outtake.changePivotSetpoint(900),
+                outtake.changePivotSetpoint(96),
+                outtake.waitUntilPivotAtSetpoint(), // we might not need this
                 outtake.changeRPMSetpoint(600),
                 Commands.waitUntil(() -> !outtake.beamBroken()),
                 outtake.changeRPMSetpoint(0),
@@ -118,9 +119,9 @@ public class Superstructure {
                 Commands.runOnce(() -> currentNoteState = noteState.None)),
             Commands.sequence(
                 outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
-                Commands.waitSeconds(1.5),
+                outtake.waitUntilFlywheelAtSetpoint(),
                 intake.changeRollerSpeed(-0.6),
-                Commands.waitUntil(outtake::beamBroken).withTimeout(1),
+                Commands.waitUntil(outtake::beamBroken),
                 outtake.changeRPMSetpoint(0),
                 intake.changeRollerSpeed(0),
                 Commands.runOnce(() -> currentNoteState = noteState.None)),
@@ -130,7 +131,7 @@ public class Superstructure {
 
   public Command testAuto() {
     return Commands.sequence(
-        shootPiece(),
+        // shootPiece(),
         extendIntake(),
         runPath("testPath.1", false, true),
         retractIntake(),

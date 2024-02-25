@@ -12,11 +12,13 @@ public interface OuttakeIO {
     public double pivotMotorTemp = 0.0; // Celcius
     public double pivotMotorVoltage = 0.0; // Volts
     public double pivotMotorCurrent = 0.0; // Amps
+    public boolean pivotAtSetpoint = false;
 
     public double flywheelMotorVelocity = 0.0; // RPM
     public double flywheelMotorTemp = 0.0; // Celcius
     public double flywheelMotorVoltage = 0.0; // Volts
     public double flywheelMotorCurrent = 0.0; // Amps
+    public boolean flywheelAtSetpoint = false;
 
     public boolean beamBroken = false; // True if a note is blocking the beambreak
   }
