@@ -180,7 +180,7 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     superstructure.update3DPose();
-   
+
     var backVisionEst = vision.getEstimatedGlobalPose();
     var sideVisionEst = vision.getEstimatedGlobalPose();
 
