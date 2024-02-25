@@ -5,6 +5,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -23,6 +24,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import com.choreo.lib.Choreo;
 import com.choreo.lib.ChoreoTrajectory;
+import com.ctre.phoenix6.signals.InvertedValue;
 public class Superstructure {
   MAXSwerve drivebase;
   Intake intake;
@@ -44,7 +46,7 @@ public class Superstructure {
     this.outtake = outtake;
     this.climb = climb;
 
-    noteDetected = new Trigger(intake::noteDetected);
+    noteDetected = new Trigger(noteDetected);
 
     noteDetected.onTrue(
       Commands.sequence(
@@ -59,6 +61,7 @@ public class Superstructure {
 
     
   }
+
   public void update3DPose() {
     Pose3d[] mechanismPoses = new Pose3d[4];
     mechanismPoses[0] = outtake.get3DPose();
@@ -71,21 +74,21 @@ public class Superstructure {
 
 
 
-  public Command extendIntake(){
+  public Command extendIntake() {
     return Commands.sequence(
       intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
       intake.changeRollerSpeed(0.5)
     );
   }
 
-  public Command retractIntake(){
+  public Command retractIntake() {
     return Commands.sequence(
       intake.changeRollerSpeed(0),
       intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle)
       );
   }
 
-  public Command feedPieceChamberNote(){
+  public Command feedPieceChamberNote() {
     return Commands.sequence(
       intake.changeRollerSpeed(-0.6),
       outtake.changeRPMSetpoint(300),
@@ -131,8 +134,7 @@ public class Superstructure {
       () -> currentScoringModeState == scoringModeState.Amp).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
-
-  public Command testAuto(){
+  public Command testAuto() {
     return Commands.sequence(
       runPath("testPath.1", true, true),
       runPath("testPath.2", true, false),
@@ -140,6 +142,7 @@ public class Superstructure {
       Commands.waitSeconds(3)
     );
   }
+
   private Command runPath(String pathName, boolean isBlue, boolean isFirstPath) {
     ChoreoTrajectory traj = Choreo.getTrajectory(pathName);
     var thetaController = AutoConstants.kThetaController;
@@ -159,7 +162,8 @@ public class Superstructure {
       setPoseCommand = Commands.none();
     }
 
-    Command swerveCommand = Choreo.choreoSwerveCommand(
+    Command swerveCommand =
+        Choreo.choreoSwerveCommand(
             traj, // Choreo trajectory from above
             drivebase::getPose,
             AutoConstants.kXController,

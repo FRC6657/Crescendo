@@ -69,7 +69,6 @@ public class MAXSwerve extends SubsystemBase {
     poseEstimator =
         new SwerveDrivePoseEstimator(
             kinematics, gyroInputs.yawPosition, getModulePositions(), new Pose2d());
-
   }
 
   /** This code runs at 50hz and is responsible for updating the IO and pose estimator */
@@ -112,7 +111,6 @@ public class MAXSwerve extends SubsystemBase {
       Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
-
   }
 
   /**
@@ -191,7 +189,8 @@ public class MAXSwerve extends SubsystemBase {
     return poseEstimator.getEstimatedPosition();
   }
 
-  public void addVisionMeasurement(Pose2d visionMeasurement, double timestampSeconds, Matrix<N3,N1> stdDevs) {
+  public void addVisionMeasurement(
+      Pose2d visionMeasurement, double timestampSeconds, Matrix<N3, N1> stdDevs) {
     poseEstimator.addVisionMeasurement(visionMeasurement, timestampSeconds, stdDevs);
   }
 

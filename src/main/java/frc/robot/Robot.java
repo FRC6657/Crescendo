@@ -29,7 +29,6 @@ import frc.robot.subsystems.intake.IntakeIO_Sim;
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO_Real;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;
-
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -41,7 +40,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
 
   Vision vision = new Vision();
-
 
   public static enum RobotMode {
     SIM,
@@ -187,26 +185,23 @@ public class Robot extends LoggedRobot {
     var sideVisionEst = vision.getEstimatedGlobalPose();
 
     backVisionEst.ifPresent(
-      est -> {
-        var estPose = est.estimatedPose.toPose2d();
-        Logger.recordOutput("Vision/BackGlobalEstimate", estPose);
+        est -> {
+          var estPose = est.estimatedPose.toPose2d();
+          Logger.recordOutput("Vision/BackGlobalEstimate", estPose);
 
-        // var estStdDevs = vision.getBackEstimationStdDevs(estPose);
-        // drivebase.addVisionMeasurement(estPose, est.timestampSeconds, estStdDevs);
+          // var estStdDevs = vision.getBackEstimationStdDevs(estPose);
+          // drivebase.addVisionMeasurement(estPose, est.timestampSeconds, estStdDevs);
 
-      }
-    );
+        });
 
     sideVisionEst.ifPresent(
-      est -> {
-        var estPose = est.estimatedPose.toPose2d();
-        Logger.recordOutput("Vision/SideGlobalEstimate", estPose);
+        est -> {
+          var estPose = est.estimatedPose.toPose2d();
+          Logger.recordOutput("Vision/SideGlobalEstimate", estPose);
 
-        // var estStdDevs = vision.getSideEstimationStdDevs(estPose);
-        // drivebase.addVisionMeasurement(estPose, est.timestampSeconds, estStdDevs);
-      }
-    );
-
+          // var estStdDevs = vision.getSideEstimationStdDevs(estPose);
+          // drivebase.addVisionMeasurement(estPose, est.timestampSeconds, estStdDevs);
+        });
   }
 
   @Override
@@ -223,9 +218,6 @@ public class Robot extends LoggedRobot {
 
     autoCommand = autoChooser.get();
 
-
- 
- 
     if (autoCommand != null) {
       autoCommand.schedule();
     }

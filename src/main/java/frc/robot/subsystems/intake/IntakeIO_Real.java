@@ -6,7 +6,6 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
@@ -25,7 +24,6 @@ public class IntakeIO_Real implements IntakeIO {
   // Variables to store/log the setpoints
   @AutoLogOutput(key = "Intake/Angle Setpoint")
   private double angleSetpoint = IntakeConstants.kMaxPivotAngle;
-
 
   @AutoLogOutput(key = "Intake/Speed Setpoint")
   private double speedSetpoint = 0;
@@ -123,7 +121,9 @@ public class IntakeIO_Real implements IntakeIO {
     inputs.rollerMotorCurrent = rollerMotor.getSupplyCurrent().getValueAsDouble(); // Amps
 
     rollerMotor.setControl(rollerSetpoint.withOutput(speedSetpoint));
-    pivotMotor.setControl(pivotSetpoint.withPosition(Units.degreesToRotations(angleSetpoint))); // Degrees to Native Rotations
+    pivotMotor.setControl(
+        pivotSetpoint.withPosition(
+            Units.degreesToRotations(angleSetpoint))); // Degrees to Native Rotations
 
     // lastVelocity = inputs.rollerMotorVelocity;
 
