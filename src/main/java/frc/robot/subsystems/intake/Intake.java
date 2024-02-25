@@ -25,9 +25,13 @@ public class Intake extends SubsystemBase {
 
   public Command changePivotSetpoint(double angleDegrees) {
     return this.runOnce(
+        
         () ->
+           
             intakeIO.changePivotSetpoint(
+                
                 MathUtil.clamp(
+                    
                     angleDegrees, IntakeConstants.kMinPivotAngle, IntakeConstants.kMaxPivotAngle)));
   }
 
@@ -35,14 +39,8 @@ public class Intake extends SubsystemBase {
     return this.runOnce(() -> intakeIO.changeRollerSpeed(MathUtil.clamp(speed, -1, 1)));
   }
 
-  @AutoLogOutput()
-  public boolean intakeExtended() {
-    return intakeInputs.pivotMotorPosition < 0;
-  }
-
-  @AutoLogOutput(key = "Intake/NoteDetected")
-  public boolean noteDetected() {
-    return (intakeInputs.rollerMotorAcceleration < -6000) && intakeExtended();
+  public Command waitUntilIntookPiece () {
+    return Commands.waitUntil(() -> (intakeInputs.rollerMotorAcceleration < -100) && (intakeInputs.rollerMotorCurrent > 10));
   }
 
   @Override

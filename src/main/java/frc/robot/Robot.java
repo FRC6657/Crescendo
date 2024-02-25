@@ -1,6 +1,7 @@
 package frc.robot;
 
-import com.choreo.lib.ChoreoTrajectory;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -12,9 +13,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.ClimbConstants;
-import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.MAXSwerveConstants;
@@ -36,6 +34,7 @@ import frc.robot.subsystems.intake.IntakeIO_Sim;
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO_Real;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -45,6 +44,9 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
+
+  Vision vision = new Vision();
+
 
   public static enum RobotMode {
     SIM,
@@ -60,11 +62,12 @@ public class Robot extends LoggedRobot {
   private final LoggedDashboardChooser<Command> autoChooser =
       new LoggedDashboardChooser<>("Auto Chooser");
 
+  private Command autoCommand;
+
   // Driver Controllers
   private CommandXboxController controller = new CommandXboxController(0);
-  private CommandGenericHID operator = new CommandGenericHID(1);
 
-  private Trigger noteDetected;
+  
   // Subsystems
   private MAXSwerve drivebase =
       new MAXSwerve(
@@ -102,8 +105,6 @@ public class Robot extends LoggedRobot {
 
   private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
 
-  ChoreoTrajectory TestPath1;
-
   // Trigger stopTrigger = new Trigger(outtake::beamBroken).onTrue(outtake.changeRPMSetpoint(0));
 
   @SuppressWarnings(value = "resource")
@@ -132,103 +133,55 @@ public class Robot extends LoggedRobot {
     }
     Logger.start();
 
-    noteDetected = new Trigger(intake::noteDetected);
-    noteDetected.onTrue(intake.changeRollerSpeed(0));
+    // Set the default command for the drivebase for TeleOP driving
+    // drivebase.setDefaultCommand(
+    //     drivebase.runVelocityFieldRelative(
+    //         () ->
+    //             new ChassisSpeeds(
+    //                 -MathUtil.applyDeadband(controller.getLeftY(), 0.05)
+    //                     * MAXSwerveConstants.kMaxDriveSpeed
+    //                     * 0.5,
+    //                 -MathUtil.applyDeadband(controller.getLeftX(), 0.15)
+    //                     * MAXSwerveConstants.kMaxDriveSpeed
+    //                     * 0.5,
+    //                 -MathUtil.applyDeadband(controller.getRightX(), 0.15)
+    //                     * DriveConstants.kMaxAngularVelocity
+    //                     * 0.25)));
 
-    // Driver Controls
-    drivebase.setDefaultCommand(
-        drivebase.runVelocityFieldRelative(
-            () ->
-                new ChassisSpeeds(
-                    -MathUtil.applyDeadband(controller.getLeftY(), 0.05)
-                        * MAXSwerveConstants.kMaxDriveSpeed
-                        * 0.5,
-                    -MathUtil.applyDeadband(controller.getLeftX(), 0.15)
-                        * MAXSwerveConstants.kMaxDriveSpeed
-                        * 0.5,
-                    -MathUtil.applyDeadband(controller.getRightX(), 0.15)
-                        * DriveConstants.kMaxAngularVelocity
-                        * 0.25)));
+    autoChooser.addDefaultOption("None", null);
 
-    // Floor Pickup
-    controller
-        .a()
-        .onTrue(
-            new SequentialCommandGroup(
-                intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
-                intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed)))
-        .onFalse(
-            new SequentialCommandGroup(
-                intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
-                intake.changeRollerSpeed(0)));
+    // controller.b().onTrue(outtake.changePivotSetpoint(OuttakeConstants.kMaxAngle));
+    // controller.b().onFalse(outtake.changePivotSetpoint(OuttakeConstants.kMinAngle));
 
-    // Fire Amp
-    controller
-        .x()
-        .onTrue(
-            new SequentialCommandGroup(
-                outtake.changeRPMSetpoint(300),
-                new WaitUntilCommand(outtake::beamBroken),
-                outtake.changeRPMSetpoint(0),
-                outtake.changePivotSetpoint(96),
-                new WaitCommand(1),
-                outtake.changeRPMSetpoint(1000),
-                new WaitUntilCommand(() -> !outtake.beamBroken()),
-                outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
-                outtake.changeRPMSetpoint(0)));
+    controller.a().onTrue(outtake.changeRPMSetpoint(2300));
+    controller.a().onFalse(outtake.changeRPMSetpoint(0));
+    // controller.a().onTrue(
+    //   new SequentialCommandGroup(
+    //     outtake.changeRPMSetpoint(300),
+    //     new WaitUntilCommand(outtake::beamBroken),
+    //     outtake.changeRPMSetpoint(0),
+    //     outtake.changePivotSetpoint(96),
+    //     new WaitCommand(1),
+    //     outtake.changeRPMSetpoint(1000),
+    //     new WaitUntilCommand(() -> !outtake.beamBroken()),
+    //     outtake.changePivotSetpoint(OuttakeConstants.kMinAngle),
+    //     outtake.changeRPMSetpoint(0)
+    //   )
+    //   );
 
-    // Fire Speaker
-    controller
-        .y()
-        .onTrue(outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm))
-        .onFalse(outtake.changeRPMSetpoint(0));
+    // controller.a().onFalse(
+    // new SequentialCommandGroup(
 
-    controller.b().onTrue(intake.changeRollerSpeed(-0.6)).onFalse(intake.changeRollerSpeed(0));
-
+    // )
+    // );
+    
     controller.leftTrigger().onTrue(outtake.changeRPMSetpoint(600));
     controller.leftTrigger().onFalse(outtake.changeRPMSetpoint(0));
 
-    controller
-        .rightTrigger()
-        .onTrue(intake.changeRollerSpeed(-0.4))
-        .onFalse(intake.changeRollerSpeed(0));
 
-    controller.rightBumper().onTrue(intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
-    controller.leftBumper().onTrue(intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle));
-
-    // Operator Controls
-
-    // Load Shooter for Amp
-    operator
-        .button(1)
-        .onTrue(
-            new SequentialCommandGroup(
-                intake.changeRollerSpeed(-0.6),
-                outtake.changeRPMSetpoint(300),
-                new WaitUntilCommand(outtake::beamBroken),
-                intake.changeRollerSpeed(0),
-                outtake.changeRPMSetpoint(0),
-                outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle)));
-
-    // Ready Amp
-    operator.button(2).onTrue(outtake.changePivotSetpoint(96));
-
-    // Un-Ready Amp or Pivot Home
-    operator.button(3).onTrue(outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle));
-
-    // Man intake
-    operator.button(4).onTrue(intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed));
-
-    // Climbers Up
-    operator.button(5).onTrue(climb.changeSetpoint(ClimbConstants.kMaxHeight));
-
-    // Climbers Down
-    operator.button(6).onTrue(climb.changeSetpoint(ClimbConstants.kMinHeight + 0.1));
-
-    // Man feed
-    operator.button(7).onTrue(intake.changeRollerSpeed(-0.8)).onFalse(intake.changeRollerSpeed(0));
-
-    autoChooser.addDefaultOption("None", null);
+    controller.b().onTrue(intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle));
+    controller.x().onTrue(intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
+    controller.y().onTrue(outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle));
   }
 
   @Override
@@ -236,6 +189,31 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
     superstructure.update3DPose();
     superstructure.processQueue();
+   
+    var backVisionEst = vision.getBackEstimatedGlobalPose();
+    var sideVisionEst = vision.getSideEstimatedGlobalPose();
+
+    backVisionEst.ifPresent(
+      est -> {
+        var estPose = est.estimatedPose.toPose2d();
+        Logger.recordOutput("Vision/BackGlobalEstimate", estPose);
+
+        // var estStdDevs = vision.getBackEstimationStdDevs(estPose);
+        // drivebase.addVisionMeasurement(estPose, est.timestampSeconds, estStdDevs);
+
+      }
+    );
+
+    sideVisionEst.ifPresent(
+      est -> {
+        var estPose = est.estimatedPose.toPose2d();
+        Logger.recordOutput("Vision/SideGlobalEstimate", estPose);
+
+        // var estStdDevs = vision.getSideEstimationStdDevs(estPose);
+        // drivebase.addVisionMeasurement(estPose, est.timestampSeconds, estStdDevs);
+      }
+    );
+
   }
 
   @Override
@@ -249,8 +227,14 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    if (autoChooser.get() != null) {
-      CommandScheduler.getInstance().schedule(autoChooser.get());
+
+    autoCommand = autoChooser.get();
+
+
+ 
+ 
+    if (autoCommand != null) {
+      autoCommand.schedule();
     }
   }
 
@@ -276,6 +260,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void simulationPeriodic() {
-    // noteVisulaizer.updateNotes();
+    vision.simulationPeriodic(drivebase.getPose());
   }
 }
