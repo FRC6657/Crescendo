@@ -148,54 +148,54 @@ public class Robot extends LoggedRobot {
     autoChooser.addDefaultOption("None", null);
     autoChooser.addDefaultOption("test", superstructure.testAuto());
 
-    //Floor Pickup
-    driver.a().whileTrue(
-      new SequentialCommandGroup(
-        intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
-        intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed)
-      )
-    ).whileFalse(
-      new SequentialCommandGroup(
-        intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
-        intake.changeRollerSpeed(0)
-    ));
+    // Floor Pickup
+    driver
+        .a()
+        .whileTrue(
+            new SequentialCommandGroup(
+                intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
+                intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed)))
+        .whileFalse(
+            new SequentialCommandGroup(
+                intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
+                intake.changeRollerSpeed(0)));
 
-    //Fire Amp
-    driver.x().whileTrue(
-      new SequentialCommandGroup(
-        outtake.changeRPMSetpoint(300),
-        new WaitUntilCommand(outtake::beamBroken),
-        outtake.changeRPMSetpoint(0),
-        outtake.changePivotSetpoint(96),
-        new WaitCommand(1),
-        outtake.changeRPMSetpoint(1000),
-        new WaitUntilCommand(() -> !outtake.beamBroken()),
-        outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
-        outtake.changeRPMSetpoint(0)
-      ));
+    // Fire Amp
+    driver
+        .x()
+        .whileTrue(
+            new SequentialCommandGroup(
+                outtake.changeRPMSetpoint(300),
+                new WaitUntilCommand(outtake::beamBroken),
+                outtake.changeRPMSetpoint(0),
+                outtake.changePivotSetpoint(96),
+                new WaitCommand(1),
+                outtake.changeRPMSetpoint(1000),
+                new WaitUntilCommand(() -> !outtake.beamBroken()),
+                outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
+                outtake.changeRPMSetpoint(0)));
 
-    //Fire Speaker
-    driver.y().whileTrue(
-      new SequentialCommandGroup(
-        outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
-        new WaitCommand(1.5),
-        intake.changeRollerSpeed(-0.6)
-      )
-    ).whileFalse(
-      new SequentialCommandGroup(
-        intake.changeRollerSpeed(0),
-        outtake.changeRPMSetpoint(0)));
+    // Fire Speaker
+    driver
+        .y()
+        .whileTrue(
+            new SequentialCommandGroup(
+                outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
+                new WaitCommand(1.5),
+                intake.changeRollerSpeed(-0.6)))
+        .whileFalse(
+            new SequentialCommandGroup(intake.changeRollerSpeed(0), outtake.changeRPMSetpoint(0)));
 
-    //Ready Amp
-    operator.button(1).onTrue(
-      new SequentialCommandGroup(
-        intake.changeRollerSpeed(-0.6),
-        outtake.changeRPMSetpoint(300),
-        new WaitUntilCommand(outtake::beamBroken),
-        outtake.changeRPMSetpoint(0),
-        intake.changeRollerSpeed(0))
-      );
-    
+    // Ready Amp
+    operator
+        .button(1)
+        .onTrue(
+            new SequentialCommandGroup(
+                intake.changeRollerSpeed(-0.6),
+                outtake.changeRPMSetpoint(300),
+                new WaitUntilCommand(outtake::beamBroken),
+                outtake.changeRPMSetpoint(0),
+                intake.changeRollerSpeed(0)));
   }
 
   @Override
