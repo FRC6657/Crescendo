@@ -6,6 +6,10 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.Constants.DriveConstants;
@@ -58,7 +62,8 @@ public class Robot extends LoggedRobot {
   private Command autoCommand;
 
   // Driver Controllers
-  private CommandXboxController controller = new CommandXboxController(0);
+  private CommandXboxController driver = new CommandXboxController(0);
+  private CommandGenericHID operator = new CommandGenericHID(1);
 
   // Subsystems
   private MAXSwerve drivebase =
@@ -130,50 +135,67 @@ public class Robot extends LoggedRobot {
         drivebase.runVelocityFieldRelative(
             () ->
                 new ChassisSpeeds(
-                    -MathUtil.applyDeadband(controller.getLeftY(), 0.05)
+                    -MathUtil.applyDeadband(driver.getLeftY(), 0.05)
                         * MAXSwerveConstants.kMaxDriveSpeed
                         * 0.5,
-                    -MathUtil.applyDeadband(controller.getLeftX(), 0.15)
+                    -MathUtil.applyDeadband(driver.getLeftX(), 0.15)
                         * MAXSwerveConstants.kMaxDriveSpeed
                         * 0.5,
-                    -MathUtil.applyDeadband(controller.getRightX(), 0.15)
+                    -MathUtil.applyDeadband(driver.getRightX(), 0.15)
                         * DriveConstants.kMaxAngularVelocity
                         * 0.25)));
 
     autoChooser.addDefaultOption("None", null);
     autoChooser.addDefaultOption("test", superstructure.testAuto());
 
-    // controller.b().onTrue(outtake.changePivotSetpoint(OuttakeConstants.kMaxAngle));
-    // controller.b().onFalse(outtake.changePivotSetpoint(OuttakeConstants.kMinAngle));
+    //Floor Pickup
+    driver.a().whileTrue(
+      new SequentialCommandGroup(
+        intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
+        intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed)
+      )
+    ).whileFalse(
+      new SequentialCommandGroup(
+        intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
+        intake.changeRollerSpeed(0)
+    ));
 
-    controller.a().onTrue(outtake.changeRPMSetpoint(2300));
-    controller.a().onFalse(outtake.changeRPMSetpoint(0));
-    // controller.a().onTrue(
-    //   new SequentialCommandGroup(
-    //     outtake.changeRPMSetpoint(300),
-    //     new WaitUntilCommand(outtake::beamBroken),
-    //     outtake.changeRPMSetpoint(0),
-    //     outtake.changePivotSetpoint(96),
-    //     new WaitCommand(1),
-    //     outtake.changeRPMSetpoint(1000),
-    //     new WaitUntilCommand(() -> !outtake.beamBroken()),
-    //     outtake.changePivotSetpoint(OuttakeConstants.kMinAngle),
-    //     outtake.changeRPMSetpoint(0)
-    //   )
-    //   );
+    //Fire Amp
+    driver.x().whileTrue(
+      new SequentialCommandGroup(
+        outtake.changeRPMSetpoint(300),
+        new WaitUntilCommand(outtake::beamBroken),
+        outtake.changeRPMSetpoint(0),
+        outtake.changePivotSetpoint(96),
+        new WaitCommand(1),
+        outtake.changeRPMSetpoint(1000),
+        new WaitUntilCommand(() -> !outtake.beamBroken()),
+        outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
+        outtake.changeRPMSetpoint(0)
+      ));
 
-    // controller.a().onFalse(
-    // new SequentialCommandGroup(
+    //Fire Speaker
+    driver.y().whileTrue(
+      new SequentialCommandGroup(
+        outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
+        new WaitCommand(1.5),
+        intake.changeRollerSpeed(-0.6)
+      )
+    ).whileFalse(
+      new SequentialCommandGroup(
+        intake.changeRollerSpeed(0),
+        outtake.changeRPMSetpoint(0)));
 
-    // )
-    // );
-
-    controller.leftTrigger().onTrue(outtake.changeRPMSetpoint(600));
-    controller.leftTrigger().onFalse(outtake.changeRPMSetpoint(0));
-
-    controller.b().onTrue(intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle));
-    controller.x().onTrue(intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
-    controller.y().onTrue(outtake.changePivotSetpoint(OuttakeConstants.kMaxPivotAngle));
+    //Ready Amp
+    operator.button(1).onTrue(
+      new SequentialCommandGroup(
+        intake.changeRollerSpeed(-0.6),
+        outtake.changeRPMSetpoint(300),
+        new WaitUntilCommand(outtake::beamBroken),
+        outtake.changeRPMSetpoint(0),
+        intake.changeRollerSpeed(0))
+      );
+    
   }
 
   @Override
