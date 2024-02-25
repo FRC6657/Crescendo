@@ -21,7 +21,6 @@ import frc.robot.subsystems.outtake.Outtake;
 import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
-import org.opencv.features2d.FlannBasedMatcher;
 
 public class Superstructure {
   MAXSwerve drivebase;
@@ -119,15 +118,12 @@ public class Superstructure {
 
   public Command extendIntake() {
     return Commands.sequence(
-        intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
-        intake.changeRollerSpeed(0.5));
+        intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle), intake.changeRollerSpeed(0.5));
   }
 
   public Command retractIntake() {
     return Commands.sequence(
-        intake.changeRollerSpeed(0),
-        intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle)
-  );
+        intake.changeRollerSpeed(0), intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
   }
 
   public Command feedPieceChamberNote() {
@@ -136,8 +132,7 @@ public class Superstructure {
         outtake.changeRPMSetpoint(300),
         Commands.waitUntil(outtake::beamBroken),
         outtake.changeRPMSetpoint(0),
-        intake.changeRollerSpeed(0)
-    );
+        intake.changeRollerSpeed(0));
   }
 
   public Command endUpInRightSpot() {
@@ -164,9 +159,7 @@ public class Superstructure {
         retractIntake(),
         runPath("testPath.2", true, false),
         drivebase.stop(),
-        Commands.waitUntil(() -> false)
-        
-    );
+        Commands.waitUntil(() -> false));
   }
 
   private Command runPath(String pathName, boolean isBlue, boolean isFirstPath) {
@@ -200,8 +193,6 @@ public class Superstructure {
             // path
             // is created for the blue alliance)
             drivebase);
-    return Commands.sequence(
-        setPoseCommand,
-        swerveCommand);
+    return Commands.sequence(setPoseCommand, swerveCommand);
   }
 }
