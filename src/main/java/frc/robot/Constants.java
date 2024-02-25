@@ -50,12 +50,14 @@ public class Constants {
 
   public static final class VisionConstants {
     public static final Transform3d kBackCameraPose =
-        new Transform3d(new Translation3d(-0.343236, 0, 0.531201), new Rotation3d(0, -0.485314, Math.PI));
+        new Transform3d(
+            new Translation3d(-0.343236, 0, 0.531201), new Rotation3d(0, -0.485314, Math.PI));
     public static final Transform3d kSideCameraPose =
         new Transform3d(
             new Translation3d(-0.242086, 0.170791, 0.511322),
             new Rotation3d(0, 0.122173, -1.28248701081));
-    public static final AprilTagFieldLayout kTagLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+    public static final AprilTagFieldLayout kTagLayout =
+        AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
 
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
@@ -91,9 +93,9 @@ public class Constants {
   public static final class AutoConstants {
     // Choreo
 
-    public static final PIDController kXController = new PIDController(1,0,0);
-    public static final PIDController kYController = new PIDController(1,0,0);
-    public static final PIDController kThetaController = new PIDController(1,0,0);
+    public static final PIDController kXController = new PIDController(1, 0, 0);
+    public static final PIDController kYController = new PIDController(1, 0, 0);
+    public static final PIDController kThetaController = new PIDController(1, 0, 0);
     public static final double kPXController = 1;
     public static final double kPYController = 1;
     public static final double kPThetaController = 1;
@@ -297,9 +299,9 @@ public class Constants {
             .withKD(0);
 
     public static MotionMagicConfigs kPivotMotionMagicConfig =
-      new MotionMagicConfigs()
-        .withMotionMagicCruiseVelocity(Units.degreesToRotations(300))
-        .withMotionMagicAcceleration(Units.degreesToRotations(400));
+        new MotionMagicConfigs()
+            .withMotionMagicCruiseVelocity(Units.degreesToRotations(300))
+            .withMotionMagicAcceleration(Units.degreesToRotations(400));
 
     public static final CurrentLimitsConfigs kPivotCurrentConfigs =
         new CurrentLimitsConfigs()
@@ -334,12 +336,12 @@ public class Constants {
     public static final double kFlywheelCurrentLimit = 30;
 
     public static Slot0Configs kPivotSlot0 =
-      new Slot0Configs()
-        .withKS(0)
-        .withKV(12d/((6380d/60)*kGearingPivot)) //Volts/Mechanism RPS
-        .withKP(150)
-        .withKI(0)
-        .withKD(0);
+        new Slot0Configs()
+            .withKS(0)
+            .withKV(12d / ((6380d / 60) * kGearingPivot)) // Volts/Mechanism RPS
+            .withKP(150)
+            .withKI(0)
+            .withKD(0);
 
     public static MotionMagicConfigs kPivotMotionMagicConfig =
         new MotionMagicConfigs()

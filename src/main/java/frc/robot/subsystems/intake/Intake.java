@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
@@ -26,13 +25,9 @@ public class Intake extends SubsystemBase {
 
   public Command changePivotSetpoint(double angleDegrees) {
     return this.runOnce(
-        
         () ->
-           
             intakeIO.changePivotSetpoint(
-                
                 MathUtil.clamp(
-                    
                     angleDegrees, IntakeConstants.kMinPivotAngle, IntakeConstants.kMaxPivotAngle)));
   }
 
@@ -40,16 +35,20 @@ public class Intake extends SubsystemBase {
     return this.runOnce(() -> intakeIO.changeRollerSpeed(MathUtil.clamp(speed, -1, 1)));
   }
 
-  public Command waitUntilIntookPiece () {
-    return Commands.waitUntil(() -> (intakeInputs.rollerMotorAcceleration < -100) && (intakeInputs.rollerMotorCurrent > 10));
+  public Command waitUntilIntookPiece() {
+    return Commands.waitUntil(
+        () ->
+            (intakeInputs.rollerMotorAcceleration < -100)
+                && (intakeInputs.rollerMotorCurrent > 10));
   }
 
-  public boolean intookPiece(){
+  public boolean intookPiece() {
     return false;
-    // return ((intakeInputs.rollerMotorAcceleration < -400) && (intakeInputs.pivotMotorPosition < 0));
+    // return ((intakeInputs.rollerMotorAcceleration < -400) && (intakeInputs.pivotMotorPosition <
+    // 0));
   }
 
-  public boolean atSetpoint(){
+  public boolean atSetpoint() {
     return intakeInputs.atSetpoint;
   }
 
