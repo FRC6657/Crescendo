@@ -132,9 +132,9 @@ public class Superstructure {
     return Commands.sequence(
         shootPiece(),
         extendIntake(),
-        runPath("testPath.1", true, true),
+        runPath("testPath.1", false, true),
         retractIntake(),
-        runPath("testPath.2", true, false),
+        runPath("testPath.2", false, false),
         Commands.waitUntil(() -> currentNoteState == noteState.Intake),
         shootPiece());
   }
@@ -164,6 +164,9 @@ public class Superstructure {
             // path is created for the blue alliance)
             drivebase);
     return Commands.sequence(
-        setPoseCommand, swerveCommand, Commands.runOnce(() -> drivebase.choreoStop(), drivebase));
+        Commands.runOnce(() -> Logger.recordOutput(pathName, traj.getPoses())),
+        setPoseCommand,
+        swerveCommand,
+        Commands.runOnce(() -> drivebase.choreoStop(), drivebase));
   }
 }
