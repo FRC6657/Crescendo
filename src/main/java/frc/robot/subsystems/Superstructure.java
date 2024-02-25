@@ -40,9 +40,6 @@ public class Superstructure {
   @AutoLogOutput(key = "Note State")
   noteState currentNoteState = noteState.None;
 
-  @AutoLogOutput(key = "Path Poses")
-  Pose2d[] pathPoses;
-
   private enum scoringModeState {
     Amp,
     Speaker
@@ -169,7 +166,7 @@ public class Superstructure {
             // path is created for the blue alliance)
             drivebase);
     return Commands.sequence(
-        Commands.runOnce(() -> pathPoses = traj.getPoses()),
+        Commands.runOnce(() -> Logger.recordOutput("Current Path", traj.getPoses())),
         setPoseCommand,
         swerveCommand,
         Commands.runOnce(() -> drivebase.choreoStop(), drivebase));
