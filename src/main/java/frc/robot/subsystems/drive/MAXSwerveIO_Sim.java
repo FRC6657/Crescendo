@@ -23,6 +23,9 @@ public class MAXSwerveIO_Sim implements MAXSwerveIO {
   private double driveVolts = 0.0;
   private double turnVolts = 0.0;
 
+  private double mpsSetpoint = 0.0;
+  private Rotation2d turnAngleSetpoint = new Rotation2d();
+
   private PIDController turnController = new PIDController(15, 0.0, 0.0);
   private PIDController driveController = new PIDController(5, 0.0, 0.0);
   private SimpleMotorFeedforward driveFeedforward =
@@ -37,6 +40,15 @@ public class MAXSwerveIO_Sim implements MAXSwerveIO {
 
   @Override
   public void updateInputs(MAXSwerveIOInputs inputs) {
+
+    setDriveVoltage(
+        driveFeedforward.calculate(mpsSetpoint)
+            + driveController.calculate(
+                (driveMotor.getAngularVelocityRPM() * MAXSwerveConstants.kWheelCircumferenceMeters)
+                    / 60,
+                mpsSetpoint));
+    setTurnVoltage(
+        turnController.calculate(getTurnAngle().getRadians(), turnAngleSetpoint.getRadians()));
 
     // Step the simulation forward
     driveMotor.update(1 / CodeConstants.kMainLoopFrequency);
@@ -71,22 +83,14 @@ public class MAXSwerveIO_Sim implements MAXSwerveIO {
   /** Sets the drive MPS setpoint */
   @Override
   public void setDriveMPS(double mps) {
-
-    // Calcualtes the needed voltage to achieve the desired velocity
-
-    double currentMPS =
-        (driveMotor.getAngularVelocityRPM() * MAXSwerveConstants.kWheelCircumferenceMeters) / 60;
-
-    setDriveVoltage(driveFeedforward.calculate(mps) + driveController.calculate(currentMPS, mps));
+    mpsSetpoint = mps;
   }
 
   /** Sets the turn angle setpoint */
   @Override
   public void setTurnAngle(Rotation2d angle) {
 
-    // Calculates the needed voltage to achieve the desired angle
-
-    setTurnVoltage(turnController.calculate(getTurnAngle().getRadians(), angle.getRadians()));
+    turnAngleSetpoint = angle;
   }
 
   /** Gets the turn angle */

@@ -133,6 +133,12 @@ public class MAXSwerve extends SubsystemBase {
     return runVelocity(() -> new ChassisSpeeds());
   }
 
+  public void choreoStop() {
+    for (int i = 0; i < 4; i++) {
+      modules[i].stop();
+    }
+  }
+
   /**
    * Runs the drivebase using a continuous Chassis Speed Input in field relative mode
    *

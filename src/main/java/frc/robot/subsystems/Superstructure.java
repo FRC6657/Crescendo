@@ -53,7 +53,7 @@ public class Superstructure {
     this.outtake = outtake;
     this.climb = climb;
 
-    noteDetected = new Trigger(noteDetected);
+    noteDetected = new Trigger(() -> intake.noteDetected());
 
     noteDetected.onTrue(
         Commands.sequence(
@@ -120,7 +120,7 @@ public class Superstructure {
                 outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
                 Commands.waitSeconds(1.5),
                 intake.changeRollerSpeed(-0.6),
-                Commands.waitUntil(outtake::beamBroken),
+                Commands.waitUntil(outtake::beamBroken).withTimeout(1),
                 outtake.changeRPMSetpoint(0),
                 intake.changeRollerSpeed(0),
                 Commands.runOnce(() -> currentNoteState = noteState.None)),
@@ -130,10 +130,13 @@ public class Superstructure {
 
   public Command testAuto() {
     return Commands.sequence(
+        shootPiece(),
+        extendIntake(),
         runPath("testPath.1", true, true),
+        retractIntake(),
         runPath("testPath.2", true, false),
-        drivebase.stop(),
-        Commands.waitSeconds(3));
+        Commands.waitUntil(() -> currentNoteState == noteState.Intake),
+        shootPiece());
   }
 
   private Command runPath(String pathName, boolean isBlue, boolean isFirstPath) {
@@ -149,12 +152,6 @@ public class Superstructure {
             Commands.none(),
             () -> isFirstPath);
 
-    if (isFirstPath) {
-      setPoseCommand = Commands.runOnce(() -> drivebase.setPose(initialPose), drivebase);
-    } else {
-      setPoseCommand = Commands.none();
-    }
-
     Command swerveCommand =
         Choreo.choreoSwerveCommand(
             traj, // Choreo trajectory from above
@@ -164,9 +161,9 @@ public class Superstructure {
             thetaController,
             (ChassisSpeeds speeds) -> drivebase.runChassisSpeeds(speeds),
             () -> !isBlue, // Whether or not to mirror the path based on alliance (this assumes the
-            // path
-            // is created for the blue alliance)
+            // path is created for the blue alliance)
             drivebase);
-    return Commands.sequence(setPoseCommand, swerveCommand);
+    return Commands.sequence(
+        setPoseCommand, swerveCommand, Commands.runOnce(() -> drivebase.choreoStop(), drivebase));
   }
 }
