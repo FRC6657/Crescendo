@@ -9,6 +9,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -61,6 +62,33 @@ public class Constants {
 
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+
+    public static final class CameraInformation {
+      public final String name;
+      public final Transform3d cameraPose;
+
+      public CameraInformation(String name, Transform3d cameraPose) {
+        this.name = name;
+        this.cameraPose = cameraPose;
+      }
+    }
+
+    public static final CameraInformation kBackCameraInfo =
+        new CameraInformation("Back Camera", kBackCameraPose);
+    public static final CameraInformation kSideCameraInfo =
+        new CameraInformation("Side Camera", kSideCameraPose);
+
+    public static final class CameraResult {
+      public final Pose2d estimatedPose;
+      public final Matrix<N3, N1> stdDevs;
+      public final double timestamp;
+
+      public CameraResult(Pose2d estPose, Matrix<N3, N1> stdDevs, double timestamp) {
+        this.estimatedPose = estPose;
+        this.stdDevs = stdDevs;
+        this.timestamp = timestamp;
+      }
+    }
   }
 
   public static final class CANID {

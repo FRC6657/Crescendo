@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -16,6 +17,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.MAXSwerveConstants;
 import frc.robot.Constants.OuttakeConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimberIO;
@@ -33,6 +35,7 @@ import frc.robot.subsystems.intake.IntakeIO_Sim;
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO_Real;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;
+import frc.robot.subsystems.vision.Vision;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -43,7 +46,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
 
-  Vision vision = new Vision();
+  Vision vision = new Vision(VisionConstants.kBackCameraInfo, VisionConstants.kSideCameraInfo);
 
   public static enum RobotMode {
     SIM,
@@ -148,54 +151,54 @@ public class Robot extends LoggedRobot {
     autoChooser.addDefaultOption("None", null);
     autoChooser.addDefaultOption("test", superstructure.testAuto());
 
-    //Floor Pickup
-    driver.a().whileTrue(
-      new SequentialCommandGroup(
-        intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
-        intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed)
-      )
-    ).whileFalse(
-      new SequentialCommandGroup(
-        intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
-        intake.changeRollerSpeed(0)
-    ));
+    // Floor Pickup
+    driver
+        .a()
+        .whileTrue(
+            new SequentialCommandGroup(
+                intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
+                intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed)))
+        .whileFalse(
+            new SequentialCommandGroup(
+                intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
+                intake.changeRollerSpeed(0)));
 
-    //Fire Amp
-    driver.x().whileTrue(
-      new SequentialCommandGroup(
-        outtake.changeRPMSetpoint(300),
-        new WaitUntilCommand(outtake::beamBroken),
-        outtake.changeRPMSetpoint(0),
-        outtake.changePivotSetpoint(96),
-        new WaitCommand(1),
-        outtake.changeRPMSetpoint(1000),
-        new WaitUntilCommand(() -> !outtake.beamBroken()),
-        outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
-        outtake.changeRPMSetpoint(0)
-      ));
+    // Fire Amp
+    driver
+        .x()
+        .whileTrue(
+            new SequentialCommandGroup(
+                outtake.changeRPMSetpoint(300),
+                new WaitUntilCommand(outtake::beamBroken),
+                outtake.changeRPMSetpoint(0),
+                outtake.changePivotSetpoint(96),
+                new WaitCommand(1),
+                outtake.changeRPMSetpoint(1000),
+                new WaitUntilCommand(() -> !outtake.beamBroken()),
+                outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
+                outtake.changeRPMSetpoint(0)));
 
-    //Fire Speaker
-    driver.y().whileTrue(
-      new SequentialCommandGroup(
-        outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
-        new WaitCommand(1.5),
-        intake.changeRollerSpeed(-0.6)
-      )
-    ).whileFalse(
-      new SequentialCommandGroup(
-        intake.changeRollerSpeed(0),
-        outtake.changeRPMSetpoint(0)));
+    // Fire Speaker
+    driver
+        .y()
+        .whileTrue(
+            new SequentialCommandGroup(
+                outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
+                new WaitCommand(1.5),
+                intake.changeRollerSpeed(-0.6)))
+        .whileFalse(
+            new SequentialCommandGroup(intake.changeRollerSpeed(0), outtake.changeRPMSetpoint(0)));
 
-    //Ready Amp
-    operator.button(1).onTrue(
-      new SequentialCommandGroup(
-        intake.changeRollerSpeed(-0.6),
-        outtake.changeRPMSetpoint(300),
-        new WaitUntilCommand(outtake::beamBroken),
-        outtake.changeRPMSetpoint(0),
-        intake.changeRollerSpeed(0))
-      );
-    
+    // Ready Amp
+    operator
+        .button(1)
+        .onTrue(
+            new SequentialCommandGroup(
+                intake.changeRollerSpeed(-0.6),
+                outtake.changeRPMSetpoint(300),
+                new WaitUntilCommand(outtake::beamBroken),
+                outtake.changeRPMSetpoint(0),
+                intake.changeRollerSpeed(0)));
   }
 
   @Override
@@ -203,27 +206,24 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
     superstructure.update3DPose();
 
-    var backVisionEst = vision.getEstimatedGlobalPose();
-    var sideVisionEst = vision.getEstimatedGlobalPose();
+    var backResult = vision.getBackCameraResult();
+    var sideResult = vision.getSideCameraResult();
 
-    backVisionEst.ifPresent(
-        est -> {
-          var estPose = est.estimatedPose.toPose2d();
-          Logger.recordOutput("Vision/BackGlobalEstimate", estPose);
+    if (backResult.timestamp != 0.0) {
+      Logger.recordOutput("Vision/BackGlobalEstimate", backResult.estimatedPose);
+      if (RobotBase.isReal()) {
+        // drivebase.addVisionMeasurement(backResult.estimatedPose, backResult.timestamp,
+        // backResult.stdDevs);
+      }
+    }
 
-          // var estStdDevs = vision.getBackEstimationStdDevs(estPose);
-          // drivebase.addVisionMeasurement(estPose, est.timestampSeconds, estStdDevs);
-
-        });
-
-    sideVisionEst.ifPresent(
-        est -> {
-          var estPose = est.estimatedPose.toPose2d();
-          Logger.recordOutput("Vision/SideGlobalEstimate", estPose);
-
-          // var estStdDevs = vision.getSideEstimationStdDevs(estPose);
-          // drivebase.addVisionMeasurement(estPose, est.timestampSeconds, estStdDevs);
-        });
+    if (sideResult.timestamp != 0.0) {
+      Logger.recordOutput("Vision/SideGlobalEstimate", sideResult.estimatedPose);
+      if (RobotBase.isReal()) {
+        // drivebase.addVisionMeasurement(sideResult.estimatedPose, sideResult.timestamp,
+        // sideResult.stdDevs);
+      }
+    }
   }
 
   @Override
