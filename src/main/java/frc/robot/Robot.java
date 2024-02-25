@@ -2,17 +2,12 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.MAXSwerveConstants;
@@ -67,7 +62,6 @@ public class Robot extends LoggedRobot {
   // Driver Controllers
   private CommandXboxController controller = new CommandXboxController(0);
 
-  
   // Subsystems
   private MAXSwerve drivebase =
       new MAXSwerve(
@@ -134,21 +128,22 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     // Set the default command for the drivebase for TeleOP driving
-    // drivebase.setDefaultCommand(
-    //     drivebase.runVelocityFieldRelative(
-    //         () ->
-    //             new ChassisSpeeds(
-    //                 -MathUtil.applyDeadband(controller.getLeftY(), 0.05)
-    //                     * MAXSwerveConstants.kMaxDriveSpeed
-    //                     * 0.5,
-    //                 -MathUtil.applyDeadband(controller.getLeftX(), 0.15)
-    //                     * MAXSwerveConstants.kMaxDriveSpeed
-    //                     * 0.5,
-    //                 -MathUtil.applyDeadband(controller.getRightX(), 0.15)
-    //                     * DriveConstants.kMaxAngularVelocity
-    //                     * 0.25)));
+    drivebase.setDefaultCommand(
+        drivebase.runVelocityFieldRelative(
+            () ->
+                new ChassisSpeeds(
+                    -MathUtil.applyDeadband(controller.getLeftY(), 0.05)
+                        * MAXSwerveConstants.kMaxDriveSpeed
+                        * 0.5,
+                    -MathUtil.applyDeadband(controller.getLeftX(), 0.15)
+                        * MAXSwerveConstants.kMaxDriveSpeed
+                        * 0.5,
+                    -MathUtil.applyDeadband(controller.getRightX(), 0.15)
+                        * DriveConstants.kMaxAngularVelocity
+                        * 0.25)));
 
     autoChooser.addDefaultOption("None", null);
+    autoChooser.addDefaultOption("test", superstructure.testAuto());
 
     // controller.b().onTrue(outtake.changePivotSetpoint(OuttakeConstants.kMaxAngle));
     // controller.b().onFalse(outtake.changePivotSetpoint(OuttakeConstants.kMinAngle));
@@ -174,14 +169,13 @@ public class Robot extends LoggedRobot {
 
     // )
     // );
-    
+
     controller.leftTrigger().onTrue(outtake.changeRPMSetpoint(600));
     controller.leftTrigger().onFalse(outtake.changeRPMSetpoint(0));
 
-
     controller.b().onTrue(intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle));
     controller.x().onTrue(intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
-    controller.y().onTrue(outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle));
+    controller.y().onTrue(outtake.changePivotSetpoint(OuttakeConstants.kMaxPivotAngle));
   }
 
   @Override
@@ -190,8 +184,8 @@ public class Robot extends LoggedRobot {
     superstructure.update3DPose();
     superstructure.processQueue();
    
-    var backVisionEst = vision.getBackEstimatedGlobalPose();
-    var sideVisionEst = vision.getSideEstimatedGlobalPose();
+    var backVisionEst = vision.getEstimatedGlobalPose();
+    var sideVisionEst = vision.getEstimatedGlobalPose();
 
     backVisionEst.ifPresent(
       est -> {

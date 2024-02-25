@@ -133,8 +133,8 @@ public class MAXSwerve extends SubsystemBase {
         kinematics.toSwerveModuleStates(new ChassisSpeeds(xSpeed, ySpeed, rot));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, MAXSwerveConstants.kMaxDriveSpeed);
-
-    for(int i = 0; i < 3; i++){
+    
+    for(int i = 0; i<4; i++){
       modules[i].run(swerveModuleStates[i]);
     }
     

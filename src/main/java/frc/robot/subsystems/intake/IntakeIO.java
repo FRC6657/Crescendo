@@ -12,6 +12,7 @@ public interface IntakeIO {
     public double pivotMotorTemp = 0.0; // Celcius
     public double pivotMotorVoltage = 0.0; // Volts
     public double pivotMotorCurrent = 0.0; // Amps
+    public boolean atSetpoint = false;
 
     public double rollerMotorVelocity = 0.0; // RPM
     public double rollerMotorAcceleration = 0.0; // RPM per second

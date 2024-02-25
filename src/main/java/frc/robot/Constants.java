@@ -90,6 +90,10 @@ public class Constants {
 
   public static final class AutoConstants {
     // Choreo
+
+    public static final PIDController kXController = new PIDController(1,0,0);
+    public static final PIDController kYController = new PIDController(1,0,0);
+    public static final PIDController kThetaController = new PIDController(1,0,0);
     public static final double kPXController = 1;
     public static final double kPYController = 1;
     public static final double kPThetaController = 1;

@@ -59,7 +59,7 @@ public class Vision {
     sideCamera = new PhotonCamera("Side Camera");
 
         photonEstimator = new PhotonPoseEstimator(
-                        VisionConstants.kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, backCamera, VisionConstants.kFrontCameraPose
+                        VisionConstants.kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, backCamera, VisionConstants.kBackCameraPose
                     );
         photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
@@ -86,7 +86,7 @@ public class Vision {
             backCameraSim = new PhotonCameraSim(backCamera, cameraProp);
             sideCameraSim = new PhotonCameraSim(sideCamera, cameraProp);
             // Add the simulated camera to view the targets on this simulated field.
-            visionSim.addCamera(backCameraSim, VisionConstants.kFrontCameraPose);
+            visionSim.addCamera(backCameraSim, VisionConstants.kBackCameraPose);
             visionSim.addCamera(sideCameraSim, VisionConstants.kSideCameraPose);
 
       backCameraSim.enableDrawWireframe(true);

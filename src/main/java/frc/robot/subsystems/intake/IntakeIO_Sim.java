@@ -34,6 +34,7 @@ public class IntakeIO_Sim implements IntakeIO {
 
   public IntakeIO_Sim() {
     pivotSim.setState(Units.degreesToRadians(IntakeConstants.kMaxPivotAngle), 0);
+    pivotPID.setTolerance(2);
   }
 
   @Override
@@ -52,6 +53,7 @@ public class IntakeIO_Sim implements IntakeIO {
     inputs.pivotMotorTemp = 0; // Celcius
     inputs.pivotMotorVoltage = pivotVoltage; // Volts
     inputs.pivotMotorCurrent = pivotSim.getCurrentDrawAmps(); // Amps
+    inputs.atSetpoint = pivotPID.atSetpoint();
 
     // Roller Inputs
     inputs.rollerMotorVelocity = rollerSim.getAngularVelocityRPM(); // RPM

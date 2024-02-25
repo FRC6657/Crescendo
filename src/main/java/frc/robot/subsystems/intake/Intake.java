@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -41,6 +42,15 @@ public class Intake extends SubsystemBase {
 
   public Command waitUntilIntookPiece () {
     return Commands.waitUntil(() -> (intakeInputs.rollerMotorAcceleration < -100) && (intakeInputs.rollerMotorCurrent > 10));
+  }
+
+  public boolean intookPiece(){
+    return false;
+    // return ((intakeInputs.rollerMotorAcceleration < -400) && (intakeInputs.pivotMotorPosition < 0));
+  }
+
+  public boolean atSetpoint(){
+    return intakeInputs.atSetpoint;
   }
 
   @Override
