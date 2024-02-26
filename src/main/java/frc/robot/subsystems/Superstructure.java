@@ -48,6 +48,9 @@ public class Superstructure {
   @AutoLogOutput(key = "Scoring Note State")
   private scoringModeState currentScoringModeState = scoringModeState.Speaker;
 
+  @AutoLogOutput(key = "Ready to Shoot")
+  private boolean readyToShoot = true;
+
   public Superstructure(MAXSwerve drivebase, Intake intake, Outtake outtake, Climb climb) {
     this.drivebase = drivebase;
     this.intake = intake;
@@ -62,9 +65,7 @@ public class Superstructure {
                 retractIntake(),
                 Commands.waitUntil(intake::atSetpoint),
                 feedPieceChamberNote(),
-                endUpInRightSpot())
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-            .withTimeout(10));
+                relocateNote()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
   }
 
   public void update3DPose() {
@@ -86,48 +87,111 @@ public class Superstructure {
         intake.changeRollerSpeed(0), intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
   }
 
+  public Command relocateNote() {
+    Command returnCommand = Commands.none();
+    if ((currentNoteState == noteState.None)
+        || (currentScoringModeState == scoringModeState.Amp
+            && currentNoteState == noteState.Outtake)
+        || (currentScoringModeState == scoringModeState.Speaker
+            && currentNoteState == noteState.Intake)) {
+    } else {
+      if (readyToShoot) {
+        returnCommand.andThen(
+            Commands.sequence(
+                outtake.changeRPMSetpoint(0),
+                outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
+                outtake.waitUntilFlywheelAtSetpoint(),
+                outtake.waitUntilPivotAtSetpoint()));
+      }
+      if (currentScoringModeState == scoringModeState.Amp && currentNoteState == noteState.Intake) {
+        returnCommand.andThen(feedPieceChamberNote());
+      } else if (currentScoringModeState == scoringModeState.Amp
+          && currentNoteState == noteState.Intake) {
+        returnCommand.andThen(
+            Commands.sequence(
+                Commands.runOnce(() -> currentNoteState = noteState.Processing),
+                intake.changeRollerSpeed(0.4),
+                outtake.changeRPMSetpoint(-300),
+                Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
+                intake.changeRollerSpeed(0),
+                outtake.changeRPMSetpoint(0),
+                Commands.runOnce(() -> currentNoteState = noteState.Intake)));
+      }
+      if (readyToShoot) {
+        returnCommand.andThen(readyPiece());
+      }
+    }
+
+    return returnCommand.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+  }
+
+  public Command readyPiece() {
+    Command returnCommand = Commands.print("Peice and state were not correct");
+    if (currentScoringModeState == scoringModeState.Amp && currentNoteState == noteState.Outtake) {
+      returnCommand =
+          Commands.sequence(
+              outtake.changePivotSetpoint(96), Commands.runOnce(() -> readyToShoot = true));
+    } else if (currentScoringModeState == scoringModeState.Speaker
+        && currentNoteState == noteState.Intake) {
+      returnCommand =
+          Commands.sequence(
+              outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
+              Commands.runOnce(() -> readyToShoot = true));
+    }
+    return returnCommand;
+  }
+
   public Command feedPieceChamberNote() {
     return Commands.sequence(
+        Commands.runOnce(() -> currentNoteState = noteState.Processing),
         intake.changeRollerSpeed(-0.6),
         outtake.changeRPMSetpoint(300),
         Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
         outtake.changeRPMSetpoint(0),
-        intake.changeRollerSpeed(0));
-  }
-
-  public Command endUpInRightSpot() {
-    return Commands.either(
-        Commands.runOnce(() -> currentNoteState = noteState.Outtake),
-        Commands.sequence(
-            intake.changeRollerSpeed(0.4),
-            outtake.changeRPMSetpoint(-300),
-            Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
-            intake.changeRollerSpeed(0),
-            outtake.changeRPMSetpoint(0),
-            Commands.runOnce(() -> currentNoteState = noteState.Intake)),
-        () -> currentScoringModeState == scoringModeState.Amp);
+        intake.changeRollerSpeed(0),
+        Commands.runOnce(() -> currentNoteState = noteState.Outtake))
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
 
   public Command shootPiece() {
-    return Commands.either(
-            Commands.sequence(
-                outtake.changePivotSetpoint(96),
-                outtake.waitUntilPivotAtSetpoint(), // we might not need this
-                outtake.changeRPMSetpoint(600),
-                Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
-                outtake.changeRPMSetpoint(0),
-                outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
-                Commands.runOnce(() -> currentNoteState = noteState.None)),
-            Commands.sequence(
-                outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
-                outtake.waitUntilFlywheelAtSetpoint(),
-                intake.changeRollerSpeed(-0.6),
-                Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
-                outtake.changeRPMSetpoint(0),
-                intake.changeRollerSpeed(0),
-                Commands.runOnce(() -> currentNoteState = noteState.None)),
-            () -> currentScoringModeState == scoringModeState.Amp)
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    Command returnCommand = Commands.none();
+
+    if (!readyToShoot) {
+      returnCommand.andThen(readyPiece());
+    }
+
+    if (currentScoringModeState == scoringModeState.Amp && currentNoteState == noteState.Outtake) {
+      returnCommand.andThen(
+          Commands.sequence(
+              outtake.waitUntilPivotAtSetpoint(), // we might not need this
+              outtake.changeRPMSetpoint(600),
+              Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
+              outtake.changeRPMSetpoint(0),
+              outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
+              Commands.runOnce(() -> currentNoteState = noteState.None)));
+    } else if (currentScoringModeState == scoringModeState.Speaker
+        && currentNoteState == noteState.Intake) {
+      returnCommand.andThen(
+          Commands.sequence(
+              outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
+              outtake.waitUntilFlywheelAtSetpoint(),
+              intake.changeRollerSpeed(-0.6),
+              Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
+              outtake.changeRPMSetpoint(0),
+              intake.changeRollerSpeed(0),
+              Commands.runOnce(() -> currentNoteState = noteState.None)));
+    }
+    return returnCommand.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+  }
+
+  public Command speakerMode() {
+    return Commands.sequence(
+        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Speaker), readyPiece());
+  }
+
+  public Command ampMode() {
+    return Commands.sequence(
+        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Amp), readyPiece());
   }
 
   public Command testAuto() {
@@ -166,7 +230,7 @@ public class Superstructure {
             // path is created for the blue alliance)
             drivebase);
     return Commands.sequence(
-        Commands.runOnce(() -> Logger.recordOutput(pathName, traj.getPoses())),
+        Commands.runOnce(() -> Logger.recordOutput("Current Path", traj.getPoses())),
         setPoseCommand,
         swerveCommand,
         Commands.runOnce(() -> drivebase.choreoStop(), drivebase));
