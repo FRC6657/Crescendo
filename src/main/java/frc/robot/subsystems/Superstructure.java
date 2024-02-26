@@ -65,7 +65,7 @@ public class Superstructure {
                 retractIntake(),
                 Commands.waitUntil(intake::atSetpoint),
                 feedPieceChamberNote(),
-                Relocate()));
+                relocateNote()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
   }
 
   public void update3DPose() {
@@ -87,7 +87,7 @@ public class Superstructure {
         intake.changeRollerSpeed(0), intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
   }
 
-  public Command Relocate() {
+  public Command relocateNote() {
     Command returnCommand = Commands.none();
     if ((currentNoteState == noteState.None)
         || (currentScoringModeState == scoringModeState.Amp
@@ -138,7 +138,7 @@ public class Superstructure {
               outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
               Commands.runOnce(() -> readyToShoot = true));
     }
-    return returnCommand.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    return returnCommand;
   }
 
   public Command feedPieceChamberNote() {
