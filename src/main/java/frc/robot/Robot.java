@@ -150,6 +150,8 @@ public class Robot extends LoggedRobot {
     autoChooser.addDefaultOption("None", null);
     autoChooser.addDefaultOption("test", superstructure.testAuto());
 
+    driver.povUp().whileTrue(drivebase.goToShotPoint());
+
     // Floor Pickup
     driver
         .a()
