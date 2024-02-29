@@ -231,6 +231,10 @@ public class MAXSwerve extends SubsystemBase {
             () -> {
               boolean isBlue = true;
 
+              if(DriverStation.getAlliance().isPresent()){
+                isBlue = DriverStation.getAlliance().get() == DriverStation.Alliance.Blue;
+              }
+
               // Translation2d speakerCenter = (DriverStation.getAlliance().get() == Alliance.Blue)
               // ?
               // new Translation2d(0.2167, 5.549) : new Translation2d(16.3, 5.549);
