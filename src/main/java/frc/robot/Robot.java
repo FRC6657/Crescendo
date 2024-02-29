@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -157,11 +158,14 @@ public class Robot extends LoggedRobot {
         .a()
         .whileTrue(
             new SequentialCommandGroup(
-                intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
-                intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed)))
+                intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
+                intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed),
+                Commands.waitUntil(() -> intake.noteDetected()),
+                intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed),
+                intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle)))
         .whileFalse(
             new SequentialCommandGroup(
-                intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
+                intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
                 intake.changeRollerSpeed(0)));
 
     // Fire Amp

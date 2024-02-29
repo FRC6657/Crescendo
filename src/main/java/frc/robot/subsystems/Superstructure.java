@@ -57,7 +57,7 @@ public class Superstructure {
     this.outtake = outtake;
     this.climb = climb;
 
-    noteDetected = new Trigger(() -> intake.noteDetected());
+    noteDetected = new Trigger(() -> false);
 
     noteDetected.onTrue(
         Commands.sequence(
@@ -65,7 +65,8 @@ public class Superstructure {
                 retractIntake(),
                 Commands.waitUntil(intake::atSetpoint),
                 feedPieceChamberNote(),
-                relocateNote()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+                relocateNote())
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
   }
 
   public void update3DPose() {
@@ -105,8 +106,8 @@ public class Superstructure {
       }
       if (currentScoringModeState == scoringModeState.Amp && currentNoteState == noteState.Intake) {
         returnCommand.andThen(feedPieceChamberNote());
-      } else if (currentScoringModeState == scoringModeState.Amp
-          && currentNoteState == noteState.Intake) {
+      } else if (currentScoringModeState == scoringModeState.Speaker
+          && currentNoteState == noteState.Outtake) {
         returnCommand.andThen(
             Commands.sequence(
                 Commands.runOnce(() -> currentNoteState = noteState.Processing),
@@ -143,13 +144,13 @@ public class Superstructure {
 
   public Command feedPieceChamberNote() {
     return Commands.sequence(
-        Commands.runOnce(() -> currentNoteState = noteState.Processing),
-        intake.changeRollerSpeed(-0.6),
-        outtake.changeRPMSetpoint(300),
-        Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
-        outtake.changeRPMSetpoint(0),
-        intake.changeRollerSpeed(0),
-        Commands.runOnce(() -> currentNoteState = noteState.Outtake))
+            Commands.runOnce(() -> currentNoteState = noteState.Processing),
+            intake.changeRollerSpeed(-0.6),
+            outtake.changeRPMSetpoint(300),
+            Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
+            outtake.changeRPMSetpoint(0),
+            intake.changeRollerSpeed(0),
+            Commands.runOnce(() -> currentNoteState = noteState.Outtake))
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
 

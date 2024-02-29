@@ -217,9 +217,9 @@ public class MAXSwerve extends SubsystemBase {
 
   public Command goToShotPoint() {
 
-    var xController = new PIDController(AutoConstants.kAA_P_X, 0, 0);
-    var yController = new PIDController(AutoConstants.kAA_P_Y, 0, 0);
-    var thetaController = new PIDController(AutoConstants.kAA_P_Theta, 0, 0);
+    PIDController xController = new PIDController(AutoConstants.kAA_P_X, 0, 0);
+    PIDController yController = new PIDController(AutoConstants.kAA_P_Y, 0, 0);
+    PIDController thetaController = new PIDController(AutoConstants.kAA_P_Theta, 0, 0);
 
     xController.setTolerance(0.02);
     yController.setTolerance(0.02);
@@ -229,7 +229,6 @@ public class MAXSwerve extends SubsystemBase {
 
     return this.run(
             () -> {
-
               boolean isBlue = true;
 
               // Translation2d speakerCenter = (DriverStation.getAlliance().get() == Alliance.Blue)
@@ -283,7 +282,9 @@ public class MAXSwerve extends SubsystemBase {
               double m = (aY - getPose().getY()) / (aX - getPose().getX());
               double angle = Math.atan(m);
 
-              Pose2d desiredPos = new Pose2d(aX, aY, new Rotation2d(angle).plus(new Rotation2d(isBlue ? 0 : Math.PI)));
+              Pose2d desiredPos =
+                  new Pose2d(
+                      aX, aY, new Rotation2d(angle).plus(new Rotation2d(isBlue ? 0 : Math.PI)));
 
               Logger.recordOutput("AutoAim/DesiredShotPos", desiredPos);
 

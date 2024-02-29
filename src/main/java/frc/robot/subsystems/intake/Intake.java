@@ -43,9 +43,8 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean noteDetected() {
-    return false;
-    // return ((intakeInputs.rollerMotorAcceleration < -400) && (intakeInputs.pivotMotorPosition <
-    // 0));
+    return ((intakeInputs.rollerMotorAcceleration < -4000)
+        && (intakeInputs.pivotMotorPosition < 0));
   }
 
   public boolean atSetpoint() {
