@@ -148,13 +148,13 @@ public class Robot extends LoggedRobot {
 
     driver.povUp().whileTrue(drivebase.goToShotPoint());
 
-    operator.button(0).onTrue(superstructure.ampMode());
-    operator.button(1).onTrue(superstructure.speakerMode());
-    operator.button(2).onTrue(superstructure.readyPiece());
-    operator.button(3).onTrue(superstructure.extendIntake());
-    operator.button(3).onFalse(superstructure.retractIntake());
-    operator.button(4).onTrue(superstructure.shootPiece());
-    operator.button(8).onTrue(superstructure.resetEverything());
+    operator.button(1).onTrue(superstructure.ampMode());
+    operator.button(2).onTrue(superstructure.speakerMode());
+    operator.button(3).onTrue(superstructure.readyPiece());
+    operator.button(4).onTrue(superstructure.extendIntake());
+    operator.button(4).onFalse(superstructure.retractIntake());
+    operator.button(5).onTrue(superstructure.shootPiece());
+    operator.button(9).onTrue(superstructure.resetEverything());
   }
 
   @Override
