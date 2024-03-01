@@ -5,7 +5,6 @@ package frc.robot.subsystems;
 
 import com.choreo.lib.Choreo;
 import com.choreo.lib.ChoreoTrajectory;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -22,6 +21,7 @@ import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drive.MAXSwerve;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.outtake.Outtake;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -229,25 +229,31 @@ public class Superstructure {
     return Commands.sequence(extendIntake(), runPath("interuptChoreoTest", true));
   }
 
-  private boolean alliance() {
-    boolean isBlue = true;
-    if (DriverStation.getAlliance().isPresent()) {
-      isBlue = (DriverStation.getAlliance().get() == Alliance.Blue);
-    }
-    return isBlue;
+  private BooleanSupplier isRedSupplier() {
+    return () -> {
+      boolean isRed = false;
+      if (DriverStation.getAlliance().isPresent()) {
+        isRed = (DriverStation.getAlliance().get() == Alliance.Red);
+      }
+      return isRed;
+    };
   }
 
   private Command runPath(String pathName, boolean isFirstPath) {
-    boolean isBlue = alliance();
+
     ChoreoTrajectory traj = Choreo.getTrajectory(pathName);
     var thetaController = AutoConstants.kThetaController;
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-    Pose2d initialPose = isBlue ? traj.getInitialPose() : traj.flipped().getInitialPose();
-
     Command setPoseCommand =
         Commands.either(
-            Commands.runOnce(() -> drivebase.setPose(initialPose), drivebase),
+            Commands.runOnce(
+                () ->
+                    drivebase.setPose(
+                        !isRedSupplier().getAsBoolean()
+                            ? traj.getInitialPose()
+                            : traj.flipped().getInitialPose()),
+                drivebase),
             Commands.none(),
             () -> isFirstPath);
 
@@ -259,8 +265,8 @@ public class Superstructure {
             AutoConstants.kYController,
             thetaController,
             (ChassisSpeeds speeds) -> drivebase.runChassisSpeeds(speeds),
-            () -> !isBlue, // Whether or not to mirror the path based on alliance (this assumes the
-            // path is created for the blue alliance)
+            isRedSupplier(), // Whether or not to mirror the path based on alliance (this assumes
+            // the path is created for the blue alliance)
             drivebase);
     return Commands.sequence(
             Commands.runOnce(() -> Logger.recordOutput("Current Path", traj.getPoses())),
