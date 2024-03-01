@@ -57,7 +57,7 @@ public class Superstructure {
     this.outtake = outtake;
     this.climb = climb;
 
-    noteDetected = new Trigger(() -> intake.noteDetected());
+    noteDetected = new Trigger(intake::noteDetected);
 
     noteDetected.onTrue(
         Commands.sequence(
@@ -260,7 +260,7 @@ public class Superstructure {
             setPoseCommand,
             swerveCommand,
             Commands.runOnce(() -> drivebase.choreoStop(), drivebase))
-        .until(() -> intake.noteDetected())
+        .until(intake::noteDetected)
         .handleInterrupt(() -> drivebase.choreoStop());
   }
 }
