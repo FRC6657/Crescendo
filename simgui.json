@@ -4,38 +4,6 @@
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Auto Chooser": "String Chooser",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d"
-    },
-    "windows": {
-      "/SmartDashboard/Auto Chooser": {
-        "window": {
-          "visible": true
-        }
-      }
-    }
-  },
-  "NetworkTables": {
-    "transitory": {
-      "AdvantageKit": {
-        "DashboardInputs": {
-          "open": true
-        },
-        "RealOutputs": {
-          "Outtake": {
-            "open": true
-          },
-          "open": true
-        },
-        "open": true
-      },
-      "LiveWindow": {
-        "open": true
-      },
-      "Shuffleboard": {
-        "open": true
-      },
-      "SmartDashboard": {
-        "open": true
-      }
     }
   },
   "NetworkTables Info": {

@@ -86,6 +86,7 @@ public class OuttakeIO_Real implements OuttakeIO {
         1.0 / OuttakeConstants.kGearingFlywheel; // Sets default output to flywheel rotations
     flywheelConfigs.Slot0 = OuttakeConstants.kFlyWheelSlot0; // PID Constants
     flywheelConfigs.CurrentLimits = OuttakeConstants.kPivotCurrentConfigs; // Current Limits
+    flywheelConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     flywheelConfigurator.apply(flywheelConfigs);
 
     // Flywheel Status Signals

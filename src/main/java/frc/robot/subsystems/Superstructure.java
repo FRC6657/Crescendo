@@ -57,7 +57,7 @@ public class Superstructure {
     this.outtake = outtake;
     this.climb = climb;
 
-    noteDetected = new Trigger(() -> false);
+    noteDetected = new Trigger(() -> intake.noteDetected());
 
     noteDetected.onTrue(
         Commands.sequence(
@@ -127,7 +127,7 @@ public class Superstructure {
   }
 
   public Command readyPiece() {
-    Command returnCommand = Commands.print("Peice and state were not correct");
+    Command returnCommand = Commands.print("Piece and state were not correct");
     if (currentScoringModeState == scoringModeState.Amp && currentNoteState == noteState.Outtake) {
       returnCommand =
           Commands.sequence(
@@ -187,23 +187,48 @@ public class Superstructure {
 
   public Command speakerMode() {
     return Commands.sequence(
-        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Speaker), readyPiece());
+        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Speaker), relocateNote());
   }
 
   public Command ampMode() {
     return Commands.sequence(
-        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Amp), readyPiece());
+        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Amp), relocateNote());
+  }
+
+  // hopefully we can get rid of this later on
+  public Command resetEverything() {
+    return Commands.sequence(
+        intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
+        intake.changeRollerSpeed(0),
+        outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
+        outtake.changeRPMSetpoint(0),
+        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Amp),
+        Commands.runOnce(() -> currentNoteState = noteState.None),
+        Commands.runOnce(() -> readyToShoot = false));
   }
 
   public Command testAuto() {
     return Commands.sequence(
         shootPiece(),
         extendIntake(),
-        runPath("testPath.1", true, true),
+        Commands.waitUntil(() -> intake.atSetpoint()), // would be nice if we could get rid of this
+        runPath("testPath.1", alliance(), true),
         retractIntake(),
-        runPath("testPath.2", true, false),
+        runPath("testPath.2", alliance(), false),
         Commands.waitUntil(() -> currentNoteState == noteState.Intake),
         shootPiece());
+  }
+
+  public Command meterTestAuto() {
+    return runPath("1MeterTest", alliance(), true);
+  }
+
+  public Command interuptChoreoTest() {
+    return Commands.sequence(extendIntake(), runPath("interuptChoreoTest", alliance(), true));
+  }
+
+  private boolean alliance() {
+    return true;
   }
 
   private Command runPath(String pathName, boolean isBlue, boolean isFirstPath) {
@@ -231,9 +256,11 @@ public class Superstructure {
             // path is created for the blue alliance)
             drivebase);
     return Commands.sequence(
-        Commands.runOnce(() -> Logger.recordOutput("Current Path", traj.getPoses())),
-        setPoseCommand,
-        swerveCommand,
-        Commands.runOnce(() -> drivebase.choreoStop(), drivebase));
+            Commands.runOnce(() -> Logger.recordOutput("Current Path", traj.getPoses())),
+            setPoseCommand,
+            swerveCommand,
+            Commands.runOnce(() -> drivebase.choreoStop(), drivebase))
+        .until(() -> intake.noteDetected())
+        .handleInterrupt(() -> drivebase.choreoStop());
   }
 }

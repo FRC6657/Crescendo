@@ -7,18 +7,13 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.IntakeConstants;
-import frc.robot.Constants.MAXSwerveConstants;
-import frc.robot.Constants.OuttakeConstants;
-import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.MAXSwerveConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimberIO;
@@ -150,73 +145,21 @@ public class Robot extends LoggedRobot {
                         * 0.25)));
 
     autoChooser.addDefaultOption("None", null);
-    autoChooser.addDefaultOption("test", superstructure.testAuto());
+    autoChooser.addOption("testAuto", superstructure.testAuto());
+    autoChooser.addOption("1 Meter Test", superstructure.meterTestAuto());
 
     driver.povUp().whileTrue(drivebase.goToShotPoint());
 
-    // Floor Pickup
-    // driver
-    //     .a()
-    //     .whileTrue(
-    //         new SequentialCommandGroup(
-    //             intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
-    //             intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed),
-    //             Commands.waitUntil(() -> intake.noteDetected()),
-    //             intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed),
-    //             intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle)))
-    //     .whileFalse(
-    //         new SequentialCommandGroup(
-    //             intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
-    //             intake.changeRollerSpeed(0)));
+    operator.button(0).onTrue(superstructure.ampMode());
+    operator.button(1).onTrue(superstructure.speakerMode());
+    operator.button(2).onTrue(superstructure.readyPiece());
 
-    driver.x().whileTrue(
-      intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed)
-    ).onFalse(
-      intake.changeRollerSpeed(0)
-    );
-
-    driver.y().whileTrue(
-      intake.changeRollerSpeed(-0.5)
-    ).onFalse(
-      intake.changeRollerSpeed(0)
-    );
-
-    // Fire Amp
-    // driver
-    //     .x()
-    //     .whileTrue(
-    //         new SequentialCommandGroup(
-    //             outtake.changeRPMSetpoint(300),
-    //             new WaitUntilCommand(outtake::beamBroken),
-    //             outtake.changeRPMSetpoint(0),
-    //             outtake.changePivotSetpoint(96),
-    //             outtake.waitUntilPivotAtSetpoint(),
-    //             outtake.changeRPMSetpoint(1000),
-    //             new WaitUntilCommand(() -> !outtake.beamBroken()),
-    //             outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
-    //             outtake.changeRPMSetpoint(0)));
-
-    // Fire Speaker
-    driver
-        .b()
-        .whileTrue(
-            new SequentialCommandGroup(
-                outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
-                outtake.waitUntilFlywheelAtSetpoint(),
-                intake.changeRollerSpeed(-0.6)))
-        .whileFalse(
-            new SequentialCommandGroup(intake.changeRollerSpeed(0), outtake.changeRPMSetpoint(0)));
-
-    // Ready Amp
     operator
-        .button(1)
-        .onTrue(
-            new SequentialCommandGroup(
-                intake.changeRollerSpeed(-0.6),
-                outtake.changeRPMSetpoint(300),
-                new WaitUntilCommand(outtake::beamBroken),
-                outtake.changeRPMSetpoint(0),
-                intake.changeRollerSpeed(0)));
+        .button(3)
+        .onTrue(superstructure.extendIntake())
+        .onFalse(superstructure.retractIntake());
+    operator.button(4).onTrue(superstructure.shootPiece());
+    operator.button(8).onTrue(superstructure.resetEverything());
   }
 
   @Override

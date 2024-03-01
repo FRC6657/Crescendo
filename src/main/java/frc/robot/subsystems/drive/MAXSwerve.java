@@ -217,9 +217,9 @@ public class MAXSwerve extends SubsystemBase {
 
   public Command goToShotPoint() {
 
-    PIDController xController = new PIDController(AutoConstants.kAA_P_X, 0, 0);
-    PIDController yController = new PIDController(AutoConstants.kAA_P_Y, 0, 0);
-    PIDController thetaController = new PIDController(AutoConstants.kAA_P_Theta, 0, 0);
+    var xController = new PIDController(AutoConstants.kAA_P_X, 0, 0);
+    var yController = new PIDController(AutoConstants.kAA_P_Y, 0, 0);
+    var thetaController = new PIDController(AutoConstants.kAA_P_Theta, 0, 0);
 
     xController.setTolerance(0.02);
     yController.setTolerance(0.02);
