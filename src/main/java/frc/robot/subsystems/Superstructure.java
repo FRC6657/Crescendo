@@ -7,7 +7,9 @@ import com.choreo.lib.Choreo;
 import com.choreo.lib.ChoreoTrajectory;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -234,9 +236,9 @@ public class Superstructure {
 
   private boolean isRed() {
     boolean isRed = false;
-    // if (DriverStation.getAlliance().isPresent()) {
-    //   isRed = (DriverStation.getAlliance().get() == Alliance.Red);
-    // }
+    if (DriverStation.getAlliance().isPresent()) {
+      isRed = (DriverStation.getAlliance().get() == Alliance.Red);
+    }
     return isRed;
   }
 
