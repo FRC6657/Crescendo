@@ -27,8 +27,8 @@ public class Climb extends SubsystemBase {
     leftClimber.updateInputs();
     rightClimber.updateInputs();
 
-    leftClimber.run();
-    rightClimber.run();
+    // leftClimber.run();
+    // rightClimber.run();
   }
 
   public Command changeSetpoint(double setpoint) {

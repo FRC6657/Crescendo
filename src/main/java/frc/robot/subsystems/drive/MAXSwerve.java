@@ -231,7 +231,7 @@ public class MAXSwerve extends SubsystemBase {
             () -> {
               boolean isBlue = true;
 
-              if(DriverStation.getAlliance().isPresent()){
+              if (DriverStation.getAlliance().isPresent()) {
                 isBlue = DriverStation.getAlliance().get() == DriverStation.Alliance.Blue;
               }
 

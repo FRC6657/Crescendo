@@ -12,12 +12,13 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.ClimbConstants.ClimberInformation;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.MAXSwerveConstants;
 import frc.robot.Constants.OuttakeConstants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimberIO;
@@ -105,7 +106,7 @@ public class Robot extends LoggedRobot {
 
   private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
 
-  // Trigger stopTrigger = new Trigger(outtake::beamBroken).onTrue(outtake.changeRPMSetpoint(0));
+  Trigger stopTrigger = new Trigger(outtake::beamBroken).onTrue(outtake.changeRPMSetpoint(0));
 
   @SuppressWarnings(value = "resource")
   @Override
@@ -154,38 +155,50 @@ public class Robot extends LoggedRobot {
     driver.povUp().whileTrue(drivebase.goToShotPoint());
 
     // Floor Pickup
-    driver
-        .a()
-        .whileTrue(
-            new SequentialCommandGroup(
-                intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
-                intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed),
-                Commands.waitUntil(() -> intake.noteDetected()),
-                intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed),
-                intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle)))
-        .whileFalse(
-            new SequentialCommandGroup(
-                intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
-                intake.changeRollerSpeed(0)));
+    // driver
+    //     .a()
+    //     .whileTrue(
+    //         new SequentialCommandGroup(
+    //             intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
+    //             intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed),
+    //             Commands.waitUntil(() -> intake.noteDetected()),
+    //             intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed),
+    //             intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle)))
+    //     .whileFalse(
+    //         new SequentialCommandGroup(
+    //             intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
+    //             intake.changeRollerSpeed(0)));
+
+    driver.x().whileTrue(
+      intake.changeRollerSpeed(IntakeConstants.kFloorInSpeed)
+    ).onFalse(
+      intake.changeRollerSpeed(0)
+    );
+
+    driver.y().whileTrue(
+      intake.changeRollerSpeed(-0.5)
+    ).onFalse(
+      intake.changeRollerSpeed(0)
+    );
 
     // Fire Amp
-    driver
-        .x()
-        .whileTrue(
-            new SequentialCommandGroup(
-                outtake.changeRPMSetpoint(300),
-                new WaitUntilCommand(outtake::beamBroken),
-                outtake.changeRPMSetpoint(0),
-                outtake.changePivotSetpoint(96),
-                outtake.waitUntilPivotAtSetpoint(),
-                outtake.changeRPMSetpoint(1000),
-                new WaitUntilCommand(() -> !outtake.beamBroken()),
-                outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
-                outtake.changeRPMSetpoint(0)));
+    // driver
+    //     .x()
+    //     .whileTrue(
+    //         new SequentialCommandGroup(
+    //             outtake.changeRPMSetpoint(300),
+    //             new WaitUntilCommand(outtake::beamBroken),
+    //             outtake.changeRPMSetpoint(0),
+    //             outtake.changePivotSetpoint(96),
+    //             outtake.waitUntilPivotAtSetpoint(),
+    //             outtake.changeRPMSetpoint(1000),
+    //             new WaitUntilCommand(() -> !outtake.beamBroken()),
+    //             outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
+    //             outtake.changeRPMSetpoint(0)));
 
     // Fire Speaker
     driver
-        .y()
+        .b()
         .whileTrue(
             new SequentialCommandGroup(
                 outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
