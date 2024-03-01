@@ -229,14 +229,12 @@ public class Superstructure {
     return Commands.sequence(extendIntake(), runPath("interuptChoreoTest", true));
   }
 
-  private BooleanSupplier isRedSupplier() {
-    return () -> {
-      boolean isRed = false;
-      if (DriverStation.getAlliance().isPresent()) {
-        isRed = (DriverStation.getAlliance().get() == Alliance.Red);
-      }
-      return isRed;
-    };
+  private boolean isRed() {
+    boolean isRed = false;
+    if (DriverStation.getAlliance().isPresent()) {
+      isRed = (DriverStation.getAlliance().get() == Alliance.Red);
+    }
+    return isRed;
   }
 
   private Command runPath(String pathName, boolean isFirstPath) {
@@ -250,7 +248,7 @@ public class Superstructure {
             Commands.runOnce(
                 () ->
                     drivebase.setPose(
-                        !isRedSupplier().getAsBoolean()
+                        !isRed()
                             ? traj.getInitialPose()
                             : traj.flipped().getInitialPose()),
                 drivebase),
@@ -265,7 +263,7 @@ public class Superstructure {
             AutoConstants.kYController,
             thetaController,
             (ChassisSpeeds speeds) -> drivebase.runChassisSpeeds(speeds),
-            isRedSupplier(), // Whether or not to mirror the path based on alliance (this assumes
+            this::isRed, // Whether or not to mirror the path based on alliance (this assumes
             // the path is created for the blue alliance)
             drivebase);
     return Commands.sequence(
