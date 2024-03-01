@@ -8,6 +8,8 @@ import com.choreo.lib.ChoreoTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -212,26 +214,31 @@ public class Superstructure {
         shootPiece(),
         extendIntake(),
         Commands.waitUntil(() -> intake.atSetpoint()), // would be nice if we could get rid of this
-        runPath("testPath.1", alliance(), true),
+        runPath("testPath.1", true),
         retractIntake(),
-        runPath("testPath.2", alliance(), false),
+        runPath("testPath.2", false),
         Commands.waitUntil(() -> currentNoteState == noteState.Intake),
         shootPiece());
   }
 
   public Command meterTestAuto() {
-    return runPath("1MeterTest", alliance(), true);
+    return runPath("1MeterTest", true);
   }
 
   public Command interuptChoreoTest() {
-    return Commands.sequence(extendIntake(), runPath("interuptChoreoTest", alliance(), true));
+    return Commands.sequence(extendIntake(), runPath("interuptChoreoTest", true));
   }
 
   private boolean alliance() {
-    return true;
+    boolean isBlue = true;
+    if (DriverStation.getAlliance().isPresent()) {
+      isBlue = (DriverStation.getAlliance().get() == Alliance.Blue);
+    }
+    return isBlue;
   }
 
-  private Command runPath(String pathName, boolean isBlue, boolean isFirstPath) {
+  private Command runPath(String pathName, boolean isFirstPath) {
+    boolean isBlue = alliance();
     ChoreoTrajectory traj = Choreo.getTrajectory(pathName);
     var thetaController = AutoConstants.kThetaController;
     thetaController.enableContinuousInput(-Math.PI, Math.PI);

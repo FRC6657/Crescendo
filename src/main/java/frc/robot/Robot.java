@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MAXSwerveConstants;
@@ -101,8 +100,6 @@ public class Robot extends LoggedRobot {
 
   private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
 
-  Trigger stopTrigger = new Trigger(outtake::beamBroken).onTrue(outtake.changeRPMSetpoint(0));
-
   @SuppressWarnings(value = "resource")
   @Override
   public void robotInit() {
@@ -147,17 +144,15 @@ public class Robot extends LoggedRobot {
     autoChooser.addDefaultOption("None", null);
     autoChooser.addOption("testAuto", superstructure.testAuto());
     autoChooser.addOption("1 Meter Test", superstructure.meterTestAuto());
+    autoChooser.addOption("interupt Choreo Test", superstructure.interuptChoreoTest());
 
     driver.povUp().whileTrue(drivebase.goToShotPoint());
 
     operator.button(0).onTrue(superstructure.ampMode());
     operator.button(1).onTrue(superstructure.speakerMode());
     operator.button(2).onTrue(superstructure.readyPiece());
-
-    operator
-        .button(3)
-        .onTrue(superstructure.extendIntake())
-        .onFalse(superstructure.retractIntake());
+    operator.button(3).onTrue(superstructure.extendIntake());
+    operator.button(3).onFalse(superstructure.retractIntake());
     operator.button(4).onTrue(superstructure.shootPiece());
     operator.button(8).onTrue(superstructure.resetEverything());
   }
