@@ -27,8 +27,8 @@ public class Climb extends SubsystemBase {
     leftClimber.updateInputs();
     rightClimber.updateInputs();
 
-    // leftClimber.run();
-    // rightClimber.run();
+    leftClimber.run();
+    rightClimber.run();
   }
 
   public Command changeSetpoint(double setpoint) {
@@ -43,5 +43,9 @@ public class Climb extends SubsystemBase {
 
   public Pose3d[] get3DPoses() {
     return new Pose3d[] {leftClimber.get3DPose(), rightClimber.get3DPose()};
+  }
+
+  public boolean atSetpoint() {
+    return leftClimber.atSetpoint() && rightClimber.atSetpoint();
   }
 }

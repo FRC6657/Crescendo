@@ -10,6 +10,7 @@ public interface ClimberIO {
     public double velocity = 0.0;
     public double appliedVoltage = 0.0;
     public double current = 0.0;
+    public boolean atSetpoint = false;
   }
 
   public default void updateInputs(ClimberIOInputs inputs) {}

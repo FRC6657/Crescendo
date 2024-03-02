@@ -31,7 +31,7 @@ public class Superstructure {
   Intake intake;
   Outtake outtake;
   Climb climb;
-  Trigger noteDetected;
+  Trigger noteDetector;
 
   private enum noteState {
     Processing,
@@ -41,39 +41,42 @@ public class Superstructure {
   };
 
   @AutoLogOutput(key = "Superstructure/Note State")
-  noteState currentNoteState = noteState.None;
+  noteState currentNoteState = noteState.Outtake;
 
-  private enum scoringModeState {
+  private enum ScoringMode {
     Amp,
     Speaker
   };
 
-  @AutoLogOutput(key = "Superstructure/Scoring Note State")
-  private scoringModeState currentScoringModeState = scoringModeState.Speaker;
+  @AutoLogOutput(key = "Superstructure/Scoring Mode")
+  private ScoringMode currentScoringMode = ScoringMode.Speaker;
 
-  @AutoLogOutput(key = "Superstructure/Ready to Shoot")
+  @AutoLogOutput(key = "Superstructure/Ready")
   private boolean readyToShoot = false;
 
-  @AutoLogOutput(key = "Superstructure/Climebrs up")
+  @AutoLogOutput(key = "Superstructure/Climbers Up")
   private boolean climbersUp = false;
 
   public Superstructure(MAXSwerve drivebase, Intake intake, Outtake outtake, Climb climb) {
+
     this.drivebase = drivebase;
     this.intake = intake;
     this.outtake = outtake;
     this.climb = climb;
 
-    noteDetected = new Trigger(intake::noteDetected);
+    noteDetector = new Trigger(intake::noteDetected);
 
-    noteDetected.onTrue(
+    noteDetector.onTrue(
         Commands.sequence(
                 Commands.runOnce(() -> currentNoteState = noteState.Processing),
                 Commands.waitSeconds(0.27),
                 retractIntake(),
                 Commands.waitUntil(intake::atSetpoint),
-                feedPieceChamberNote(),
+                chamberNote(),
                 relocateNote())
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+
+    Logger.recordOutput("Superstructure/Latest Event", "Superstructure Initialized");
   }
 
   public void update3DPose() {
@@ -85,39 +88,82 @@ public class Superstructure {
     Logger.recordOutput("3D Poses", mechanismPoses);
   }
 
+  public Command logEvent(String event) {
+    return Commands.runOnce(() -> Logger.recordOutput("Superstructure/Latest Event", event));
+  }
+
+  public Command raiseClimbers() {
+    return stowOuttake()
+        .onlyIf(() -> (readyToShoot && currentScoringMode == ScoringMode.Amp))
+        .andThen(Commands.runOnce(() -> readyToShoot = false))
+        .beforeStarting(logEvent("Raising Climbers"))
+        .andThen(
+            Commands.sequence(
+                outtake.waitUntilPivotAtSetpoint(),
+                climb.changeSetpoint(ClimbConstants.kMaxHeight),
+                Commands.runOnce(() -> climbersUp = true)));
+  }
+
+  public Command lowerClimbers() {
+    return climb.changeSetpoint(0.1).beforeStarting(logEvent("Lowering Climbers"));
+  }
+
+  public Command stowOuttake() {
+    return Commands.sequence(
+        logEvent("Stowing Outtake"),
+        outtake.changeRPMSetpoint(0),
+        outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle));
+  }
+
+  public Command raiseOuttake() {
+    return Commands.sequence(
+        logEvent("Raising Outtake"),
+        lowerClimbers().onlyIf(() -> climbersUp).andThen(Commands.waitUntil(() -> !climbersUp)),
+        outtake.changePivotSetpoint(OuttakeConstants.kMaxPivotAngle),
+        outtake.waitUntilPivotAtSetpoint());
+  }
+
   public Command extendIntake() {
     return Commands.sequence(
-        intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle), intake.changeRollerSpeed(0.5));
+        logEvent("Extending Intake"),
+        intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
+        intake.changeRollerSpeed(0.5));
   }
 
   public Command retractIntake() {
     return Commands.sequence(
-        intake.changeRollerSpeed(0), intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
+        logEvent("Retracting Intake"),
+        intake.changeRollerSpeed(0),
+        intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
+  }
+
+  public Command zeroRobot() {
+    return Commands.sequence(
+        logEvent("Zeroing Robot"),
+        outtake.changeRPMSetpoint(0),
+        outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
+        intake.changeRollerSpeed(0),
+        intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
+        outtake.waitUntilFlywheelAtSetpoint(),
+        outtake.waitUntilPivotAtSetpoint(),
+        Commands.waitUntil(intake::atSetpoint));
   }
 
   public Command relocateNote() {
 
     Command[] commands = new Command[4];
 
-    commands[0] =
-        Commands.sequence(
-                Commands.print("0 rn"),
-                outtake.changeRPMSetpoint(0),
-                outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
-                outtake.waitUntilFlywheelAtSetpoint(),
-                outtake.waitUntilPivotAtSetpoint())
-            .onlyIf(() -> readyToShoot);
+    commands[0] = zeroRobot().onlyIf(() -> readyToShoot);
 
     commands[1] =
-        Commands.sequence(Commands.print("1 r"), feedPieceChamberNote())
+        Commands.sequence(logEvent("Chambering Note"), chamberNote())
             .onlyIf(
                 () ->
-                    currentScoringModeState == scoringModeState.Amp
-                        && currentNoteState == noteState.Intake);
+                    currentScoringMode == ScoringMode.Amp && currentNoteState == noteState.Intake);
 
     commands[2] =
         Commands.sequence(
-                Commands.print("2 rn"),
+                logEvent("Unchambering Note"),
                 Commands.runOnce(() -> currentNoteState = noteState.Processing),
                 intake.changeRollerSpeed(0.4),
                 outtake.changeRPMSetpoint(-300),
@@ -127,11 +173,10 @@ public class Superstructure {
                 Commands.runOnce(() -> currentNoteState = noteState.Intake))
             .onlyIf(
                 () ->
-                    currentScoringModeState == scoringModeState.Speaker
+                    currentScoringMode == ScoringMode.Speaker
                         && currentNoteState == noteState.Outtake);
 
-    commands[3] =
-        Commands.sequence(Commands.print("3 rn"), readyPiece()).onlyIf(() -> readyToShoot);
+    commands[3] = readyPiece().onlyIf(() -> readyToShoot);
 
     return Commands.sequence(commands);
   }
@@ -142,31 +187,33 @@ public class Superstructure {
 
     commands[0] =
         Commands.sequence(
-                Commands.print("0 rp"),
+                logEvent("Readying Robot for Amp"),
                 outtake.changePivotSetpoint(96),
                 Commands.runOnce(() -> readyToShoot = true))
+            .beforeStarting(
+                lowerClimbers()
+                    .andThen(Commands.waitUntil(climb::atSetpoint))
+                    .onlyIf(() -> climbersUp))
             .onlyIf(
                 () ->
-                    currentScoringModeState == scoringModeState.Amp
-                        && currentNoteState == noteState.Outtake
-                        && !climbersUp);
+                    currentScoringMode == ScoringMode.Amp && currentNoteState == noteState.Outtake);
 
     commands[1] =
         Commands.sequence(
-                Commands.print("1 rp"),
+                logEvent("Readying Robot for Speaker"),
                 outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
                 Commands.runOnce(() -> readyToShoot = true))
             .onlyIf(
                 () ->
-                    currentScoringModeState == scoringModeState.Speaker
+                    currentScoringMode == ScoringMode.Speaker
                         && currentNoteState == noteState.Intake);
 
     return Commands.sequence(commands);
   }
 
-  public Command feedPieceChamberNote() {
+  public Command chamberNote() {
     return Commands.sequence(
-            Commands.print("feed Piece"),
+            logEvent("Chambering Note"),
             Commands.runOnce(() -> currentNoteState = noteState.Processing),
             intake.changeRollerSpeed(-0.6),
             outtake.changeRPMSetpoint(300),
@@ -181,12 +228,11 @@ public class Superstructure {
 
     Command[] commands = new Command[3];
 
-    commands[0] =
-        Commands.sequence(Commands.print("0 s"), readyPiece()).onlyIf(() -> !readyToShoot);
+    commands[0] = readyPiece().onlyIf(() -> !readyToShoot);
 
     commands[1] =
         Commands.sequence(
-                Commands.print("1 s"),
+                logEvent("Scoring Amp"),
                 outtake.waitUntilPivotAtSetpoint(), // we might not need this
                 outtake.changeRPMSetpoint(600),
                 Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
@@ -194,11 +240,11 @@ public class Superstructure {
                 outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
                 Commands.runOnce(() -> currentNoteState = noteState.None),
                 Commands.runOnce(() -> readyToShoot = false))
-            .onlyIf(() -> currentScoringModeState == scoringModeState.Amp);
+            .onlyIf(() -> currentScoringMode == ScoringMode.Amp);
 
     commands[2] =
         Commands.sequence(
-                Commands.print("2 s"),
+                logEvent("Scoring Speaker"),
                 outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
                 outtake.waitUntilFlywheelAtSetpoint(),
                 intake.changeRollerSpeed(-0.6),
@@ -207,52 +253,38 @@ public class Superstructure {
                 intake.changeRollerSpeed(0),
                 Commands.runOnce(() -> readyToShoot = false),
                 Commands.runOnce(() -> currentNoteState = noteState.None))
-            .onlyIf(() -> currentScoringModeState == scoringModeState.Speaker);
+            .onlyIf(() -> currentScoringMode == ScoringMode.Speaker);
 
     return Commands.sequence(commands);
   }
 
-  public Command raiseClimbers() {
-    return Commands.either(
-        Commands.none(),
-        Commands.sequence(
-            climb.changeSetpoint(ClimbConstants.kMaxHeight),
-            Commands.runOnce(() -> climbersUp = true)),
-        () -> (readyToShoot && currentScoringModeState == scoringModeState.Amp));
-  }
-
-  public Command lowerClimbers() {
-    return climb.changeSetpoint(0.1);
-  }
-
   public Command speakerMode() {
     return Commands.sequence(
-            Commands.runOnce(() -> currentScoringModeState = scoringModeState.Speaker),
-            relocateNote())
-        .unless(() -> currentScoringModeState == scoringModeState.Speaker);
+            Commands.runOnce(() -> currentScoringMode = ScoringMode.Speaker), relocateNote())
+        .unless(() -> currentScoringMode == ScoringMode.Speaker);
   }
 
   public Command ampMode() {
     return Commands.sequence(
-            Commands.runOnce(() -> currentScoringModeState = scoringModeState.Amp), relocateNote())
-        .unless(() -> currentScoringModeState == scoringModeState.Amp);
+            Commands.runOnce(() -> currentScoringMode = ScoringMode.Amp), relocateNote())
+        .unless(() -> currentScoringMode == ScoringMode.Amp);
   }
 
   public Command ampStart() {
     return Commands.sequence(
-        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Amp),
+        Commands.runOnce(() -> currentScoringMode = ScoringMode.Amp),
         Commands.runOnce(() -> currentNoteState = noteState.Outtake));
   }
 
   public Command speakerStart() {
     return Commands.sequence(
-        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Speaker),
+        Commands.runOnce(() -> currentScoringMode = ScoringMode.Speaker),
         Commands.runOnce(() -> currentNoteState = noteState.Intake));
   }
 
   public Command nothingStart() {
     return Commands.sequence(
-        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Speaker),
+        Commands.runOnce(() -> currentScoringMode = ScoringMode.Speaker),
         Commands.runOnce(() -> currentNoteState = noteState.None));
   }
 
@@ -263,7 +295,7 @@ public class Superstructure {
         intake.changeRollerSpeed(0),
         outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
         outtake.changeRPMSetpoint(0),
-        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Speaker),
+        Commands.runOnce(() -> currentScoringMode = ScoringMode.Speaker),
         Commands.runOnce(() -> currentNoteState = noteState.None),
         Commands.runOnce(() -> readyToShoot = false));
   }
@@ -374,7 +406,7 @@ public class Superstructure {
     return Commands.sequence(
         Commands.runOnce(() -> currentNoteState = noteState.Outtake),
         Commands.runOnce(() -> readyToShoot = true),
-        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Amp),
+        Commands.runOnce(() -> currentScoringMode = ScoringMode.Amp),
         ampMode());
   }
 }

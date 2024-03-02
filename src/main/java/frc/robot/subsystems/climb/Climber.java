@@ -33,6 +33,10 @@ public class Climber {
     io.changeSetpoint(height);
   }
 
+  public boolean atSetpoint() {
+    return inputs.atSetpoint;
+  }
+
   public Pose3d get3DPose() {
     return new Pose3d(0, 0, Units.inchesToMeters(inputs.position), new Rotation3d(0, 0, 0));
   }

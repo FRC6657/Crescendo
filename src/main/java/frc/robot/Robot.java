@@ -147,20 +147,25 @@ public class Robot extends LoggedRobot {
     autoChooser.addOption("interupt Choreo Test", superstructure.interuptChoreoTest());
     autoChooser.addOption("2Center", superstructure.twoCenter());
 
-    driver.povUp().whileTrue(drivebase.goToShotPoint());
+    driver.a().onTrue(superstructure.ampMode());
+    driver.b().onTrue(superstructure.readyPiece());
+    driver.povUp().onTrue(superstructure.raiseClimbers());
+    driver.povDown().onTrue(superstructure.lowerClimbers());
 
-    operator.button(1).onTrue(superstructure.ampMode());
-    operator.button(2).onTrue(superstructure.speakerMode());
-    operator.button(3).onTrue(superstructure.readyPiece());
-    operator.button(4).onTrue(superstructure.extendIntake());
-    operator.button(4).onFalse(superstructure.retractIntake());
-    operator.button(5).onTrue(superstructure.shootPiece());
+    // driver.povUp().whileTrue(drivebase.goToShotPoint());
 
-    operator.button(6).onTrue(superstructure.raiseClimbers());
-    operator.button(7).onTrue(superstructure.lowerClimbers());
+    // operator.button(1).onTrue(superstructure.ampMode());
+    // operator.button(2).onTrue(superstructure.speakerMode());
+    // operator.button(3).onTrue(superstructure.readyPiece());
+    // operator.button(4).onTrue(superstructure.extendIntake());
+    // operator.button(4).onFalse(superstructure.retractIntake());
+    // operator.button(5).onTrue(superstructure.shootPiece());
 
-    operator.button(9).onTrue(superstructure.firstReset());
-    operator.button(9).onFalse(superstructure.secondReset());
+    // operator.button(6).onTrue(superstructure.raiseClimbers());
+    // operator.button(7).onTrue(superstructure.lowerClimbers());
+
+    // operator.button(9).onTrue(superstructure.firstReset());
+    // operator.button(9).onFalse(superstructure.secondReset());
   }
 
   @Override

@@ -61,5 +61,6 @@ public class ClimberIO_Real implements ClimberIO {
     inputs.position = mEncoder.getPosition();
     inputs.current = mMotor.getOutputCurrent();
     inputs.velocity = mEncoder.getVelocity();
+    inputs.atSetpoint = MathUtil.isNear(setpoint, inputs.position, 0.25);
   }
 }
