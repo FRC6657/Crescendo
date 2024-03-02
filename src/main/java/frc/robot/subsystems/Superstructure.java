@@ -7,12 +7,16 @@ import com.choreo.lib.Choreo;
 import com.choreo.lib.ChoreoTrajectory;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OuttakeConstants;
 import frc.robot.subsystems.climb.Climb;
@@ -36,7 +40,7 @@ public class Superstructure {
     None
   };
 
-  @AutoLogOutput(key = "Note State")
+  @AutoLogOutput(key = "Superstructure/Note State")
   noteState currentNoteState = noteState.None;
 
   private enum scoringModeState {
@@ -44,11 +48,14 @@ public class Superstructure {
     Speaker
   };
 
-  @AutoLogOutput(key = "Scoring Note State")
+  @AutoLogOutput(key = "Superstructure/Scoring Note State")
   private scoringModeState currentScoringModeState = scoringModeState.Speaker;
 
-  @AutoLogOutput(key = "Ready to Shoot")
+  @AutoLogOutput(key = "Superstructure/Ready to Shoot")
   private boolean readyToShoot = false;
+
+  @AutoLogOutput(key = "Superstructure/Climebrs up")
+  private boolean climbersUp = false;
 
   public Superstructure(MAXSwerve drivebase, Intake intake, Outtake outtake, Climb climb) {
     this.drivebase = drivebase;
@@ -90,60 +97,75 @@ public class Superstructure {
 
   public Command relocateNote() {
 
-    Command[] commands = new Command[3];
+    Command[] commands = new Command[4];
 
-    commands[0] = Commands.none();
-    commands[1] = Commands.none();
-    commands[2] = Commands.none();
+    commands[0] =
+        Commands.sequence(
+                Commands.print("0 rn"),
+                outtake.changeRPMSetpoint(0),
+                outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
+                outtake.waitUntilFlywheelAtSetpoint(),
+                outtake.waitUntilPivotAtSetpoint())
+            .onlyIf(() -> readyToShoot);
 
-    if (readyToShoot) {
-      commands[0] =
-          Commands.sequence(
-              outtake.changeRPMSetpoint(0),
-              outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
-              outtake.waitUntilFlywheelAtSetpoint(),
-              outtake.waitUntilPivotAtSetpoint());
-    }
-    if (currentScoringModeState == scoringModeState.Amp && currentNoteState == noteState.Intake) {
-      commands[1] = (feedPieceChamberNote());
-    }
-    if (currentScoringModeState == scoringModeState.Speaker
-        && currentNoteState == noteState.Outtake) {
-      commands[1] =
-          Commands.sequence(
-              Commands.runOnce(() -> currentNoteState = noteState.Processing),
-              intake.changeRollerSpeed(0.4),
-              outtake.changeRPMSetpoint(-300),
-              Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
-              intake.changeRollerSpeed(0),
-              outtake.changeRPMSetpoint(0),
-              Commands.runOnce(() -> currentNoteState = noteState.Intake));
-    }
-    if (readyToShoot) {
-      commands[2] = (readyPiece());
-    }
+    commands[1] =
+        Commands.sequence(Commands.print("1 r"), feedPieceChamberNote())
+            .onlyIf(
+                () ->
+                    currentScoringModeState == scoringModeState.Amp
+                        && currentNoteState == noteState.Intake);
+
+    commands[2] =
+        Commands.sequence(
+                Commands.print("2 rn"),
+                Commands.runOnce(() -> currentNoteState = noteState.Processing),
+                intake.changeRollerSpeed(0.4),
+                outtake.changeRPMSetpoint(-300),
+                Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
+                intake.changeRollerSpeed(0),
+                outtake.changeRPMSetpoint(0),
+                Commands.runOnce(() -> currentNoteState = noteState.Intake))
+            .onlyIf(
+                () ->
+                    currentScoringModeState == scoringModeState.Speaker
+                        && currentNoteState == noteState.Outtake);
+
+    commands[3] =
+        Commands.sequence(Commands.print("3 rn"), readyPiece()).onlyIf(() -> readyToShoot);
 
     return Commands.sequence(commands);
   }
 
   public Command readyPiece() {
-    Command returnCommand = Commands.print("Piece and state were not correct");
-    if (currentScoringModeState == scoringModeState.Amp && currentNoteState == noteState.Outtake) {
-      returnCommand =
-          Commands.sequence(
-              outtake.changePivotSetpoint(96), Commands.runOnce(() -> readyToShoot = true));
-    } else if (currentScoringModeState == scoringModeState.Speaker
-        && currentNoteState == noteState.Intake) {
-      returnCommand =
-          Commands.sequence(
-              outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
-              Commands.runOnce(() -> readyToShoot = true));
-    }
-    return returnCommand;
+
+    Command[] commands = new Command[2];
+
+    commands[0] =
+        Commands.sequence(
+                Commands.print("0 rp"),
+                outtake.changePivotSetpoint(96),
+                Commands.runOnce(() -> readyToShoot = true))
+            .onlyIf(
+                () ->
+                    currentScoringModeState == scoringModeState.Amp
+                        && currentNoteState == noteState.Outtake && !climbersUp);
+
+    commands[1] =
+        Commands.sequence(
+                Commands.print("1 rp"),
+                outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
+                Commands.runOnce(() -> readyToShoot = true))
+            .onlyIf(
+                () ->
+                    currentScoringModeState == scoringModeState.Speaker
+                        && currentNoteState == noteState.Intake);
+
+    return Commands.sequence(commands);
   }
 
   public Command feedPieceChamberNote() {
     return Commands.sequence(
+            Commands.print("feed Piece"),
             Commands.runOnce(() -> currentNoteState = noteState.Processing),
             intake.changeRollerSpeed(-0.6),
             outtake.changeRPMSetpoint(300),
@@ -156,87 +178,105 @@ public class Superstructure {
 
   public Command shootPiece() {
 
-    Command[] commands = new Command[2];
+    Command[] commands = new Command[3];
 
-    commands[0] = Commands.none();
-    commands[1] = Commands.none();
+    commands[0] =
+        Commands.sequence(Commands.print("0 s"), readyPiece()).onlyIf(() -> !readyToShoot);
 
-    if (!readyToShoot) {
-      commands[0] = (readyPiece());
-    }
+    commands[1] =
+        Commands.sequence(
+                Commands.print("1 s"),
+                outtake.waitUntilPivotAtSetpoint(), // we might not need this
+                outtake.changeRPMSetpoint(600),
+                Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
+                outtake.changeRPMSetpoint(0),
+                outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
+                Commands.runOnce(() -> currentNoteState = noteState.None),
+                Commands.runOnce(() -> readyToShoot = false))
+            .onlyIf(() -> currentScoringModeState == scoringModeState.Amp);
 
-    if (currentScoringModeState == scoringModeState.Amp && currentNoteState == noteState.Outtake) {
-      commands[1] =
-          Commands.sequence(
-              outtake.waitUntilPivotAtSetpoint(), // we might not need this
-              outtake.changeRPMSetpoint(600),
-              Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
-              outtake.changeRPMSetpoint(0),
-              outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
-              Commands.runOnce(() -> currentNoteState = noteState.None));
-    } else if (currentScoringModeState == scoringModeState.Speaker
-        && currentNoteState == noteState.Intake) {
-      commands[1] =
-          Commands.sequence(
-              outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
-              outtake.waitUntilFlywheelAtSetpoint(),
-              intake.changeRollerSpeed(-0.6),
-              Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
-              outtake.changeRPMSetpoint(0),
-              intake.changeRollerSpeed(0),
-              Commands.runOnce(() -> currentNoteState = noteState.None));
-    }
+    commands[2] =
+        Commands.sequence(
+                Commands.print("2 s"),
+                outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
+                outtake.waitUntilFlywheelAtSetpoint(),
+                intake.changeRollerSpeed(-0.6),
+                Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
+                outtake.changeRPMSetpoint(0),
+                intake.changeRollerSpeed(0),
+                Commands.runOnce(() -> readyToShoot = false),
+                Commands.runOnce(() -> currentNoteState = noteState.None))
+            .onlyIf(() -> currentScoringModeState == scoringModeState.Speaker);
 
     return Commands.sequence(commands);
   }
 
+  public Command raiseClimbers(){
+    return Commands.either(
+      Commands.none(), 
+      Commands.sequence(
+        climb.changeSetpoint(ClimbConstants.kMaxHeight),
+        Commands.runOnce(() -> climbersUp = true)
+      ), 
+      () -> (readyToShoot && currentScoringModeState == scoringModeState.Amp));
+  }
+
+  public Command lowerClimbers(){
+    return climb.changeSetpoint(0.1);
+  }
+
   public Command speakerMode() {
     return Commands.sequence(
-        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Speaker), relocateNote());
+            Commands.runOnce(() -> currentScoringModeState = scoringModeState.Speaker),
+            relocateNote())
+        .unless(() -> currentScoringModeState == scoringModeState.Speaker);
   }
 
   public Command ampMode() {
     return Commands.sequence(
-        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Amp), relocateNote());
+            Commands.runOnce(() -> currentScoringModeState = scoringModeState.Amp), relocateNote())
+        .unless(() -> currentScoringModeState == scoringModeState.Amp);
+  }
+
+  public Command ampStart() {
+    return Commands.sequence(
+        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Amp),
+        Commands.runOnce(() -> currentNoteState = noteState.Outtake));
+  }
+
+  public Command speakerStart() {
+    return Commands.sequence(
+        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Speaker),
+        Commands.runOnce(() -> currentNoteState = noteState.Intake));
+  }
+
+  public Command nothingStart() {
+    return Commands.sequence(
+        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Speaker),
+        Commands.runOnce(() -> currentNoteState = noteState.None));
   }
 
   // hopefully we can get rid of this later on
-  public Command resetEverything() {
+  public Command secondReset() {
     return Commands.sequence(
         intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
         intake.changeRollerSpeed(0),
         outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
         outtake.changeRPMSetpoint(0),
-        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Amp),
+        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Speaker),
         Commands.runOnce(() -> currentNoteState = noteState.None),
         Commands.runOnce(() -> readyToShoot = false));
   }
 
-  public Command testAuto() {
-    return Commands.sequence(
-        shootPiece(),
-        extendIntake(),
-        Commands.waitUntil(() -> intake.atSetpoint()), // would be nice if we could get rid of this
-        runPath("testPath.1", true),
-        retractIntake(),
-        runPath("testPath.2", false),
-        Commands.waitUntil(() -> currentNoteState == noteState.Intake),
-        shootPiece());
-  }
-
-  public Command meterTestAuto() {
-    return runPath("1MeterTest", true);
-  }
-
-  public Command interuptChoreoTest() {
-    return Commands.sequence(extendIntake(), runPath("interuptChoreoTest", true));
+  public Command firstReset() {
+    return Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll());
   }
 
   private boolean isRed() {
     boolean isRed = false;
-    // if (DriverStation.getAlliance().isPresent()) {
-    //   isRed = (DriverStation.getAlliance().get() == Alliance.Red);
-    // }
+    if (DriverStation.getAlliance().isPresent()) {
+      isRed = (DriverStation.getAlliance().get() == Alliance.Red);
+    }
     return isRed;
   }
 
@@ -268,11 +308,74 @@ public class Superstructure {
             // the path is created for the blue alliance)
             drivebase);
     return Commands.sequence(
-            Commands.runOnce(() -> Logger.recordOutput("Current Path", traj.getPoses())),
+            Commands.runOnce(
+                () -> Logger.recordOutput("Superstructure/Current Path", traj.getPoses())),
             setPoseCommand,
             swerveCommand,
             Commands.runOnce(() -> drivebase.choreoStop(), drivebase))
         .until(intake::noteDetected)
         .handleInterrupt(() -> drivebase.choreoStop());
+  }
+
+  // Autos
+
+  public Command testAuto() {
+    return Commands.sequence(
+        speakerStart(),
+        shootPiece(),
+        extendIntake(),
+        Commands.waitUntil(() -> intake.atSetpoint()), // would be nice if we could get rid of this
+        runPath("testPath.1", true),
+        retractIntake(),
+        runPath("testPath.2", false),
+        Commands.waitUntil(() -> currentNoteState == noteState.Intake),
+        shootPiece());
+  }
+
+  public Command meterTestAuto() {
+    return runPath("1MeterTest", true);
+  }
+
+
+  public Command interuptChoreoTest() {
+    return Commands.sequence(
+        extendIntake(),
+        Commands.waitUntil(intake::atSetpoint),
+        runPath("interuptChoreoTest", true));
+  }
+
+  public Command twoCenter() {
+    return Commands.sequence(
+        speakerStart(),
+        shootPiece(),
+        extendIntake(),
+        runPath("2CenterTest.1", true),
+        retractIntake(),
+        Commands
+            .parallel( // this is so it will be ready to shoot right when it gets back. Might not be
+                // needed
+                runPath("2CenterTest.2", false),
+                Commands.sequence(
+                    Commands.runOnce(() -> currentNoteState = noteState.Intake)
+                        .onlyIf(RobotBase::isSimulation),
+                    Commands.waitUntil(() -> currentNoteState == noteState.Intake),
+                    readyPiece())),
+        shootPiece(),
+        extendIntake(),
+        Commands.waitUntil(intake::atSetpoint),
+        runPath("2CenterTest.3", false),
+        retractIntake(),
+        Commands.runOnce(() -> currentNoteState = noteState.Intake).onlyIf(RobotBase::isSimulation),
+        runPath("2CenterTest.4", true),
+        Commands.waitUntil(() -> currentNoteState == noteState.Intake),
+        shootPiece());
+  }
+
+  public Command ifTest() {
+    return Commands.sequence(
+        Commands.runOnce(() -> currentNoteState = noteState.Outtake),
+        Commands.runOnce(() -> readyToShoot = true),
+        Commands.runOnce(() -> currentScoringModeState = scoringModeState.Amp),
+        ampMode());
   }
 }

@@ -31,6 +31,9 @@ import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO_Real;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;
 import frc.robot.subsystems.vision.Vision;
+
+import javax.swing.plaf.OptionPaneUI;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -145,6 +148,7 @@ public class Robot extends LoggedRobot {
     autoChooser.addOption("testAuto", superstructure.testAuto());
     autoChooser.addOption("1 Meter Test", superstructure.meterTestAuto());
     autoChooser.addOption("interupt Choreo Test", superstructure.interuptChoreoTest());
+    autoChooser.addDefaultOption("2Center", superstructure.twoCenter());
 
     driver.povUp().whileTrue(drivebase.goToShotPoint());
 
@@ -154,7 +158,12 @@ public class Robot extends LoggedRobot {
     operator.button(4).onTrue(superstructure.extendIntake());
     operator.button(4).onFalse(superstructure.retractIntake());
     operator.button(5).onTrue(superstructure.shootPiece());
-    operator.button(9).onTrue(superstructure.resetEverything());
+
+    operator.button(6).onTrue(superstructure.raiseClimbers());
+    operator.button(7).onTrue(superstructure.lowerClimbers());
+
+    operator.button(9).onTrue(superstructure.firstReset());
+    operator.button(9).onFalse(superstructure.secondReset());
   }
 
   @Override

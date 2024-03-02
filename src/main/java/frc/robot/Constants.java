@@ -265,7 +265,7 @@ public class Constants {
 
     public static final double kMinHeight = 0;
     public static final double kMaxHeight = 15.25; // Inches
-    public static final double kGearing = 1 / 20d;
+    public static final double kGearing = 1 / 60d;
     public static final double kSprocketPD = 1.790; // Inches
     public static final PIDController kClimbUpPID = new PIDController(1, 0, 0);
     public static final PIDController kClimbDownPID = new PIDController(1.5, 0, 0);
