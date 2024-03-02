@@ -145,7 +145,7 @@ public class Robot extends LoggedRobot {
     autoChooser.addOption("testAuto", superstructure.testAuto());
     autoChooser.addOption("1 Meter Test", superstructure.meterTestAuto());
     autoChooser.addOption("interupt Choreo Test", superstructure.interuptChoreoTest());
-    autoChooser.addDefaultOption("2Center", superstructure.twoCenter());
+    autoChooser.addOption("2Center", superstructure.twoCenter());
 
     driver.povUp().whileTrue(drivebase.goToShotPoint());
 
