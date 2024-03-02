@@ -10,7 +10,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -149,7 +148,8 @@ public class Superstructure {
             .onlyIf(
                 () ->
                     currentScoringModeState == scoringModeState.Amp
-                        && currentNoteState == noteState.Outtake && !climbersUp);
+                        && currentNoteState == noteState.Outtake
+                        && !climbersUp);
 
     commands[1] =
         Commands.sequence(
@@ -212,17 +212,16 @@ public class Superstructure {
     return Commands.sequence(commands);
   }
 
-  public Command raiseClimbers(){
+  public Command raiseClimbers() {
     return Commands.either(
-      Commands.none(), 
-      Commands.sequence(
-        climb.changeSetpoint(ClimbConstants.kMaxHeight),
-        Commands.runOnce(() -> climbersUp = true)
-      ), 
-      () -> (readyToShoot && currentScoringModeState == scoringModeState.Amp));
+        Commands.none(),
+        Commands.sequence(
+            climb.changeSetpoint(ClimbConstants.kMaxHeight),
+            Commands.runOnce(() -> climbersUp = true)),
+        () -> (readyToShoot && currentScoringModeState == scoringModeState.Amp));
   }
 
-  public Command lowerClimbers(){
+  public Command lowerClimbers() {
     return climb.changeSetpoint(0.1);
   }
 
@@ -336,7 +335,6 @@ public class Superstructure {
   public Command meterTestAuto() {
     return runPath("1MeterTest", true);
   }
-
 
   public Command interuptChoreoTest() {
     return Commands.sequence(
