@@ -189,7 +189,7 @@ public class Superstructure {
     commands[0] =
         Commands.sequence(
                 logEvent("Readying Robot for Amp"),
-                outtake.changePivotSetpoint(96),
+                outtake.changePivotSetpoint(OuttakeConstants.kPivotAmpAngle),
                 Commands.runOnce(() -> readyToShoot = true))
             .beforeStarting(
                 lowerClimbers()

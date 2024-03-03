@@ -356,6 +356,7 @@ public class Constants {
     public static final double kGearingFlywheel = (1d / 2);
 
     public static final double kMinPivotAngle = -10;
+    public static final double kPivotAmpAngle = 96;
     public static final double kMaxPivotAngle = 133;
     public static final double kMinFlywheelRpm = -3190;
     public static final double kMaxFlywheelRpm = 3190;

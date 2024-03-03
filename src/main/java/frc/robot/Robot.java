@@ -157,8 +157,7 @@ public class Robot extends LoggedRobot {
 
     operator.button(1).onTrue(superstructure.ampMode());
     operator.button(2).onTrue(superstructure.speakerMode());
-    // operator.button(3).onTrue(superstructure.readyPiece());
-    operator.button(3).onTrue(outtake.changePivotSetpoint(96));
+    operator.button(3).onTrue(outtake.changePivotSetpoint(OuttakeConstants.kPivotAmpAngle));
     operator.button(4).onTrue(superstructure.extendIntake());
     operator.button(4).onFalse(superstructure.retractIntake());
     operator.button(5).onTrue(superstructure.shootPiece());
