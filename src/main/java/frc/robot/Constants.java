@@ -74,9 +74,9 @@ public class Constants {
     }
 
     public static final CameraInformation kBackCameraInfo =
-        new CameraInformation("Back Camera", kBackCameraPose);
+        new CameraInformation("Camera_Rear", kBackCameraPose);
     public static final CameraInformation kSideCameraInfo =
-        new CameraInformation("Side Camera", kSideCameraPose);
+        new CameraInformation("Camera_Front", kSideCameraPose);
 
     public static final class CameraResult {
       public final Pose2d estimatedPose;
@@ -123,7 +123,7 @@ public class Constants {
 
     public static final PIDController kXController = new PIDController(1, 0, 0);
     public static final PIDController kYController = new PIDController(1, 0, 0);
-    public static final PIDController kThetaController = new PIDController(1, 0, 0);
+    public static final PIDController kThetaController = new PIDController(1.5, 0, 0);
     public static final double kPXController = 1;
     public static final double kPYController = 1;
     public static final double kPThetaController = 1;
@@ -310,7 +310,7 @@ public class Constants {
     public static final double kGearingPivot = (1d / 20) * (16d / 36);
     public static final double kGearingRollers = (11d / 24);
 
-    public static final double kMinPivotAngle = -20;
+    public static final double kMinPivotAngle = -17;
     public static final double kMaxPivotAngle = 152.25;
 
     public static final double kPivotCurrentLimit = 30;
@@ -322,14 +322,14 @@ public class Constants {
         new Slot0Configs()
             .withKS(0)
             .withKV(12d / ((6380d / 60) * kGearingPivot)) // Volts/Mechanism RPS
-            .withKP(150)
+            .withKP(300)
             .withKI(0)
             .withKD(0);
 
     public static MotionMagicConfigs kPivotMotionMagicConfig =
         new MotionMagicConfigs()
-            .withMotionMagicCruiseVelocity(Units.degreesToRotations(300))
-            .withMotionMagicAcceleration(Units.degreesToRotations(400));
+            .withMotionMagicCruiseVelocity(Units.degreesToRotations(600))
+            .withMotionMagicAcceleration(Units.degreesToRotations(800));
 
     public static final CurrentLimitsConfigs kPivotCurrentConfigs =
         new CurrentLimitsConfigs()

@@ -41,7 +41,7 @@ public class Superstructure {
   };
 
   @AutoLogOutput(key = "Superstructure/Note State")
-  noteState currentNoteState = noteState.Outtake;
+  noteState currentNoteState = noteState.None;
 
   private enum ScoringMode {
     Amp,
@@ -69,7 +69,7 @@ public class Superstructure {
     noteDetector.onTrue(
         Commands.sequence(
                 Commands.runOnce(() -> currentNoteState = noteState.Processing),
-                Commands.waitSeconds(0.27),
+                Commands.waitSeconds(0.4),
                 retractIntake(),
                 Commands.waitUntil(intake::atSetpoint),
                 chamberNote(),
@@ -165,9 +165,10 @@ public class Superstructure {
         Commands.sequence(
                 logEvent("Unchambering Note"),
                 Commands.runOnce(() -> currentNoteState = noteState.Processing),
-                intake.changeRollerSpeed(0.4),
+                intake.changeRollerSpeed(0.3),
                 outtake.changeRPMSetpoint(-300),
                 Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
+                Commands.waitSeconds(0),
                 intake.changeRollerSpeed(0),
                 outtake.changeRPMSetpoint(0),
                 Commands.runOnce(() -> currentNoteState = noteState.Intake))
@@ -215,7 +216,7 @@ public class Superstructure {
     return Commands.sequence(
             logEvent("Chambering Note"),
             Commands.runOnce(() -> currentNoteState = noteState.Processing),
-            intake.changeRollerSpeed(-0.6),
+            intake.changeRollerSpeed(-0.8),
             outtake.changeRPMSetpoint(300),
             Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
             outtake.changeRPMSetpoint(0),

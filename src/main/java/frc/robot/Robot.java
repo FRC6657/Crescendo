@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MAXSwerveConstants;
+import frc.robot.Constants.OuttakeConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.climb.Climb;
@@ -133,10 +134,10 @@ public class Robot extends LoggedRobot {
                 new ChassisSpeeds(
                     -MathUtil.applyDeadband(driver.getLeftY(), 0.05)
                         * MAXSwerveConstants.kMaxDriveSpeed
-                        * 0.5,
+                        * 0.7,
                     -MathUtil.applyDeadband(driver.getLeftX(), 0.15)
                         * MAXSwerveConstants.kMaxDriveSpeed
-                        * 0.5,
+                        * 0.7,
                     -MathUtil.applyDeadband(driver.getRightX(), 0.15)
                         * DriveConstants.kMaxAngularVelocity
                         * 0.25)));
@@ -147,25 +148,26 @@ public class Robot extends LoggedRobot {
     autoChooser.addOption("interupt Choreo Test", superstructure.interuptChoreoTest());
     autoChooser.addOption("2Center", superstructure.twoCenter());
 
-    driver.a().onTrue(superstructure.ampMode());
-    driver.b().onTrue(superstructure.readyPiece());
-    driver.povUp().onTrue(superstructure.raiseClimbers());
-    driver.povDown().onTrue(superstructure.lowerClimbers());
+    
 
-    // driver.povUp().whileTrue(drivebase.goToShotPoint());
+    driver.a().whileTrue(drivebase.goToShotPoint());
 
-    // operator.button(1).onTrue(superstructure.ampMode());
-    // operator.button(2).onTrue(superstructure.speakerMode());
+    driver.rightTrigger().onTrue(superstructure.extendIntake()).onFalse(superstructure.retractIntake());
+    driver.y().onTrue(superstructure.shootPiece());
+
+    operator.button(1).onTrue(superstructure.ampMode());
+    operator.button(2).onTrue(superstructure.speakerMode());
     // operator.button(3).onTrue(superstructure.readyPiece());
-    // operator.button(4).onTrue(superstructure.extendIntake());
-    // operator.button(4).onFalse(superstructure.retractIntake());
-    // operator.button(5).onTrue(superstructure.shootPiece());
+    operator.button(3).onTrue(outtake.changePivotSetpoint(96));
+    operator.button(4).onTrue(superstructure.extendIntake());
+    operator.button(4).onFalse(superstructure.retractIntake());
+    operator.button(5).onTrue(superstructure.shootPiece());
 
-    // operator.button(6).onTrue(superstructure.raiseClimbers());
-    // operator.button(7).onTrue(superstructure.lowerClimbers());
+    operator.button(6).onTrue(superstructure.raiseClimbers());
+    operator.button(7).onTrue(superstructure.lowerClimbers());
 
-    // operator.button(9).onTrue(superstructure.firstReset());
-    // operator.button(9).onFalse(superstructure.secondReset());
+    operator.button(9).onTrue(superstructure.firstReset());
+    operator.button(9).onFalse(superstructure.secondReset());
   }
 
   @Override
@@ -179,8 +181,8 @@ public class Robot extends LoggedRobot {
     if (backResult.timestamp != 0.0) {
       Logger.recordOutput("Vision/BackGlobalEstimate", backResult.estimatedPose);
       if (RobotBase.isReal()) {
-        // drivebase.addVisionMeasurement(backResult.estimatedPose, backResult.timestamp,
-        // backResult.stdDevs);
+        drivebase.addVisionMeasurement(backResult.estimatedPose, backResult.timestamp,
+        backResult.stdDevs);
       }
     }
 

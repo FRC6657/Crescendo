@@ -14,6 +14,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.OuttakeConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class OuttakeIO_Real implements OuttakeIO {
 
@@ -115,6 +116,8 @@ public class OuttakeIO_Real implements OuttakeIO {
   @Override
   public void updateInputs(OuttakeIOInputs inputs) {
 
+    Logger.recordOutput("Debug/OuttakePivotOutput", pivotMotor.getBridgeOutput().getValueAsDouble());
+
     // Update the pivot inputs
     inputs.pivotMotorPosition =
         Units.rotationsToDegrees(pivotMotor.getPosition().getValueAsDouble()); // Degrees
@@ -130,13 +133,13 @@ public class OuttakeIO_Real implements OuttakeIO {
     inputs.flywheelMotorTemp = leaderFlywheel.getDeviceTemp().getValueAsDouble(); // Celcius
     inputs.flywheelMotorVoltage = leaderFlywheel.getMotorVoltage().getValueAsDouble(); // Volts
     inputs.flywheelMotorCurrent = leaderFlywheel.getSupplyCurrent().getValueAsDouble(); // Amps
-    inputs.flywheelAtSetpoint = MathUtil.isNear(rpmSetpoint, inputs.flywheelMotorVelocity, 50);
+    inputs.flywheelAtSetpoint = MathUtil.isNear(rpmSetpoint, inputs.flywheelMotorVelocity, 250);
 
     // Update beambreak state
     inputs.beamBroken = !beambreak.get();
 
     // Updated profiled angle setpoint
-    // profiledAngleSetpoint =
+    // profiledAngleSetpoint = 
     // Units.rotationsToDegrees(pivotMotor.getClosedLoopReference().getValueAsDouble()); // Degrees
 
     leaderFlywheel.setControl(
