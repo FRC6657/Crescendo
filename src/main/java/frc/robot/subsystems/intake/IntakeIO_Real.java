@@ -8,6 +8,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.IntakeConstants;
@@ -20,6 +21,9 @@ public class IntakeIO_Real implements IntakeIO {
 
   // Roller Motor Controller
   TalonFX rollerMotor = new TalonFX(Constants.CANID.kIntakeRollers);
+
+  //Intake TOF Sensor
+  DigitalInput sensor = new DigitalInput(3);
 
   // Variables to store/log the setpoints
   @AutoLogOutput(key = "Intake/Angle Setpoint")
@@ -125,8 +129,9 @@ public class IntakeIO_Real implements IntakeIO {
         pivotSetpoint.withPosition(
             Units.degreesToRotations(angleSetpoint))); // Degrees to Native Rotations
 
-    // lastVelocity = inputs.rollerMotorVelocity;
 
+    inputs.beamBroken = !sensor.get();
+    
   }
 
   /**

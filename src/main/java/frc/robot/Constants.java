@@ -329,7 +329,7 @@ public class Constants {
     public static MotionMagicConfigs kPivotMotionMagicConfig =
         new MotionMagicConfigs()
             .withMotionMagicCruiseVelocity(Units.degreesToRotations(600))
-            .withMotionMagicAcceleration(Units.degreesToRotations(800));
+            .withMotionMagicAcceleration(Units.degreesToRotations(1000));
 
     public static final CurrentLimitsConfigs kPivotCurrentConfigs =
         new CurrentLimitsConfigs()

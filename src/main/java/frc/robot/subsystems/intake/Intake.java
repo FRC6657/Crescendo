@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 import org.littletonrobotics.junction.Logger;
@@ -35,16 +34,8 @@ public class Intake extends SubsystemBase {
     return this.runOnce(() -> intakeIO.changeRollerSpeed(MathUtil.clamp(speed, -1, 1)));
   }
 
-  public Command waitUntilIntookPiece() {
-    return Commands.waitUntil(
-        () ->
-            (intakeInputs.rollerMotorAcceleration < -100)
-                && (intakeInputs.rollerMotorCurrent > 10));
-  }
-
   public boolean noteDetected() {
-    return ((intakeInputs.rollerMotorAcceleration < -4000)
-        && (intakeInputs.pivotMotorPosition < 0));
+    return intakeInputs.beamBroken;
   }
 
   public boolean atSetpoint() {
