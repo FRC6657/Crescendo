@@ -4,13 +4,20 @@
 
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.CameraInformation;
 import frc.robot.Constants.VisionConstants.CameraResult;
 import frc.robot.Robot;
+import java.io.IOException;
+import java.util.ArrayList;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.simulation.VisionSystemSim;
 
 public class Vision {
@@ -27,7 +34,10 @@ public class Vision {
 
     if (RobotBase.isSimulation()) {
       visionSim = new VisionSystemSim("main");
-      visionSim.addAprilTags(VisionConstants.kTagLayout);
+      try {
+        visionSim.addAprilTags(new AprilTagFieldLayout(Filesystem.getDeployDirectory() + "/fields/BlueTags.json"));
+      } catch (IOException e) {
+      }
 
       visionSim.addCamera(backCamera.getCameraSim(), VisionConstants.kBackCameraPose);
       visionSim.addCamera(sideCamera.getCameraSim(), VisionConstants.kSideCameraPose);
@@ -44,6 +54,30 @@ public class Vision {
 
   public void simulationPeriodic(Pose2d robotSimPose) {
     visionSim.update(robotSimPose);
+  }
+
+  public void setFieldTags(Alliance alliance) throws IOException {
+
+    String resource =
+        (alliance == Alliance.Blue) ? "/fields/BlueTags.json" : "/fields/RedTags.json";
+
+    AprilTagFieldLayout field = new AprilTagFieldLayout(Filesystem.getDeployDirectory() + resource);
+
+    if (RobotBase.isSimulation()) {
+      visionSim.clearAprilTags();
+      visionSim.addAprilTags(field);
+    }
+
+    backCamera.setAprilTagField(field);
+    sideCamera.setAprilTagField(field);
+
+    ArrayList<Pose3d> tagPoses = new ArrayList<Pose3d>();
+
+    for (int i = 0; i < field.getTags().size(); i++) {
+      tagPoses.add(field.getTags().get(i).pose);
+    }
+
+    Logger.recordOutput("Vision/Tag Poses", tagPoses.toArray(new Pose3d[tagPoses.size()]));
   }
 
   public void resetSimPose(Pose2d pose) {

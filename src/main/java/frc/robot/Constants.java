@@ -4,8 +4,6 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.revrobotics.CANSparkBase.IdleMode;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
@@ -57,11 +55,11 @@ public class Constants {
         new Transform3d(
             new Translation3d(-0.242086, 0.170791, 0.511322),
             new Rotation3d(0, 0.122173, -1.28248701081));
-    public static final AprilTagFieldLayout kTagLayout =
-        AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
 
-    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
-    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+    public static final Matrix<N3, N1> kSingleTagStdDevs =
+        VecBuilder.fill(0.4, 0.4, Double.MAX_VALUE);
+    public static final Matrix<N3, N1> kMultiTagStdDevs =
+        VecBuilder.fill(0.2, 0.2, Double.MAX_VALUE);
 
     public static final class CameraInformation {
       public final String name;

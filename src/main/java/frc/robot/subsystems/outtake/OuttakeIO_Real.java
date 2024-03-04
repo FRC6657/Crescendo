@@ -116,8 +116,6 @@ public class OuttakeIO_Real implements OuttakeIO {
   @Override
   public void updateInputs(OuttakeIOInputs inputs) {
 
-    Logger.recordOutput("Debug/OuttakePivotOutput", pivotMotor.getBridgeOutput().getValueAsDouble());
-
     // Update the pivot inputs
     inputs.pivotMotorPosition =
         Units.rotationsToDegrees(pivotMotor.getPosition().getValueAsDouble()); // Degrees
@@ -139,7 +137,7 @@ public class OuttakeIO_Real implements OuttakeIO {
     inputs.beamBroken = !beambreak.get();
 
     // Updated profiled angle setpoint
-    // profiledAngleSetpoint = 
+    // profiledAngleSetpoint =
     // Units.rotationsToDegrees(pivotMotor.getClosedLoopReference().getValueAsDouble()); // Degrees
 
     leaderFlywheel.setControl(
