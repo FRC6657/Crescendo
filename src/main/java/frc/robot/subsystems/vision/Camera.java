@@ -1,5 +1,6 @@
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -7,9 +8,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.CameraResult;
+import java.io.IOException;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -38,12 +41,16 @@ public class Camera {
 
     cameraSim = new PhotonCameraSim(camera, cameraProp);
 
-    poseEstimator =
-        new PhotonPoseEstimator(
-            VisionConstants.kTagLayout,
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-            camera,
-            cameraTransform);
+    try {
+      poseEstimator =
+          new PhotonPoseEstimator(
+              new AprilTagFieldLayout(Filesystem.getDeployDirectory() + "/fields/BlueTags.json"),
+              PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+              camera,
+              cameraTransform);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
     if (RobotBase.isSimulation()) {
@@ -97,6 +104,10 @@ public class Camera {
     else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
 
     return estStdDevs;
+  }
+
+  public void setAprilTagField(AprilTagFieldLayout field) {
+    poseEstimator.setFieldTags(field);
   }
 
   public CameraResult getCameraResult() {

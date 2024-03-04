@@ -22,7 +22,7 @@ public class IntakeIO_Real implements IntakeIO {
   // Roller Motor Controller
   TalonFX rollerMotor = new TalonFX(Constants.CANID.kIntakeRollers);
 
-  //Intake TOF Sensor
+  // Intake TOF Sensor
   DigitalInput sensor = new DigitalInput(3);
 
   // Variables to store/log the setpoints
@@ -129,9 +129,7 @@ public class IntakeIO_Real implements IntakeIO {
         pivotSetpoint.withPosition(
             Units.degreesToRotations(angleSetpoint))); // Degrees to Native Rotations
 
-
     inputs.beamBroken = !sensor.get();
-    
   }
 
   /**

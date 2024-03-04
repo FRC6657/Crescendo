@@ -215,6 +215,7 @@ public class MAXSwerve extends SubsystemBase {
     }
   }
 
+  @SuppressWarnings("resource")
   public Command goToShotPoint() {
 
     var xController = new PIDController(AutoConstants.kAA_P_X, 0, 0);
@@ -243,39 +244,39 @@ public class MAXSwerve extends SubsystemBase {
 
               double shotDistance = 1.75; // meters
 
-              // Draw a circle of points around the speaker to visualize the shot line
-              Pose2d[] speakerCirclePoints = new Pose2d[360];
-              for (int i = 0; i < 360; i++) {
-                double angle = Math.toRadians(i / 360d) * 360;
-                speakerCirclePoints[i] =
-                    new Pose2d(
-                        new Translation2d(
-                                shotDistance * Math.cos(angle), shotDistance * Math.sin(angle))
-                            .plus(speakerCenter),
-                        new Rotation2d());
-              }
+              // // Draw a circle of points around the speaker to visualize the shot line
+              // Pose2d[] speakerCirclePoints = new Pose2d[360];
+              // for (int i = 0; i < 360; i++) {
+              //   double angle = Math.toRadians(i / 360d) * 360;
+              //   speakerCirclePoints[i] =
+              //       new Pose2d(
+              //           new Translation2d(
+              //                   shotDistance * Math.cos(angle), shotDistance * Math.sin(angle))
+              //               .plus(speakerCenter),
+              //           new Rotation2d());
+              // }
 
-              double distanceFromShotline =
-                  getPose().getTranslation().getDistance(speakerCenter) - shotDistance;
+              // double distanceFromShotline =
+              //     getPose().getTranslation().getDistance(speakerCenter) - shotDistance;
 
-              // Draw circle of points around the robot
-              Pose2d[] robotCirclePoints = new Pose2d[360];
-              for (int i = 0; i < 360; i++) {
-                double angle = Math.toRadians(i / 360d) * 360;
-                robotCirclePoints[i] =
-                    new Pose2d(
-                        new Translation2d(
-                                distanceFromShotline * Math.cos(angle),
-                                distanceFromShotline * Math.sin(angle))
-                            .plus(getPose().getTranslation()),
-                        new Rotation2d());
-              }
+              // // Draw circle of points around the robot
+              // Pose2d[] robotCirclePoints = new Pose2d[360];
+              // for (int i = 0; i < 360; i++) {
+              //   double angle = Math.toRadians(i / 360d) * 360;
+              //   robotCirclePoints[i] =
+              //       new Pose2d(
+              //           new Translation2d(
+              //                   distanceFromShotline * Math.cos(angle),
+              //                   distanceFromShotline * Math.sin(angle))
+              //               .plus(getPose().getTranslation()),
+              //           new Rotation2d());
+              // }
 
-              Logger.recordOutput("AutoAim/ShotLine", speakerCirclePoints);
-              Logger.recordOutput("AutoAim/RobotCircle", robotCirclePoints);
-              Logger.recordOutput(
-                  "AutoAim/Directline",
-                  new Pose2d[] {getPose(), new Pose2d(speakerCenter, new Rotation2d())});
+              // Logger.recordOutput("AutoAim/ShotLine", speakerCirclePoints);
+              // Logger.recordOutput("AutoAim/RobotCircle", robotCirclePoints);
+              // Logger.recordOutput(
+              //     "AutoAim/Directline",
+              //     new Pose2d[] {getPose(), new Pose2d(speakerCenter, new Rotation2d())});
 
               double vX = getPose().getX() - speakerCenter.getX();
               double vY = getPose().getY() - speakerCenter.getY();
@@ -287,8 +288,7 @@ public class MAXSwerve extends SubsystemBase {
               double angle = Math.atan(m);
 
               Pose2d desiredPos =
-                  new Pose2d(
-                      aX, aY, new Rotation2d(angle).plus(new Rotation2d(isBlue ? 0 : 0)));
+                  new Pose2d(aX, aY, new Rotation2d(angle).plus(new Rotation2d(isBlue ? 0 : 0)));
 
               Logger.recordOutput("AutoAim/DesiredShotPos", desiredPos);
 

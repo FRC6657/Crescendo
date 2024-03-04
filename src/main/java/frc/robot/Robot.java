@@ -2,6 +2,8 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -31,6 +33,7 @@ import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO_Real;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;
 import frc.robot.subsystems.vision.Vision;
+import java.io.IOException;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -100,6 +103,8 @@ public class Robot extends LoggedRobot {
 
   private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
 
+  private Alliance currentAlliance = Alliance.Blue;
+
   @SuppressWarnings(value = "resource")
   @Override
   public void robotInit() {
@@ -147,11 +152,12 @@ public class Robot extends LoggedRobot {
     autoChooser.addOption("interupt Choreo Test", superstructure.interuptChoreoTest());
     autoChooser.addOption("2Center", superstructure.twoCenter());
 
-    
-
     driver.a().whileTrue(drivebase.goToShotPoint());
 
-    driver.rightTrigger().onTrue(superstructure.extendIntake()).onFalse(superstructure.retractIntake());
+    driver
+        .rightTrigger()
+        .onTrue(superstructure.extendIntake())
+        .onFalse(superstructure.retractIntake());
     driver.y().onTrue(superstructure.shootPiece());
 
     // operator.button(1).onTrue(superstructure.ampMode());
@@ -175,14 +181,25 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
     superstructure.update3DPose();
 
+    if (DriverStation.getAlliance().isPresent()) {
+      if (DriverStation.getAlliance().get() != currentAlliance) {
+        currentAlliance = DriverStation.getAlliance().get();
+        try {
+          vision.setFieldTags(currentAlliance);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+
     var backResult = vision.getBackCameraResult();
     var sideResult = vision.getSideCameraResult();
 
     if (backResult.timestamp != 0.0) {
       Logger.recordOutput("Vision/BackGlobalEstimate", backResult.estimatedPose);
       if (RobotBase.isReal()) {
-        drivebase.addVisionMeasurement(backResult.estimatedPose, backResult.timestamp,
-        backResult.stdDevs);
+        drivebase.addVisionMeasurement(
+            backResult.estimatedPose, backResult.timestamp, backResult.stdDevs);
       }
     }
 
@@ -193,6 +210,7 @@ public class Robot extends LoggedRobot {
         // sideResult.stdDevs);
       }
     }
+
   }
 
   @Override
