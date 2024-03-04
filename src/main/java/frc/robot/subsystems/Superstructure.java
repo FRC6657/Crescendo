@@ -93,15 +93,17 @@ public class Superstructure {
   }
 
   public Command raiseClimbers() {
-    return stowOuttake()
-        .onlyIf(() -> (readyToShoot && currentScoringMode == ScoringMode.Amp))
-        .andThen(Commands.runOnce(() -> readyToShoot = false))
-        .beforeStarting(logEvent("Raising Climbers"))
-        .andThen(
-            Commands.sequence(
-                outtake.waitUntilPivotAtSetpoint(),
-                climb.changeSetpoint(ClimbConstants.kMaxHeight),
-                Commands.runOnce(() -> climbersUp = true)));
+    // return stowOuttake()
+    //     .onlyIf(() -> (readyToShoot && currentScoringMode == ScoringMode.Amp))
+    //     .andThen(Commands.runOnce(() -> readyToShoot = false))
+    //     .beforeStarting(logEvent("Raising Climbers"))
+    //     .andThen(
+    //         Commands.sequence(
+    //             outtake.waitUntilPivotAtSetpoint(),
+    //             climb.changeSetpoint(ClimbConstants.kMaxHeight),
+    //             Commands.runOnce(() -> climbersUp = true)));
+
+    return climb.changeSetpoint(ClimbConstants.kMaxHeight -0.5);
   }
 
   public Command lowerClimbers() {
@@ -348,6 +350,10 @@ public class Superstructure {
             Commands.runOnce(() -> drivebase.choreoStop(), drivebase))
         .until(intake::noteDetected)
         .handleInterrupt(() -> drivebase.choreoStop());
+  }
+
+  public Command testPivot(){
+    return outtake.changePivotSetpoint(96);
   }
 
   // Autos

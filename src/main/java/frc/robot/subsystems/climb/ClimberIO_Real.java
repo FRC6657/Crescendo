@@ -25,12 +25,7 @@ public class ClimberIO_Real implements ClimberIO {
     mEncoder = mMotor.getEncoder();
 
     mMotor.setSmartCurrentLimit(40);
-
-    if (info.name == "rightClimber") {
-      mMotor.setInverted(true);
-    } else {
-      mMotor.setInverted(false);
-    }
+    mMotor.setInverted(info.inverted);
 
     mEncoder.setPositionConversionFactor(ClimbConstants.kSensorToVerticalMeters);
 
