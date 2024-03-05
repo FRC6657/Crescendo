@@ -64,7 +64,7 @@ public class Superstructure {
     this.outtake = outtake;
     this.climb = climb;
 
-    noteDetector = new Trigger(intake::noteDetected);
+    noteDetector = new Trigger(() -> true);
 
     noteDetector.onTrue(
         Commands.sequence(
@@ -129,7 +129,7 @@ public class Superstructure {
     return Commands.sequence(
         logEvent("Extending Intake"),
         intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
-        intake.changeRollerSpeed(0.5));
+        intake.changeRollerSpeed(0.6));
   }
 
   public Command retractIntake() {

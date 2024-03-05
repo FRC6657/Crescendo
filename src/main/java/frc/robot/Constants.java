@@ -359,7 +359,7 @@ public class Constants {
     public static final double kMinFlywheelRpm = -3190;
     public static final double kMaxFlywheelRpm = 3190;
 
-    public static final double kPivotCurrentLimit = 30;
+    public static final double kPivotCurrentLimit = 40;
     public static final double kFlywheelCurrentLimit = 30;
 
     public static Slot0Configs kPivotSlot0 =

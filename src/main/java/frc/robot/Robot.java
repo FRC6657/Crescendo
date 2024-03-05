@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MAXSwerveConstants;
+import frc.robot.Constants.OuttakeConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.climb.Climb;
@@ -160,12 +161,12 @@ public class Robot extends LoggedRobot {
         .onFalse(superstructure.retractIntake());
     driver.y().onTrue(superstructure.shootPiece());
 
-    // operator.button(1).onTrue(superstructure.ampMode());
-    // operator.button(2).onTrue(superstructure.speakerMode());
-    // operator.button(3).onTrue(outtake.changePivotSetpoint(OuttakeConstants.kPivotAmpAngle));
-    // operator.button(4).onTrue(superstructure.extendIntake());
-    // operator.button(4).onFalse(superstructure.retractIntake());
-    // operator.button(5).onTrue(superstructure.shootPiece());
+    operator.button(1).onTrue(superstructure.ampMode());
+    operator.button(2).onTrue(superstructure.speakerMode());
+    operator.button(3).onTrue(outtake.changePivotSetpoint(OuttakeConstants.kPivotAmpAngle));
+    operator.button(4).onTrue(superstructure.extendIntake());
+    operator.button(4).onFalse(superstructure.retractIntake());
+    operator.button(5).onTrue(superstructure.shootPiece());
 
     operator.button(5).onTrue(superstructure.testPivot());
 

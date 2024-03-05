@@ -35,7 +35,7 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean noteDetected() {
-    return intakeInputs.beamBroken;
+    return (intakeInputs.rollerMotorAcceleration < -4000 && intakeInputs.pivotMotorPosition < 0);
   }
 
   public boolean atSetpoint() {
