@@ -265,8 +265,8 @@ public class Constants {
     public static final double kMaxHeight = 15.25; // Inches
     public static final double kGearing = 1 / 60d;
     public static final double kSprocketPD = 1.790; // Inches
-    public static final PIDController kClimbUpPID = new PIDController(1, 0, 0);
-    public static final PIDController kClimbDownPID = new PIDController(1.5, 0, 0);
+    public static final PIDController kClimbUpPID = new PIDController(2, 0, 0);
+    public static final PIDController kClimbDownPID = new PIDController(3, 0, 0);
 
     public static final double kSensorToVerticalMeters =
         (kGearing * kSprocketPD * Math.PI); // Motor Rotations to Climber Inches
@@ -359,7 +359,7 @@ public class Constants {
     public static final double kMinFlywheelRpm = -3190;
     public static final double kMaxFlywheelRpm = 3190;
 
-    public static final double kPivotCurrentLimit = 30;
+    public static final double kPivotCurrentLimit = 40;
     public static final double kFlywheelCurrentLimit = 30;
 
     public static Slot0Configs kPivotSlot0 =

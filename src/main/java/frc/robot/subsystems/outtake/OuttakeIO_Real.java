@@ -14,7 +14,6 @@ import frc.robot.Constants;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.OuttakeConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public class OuttakeIO_Real implements OuttakeIO {
 
@@ -29,7 +28,7 @@ public class OuttakeIO_Real implements OuttakeIO {
   DigitalInput beambreak = new DigitalInput(2);
 
   @AutoLogOutput(key = "Outtake/Raw Angle Setpoint")
-  private double rawAngleSetpoint = OuttakeConstants.kMinPivotAngle;
+  private double rawAngleSetpoint = OuttakeConstants.kMinPivotAngle;    
 
   @AutoLogOutput(key = "Outtake/Profiled Angle Setpoint")
   private double profiledAngleSetpoint = OuttakeConstants.kMinPivotAngle;
@@ -43,8 +42,6 @@ public class OuttakeIO_Real implements OuttakeIO {
       new MotionMagicVoltage(OuttakeConstants.kMinPivotAngle);
 
   public OuttakeIO_Real() {
-
-    // Set the right side to follow the left
 
     // Motor Controller Configurations
 
@@ -121,11 +118,10 @@ public class OuttakeIO_Real implements OuttakeIO {
         Units.rotationsToDegrees(pivotMotor.getPosition().getValueAsDouble()); // Degrees
     inputs.pivotMotorVelocity =
         Units.rotationsToDegrees(pivotMotor.getVelocity().getValueAsDouble()); // Degrees per second
-    inputs.pivotMotorTemp = pivotMotor.getDeviceTemp().getValueAsDouble(); // Celcius
+    inputs.pivotMotorTemp = pivotMotor.getDeviceTemp().getValueAsDouble(); 
     inputs.pivotMotorVoltage = pivotMotor.getMotorVoltage().getValueAsDouble(); // Volts
     inputs.pivotMotorCurrent = pivotMotor.getSupplyCurrent().getValueAsDouble(); // Amps
     inputs.pivotAtSetpoint = MathUtil.isNear(rawAngleSetpoint, inputs.pivotMotorPosition, 2);
-
     // Update the flywheel inputs
     inputs.flywheelMotorVelocity = leaderFlywheel.getVelocity().getValueAsDouble() * 60; // RPM
     inputs.flywheelMotorTemp = leaderFlywheel.getDeviceTemp().getValueAsDouble(); // Celcius
@@ -137,8 +133,7 @@ public class OuttakeIO_Real implements OuttakeIO {
     inputs.beamBroken = !beambreak.get();
 
     // Updated profiled angle setpoint
-    // profiledAngleSetpoint =
-    // Units.rotationsToDegrees(pivotMotor.getClosedLoopReference().getValueAsDouble()); // Degrees
+    //profiledAngleSetpoint = Units.rotationsToDegrees(pivotMotor.getClosedLoopReference().getValueAsDouble()); // Degrees
 
     leaderFlywheel.setControl(
         flywheelSetpoint
@@ -147,6 +142,7 @@ public class OuttakeIO_Real implements OuttakeIO {
     pivotMotor.setControl(
         pivotSetpoint.withPosition(
             Units.degreesToRotations(rawAngleSetpoint))); // Degrees to Native Rotations
+
   }
 
   /**

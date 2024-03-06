@@ -168,6 +168,8 @@ public class Robot extends LoggedRobot {
     operator.button(4).onFalse(superstructure.retractIntake());
     operator.button(5).onTrue(superstructure.shootPiece());
 
+    operator.button(5).onTrue(superstructure.testPivot());
+
     operator.button(6).onTrue(superstructure.raiseClimbers());
     operator.button(7).onTrue(superstructure.lowerClimbers());
 
