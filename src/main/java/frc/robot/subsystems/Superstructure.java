@@ -7,6 +7,7 @@ import com.choreo.lib.Choreo;
 import com.choreo.lib.ChoreoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -419,10 +420,19 @@ public class Superstructure {
         ampMode());
   }
 
+  public Pose2d getChoreoInitialPose(String autoName) {
+
+    ChoreoTrajectory traj = Choreo.getTrajectory(autoName);
+
+    Pose2d bluePose = traj.getInitialPose();
+    Pose2d redPose = traj.flipped().getInitialPose();
+
+    return isRed() ? redPose : bluePose;
+  }
+
   public Command choreoAuto(String autoName) {
+
     return AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory(autoName))
-        .beforeStarting(
-            Commands.runOnce(
-                () -> drivebase.setPose(Choreo.getTrajectory(autoName).getInitialPose())));
+        .beforeStarting(Commands.runOnce(() -> drivebase.setPose(getChoreoInitialPose(autoName))));
   }
 }
