@@ -27,10 +27,10 @@ public class IntakeIO_Sim implements IntakeIO {
   private DCMotorSim pivotSim =
       new DCMotorSim(DCMotor.getFalcon500(1), 1 / IntakeConstants.kGearingPivot, 0.04);
   private DCMotorSim rollerSim =
-      new DCMotorSim(DCMotor.getFalcon500(2), IntakeConstants.kGearingRollers, 0.00146376);
+      new DCMotorSim(DCMotor.getFalcon500(1), IntakeConstants.kGearingRollers, 0.00146376);
 
   // Pivot PID
-  private PIDController pivotPID = new PIDController(24d / 360, 0, 0);
+  private PIDController pivotPID = new PIDController(96d / 360, 0, 0);
 
   public IntakeIO_Sim() {
     pivotSim.setState(Units.degreesToRadians(IntakeConstants.kMaxPivotAngle), 0);

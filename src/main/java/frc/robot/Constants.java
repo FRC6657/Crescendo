@@ -3,6 +3,9 @@ package frc.robot;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -119,9 +122,9 @@ public class Constants {
   public static final class AutoConstants {
     // Choreo
 
-    public static final PIDController kXController = new PIDController(1, 0, 0);
-    public static final PIDController kYController = new PIDController(1, 0, 0);
-    public static final PIDController kThetaController = new PIDController(1.5, 0, 0);
+    public static final PIDController kXController = new PIDController(5, 0, 0);
+    public static final PIDController kYController = new PIDController(5, 0, 0);
+    public static final PIDController kThetaController = new PIDController(3, 0, 0);
     public static final double kPXController = 1;
     public static final double kPYController = 1;
     public static final double kPThetaController = 1;
@@ -130,6 +133,16 @@ public class Constants {
     public static final double kAA_P_X = 3;
     public static final double kAA_P_Y = 3;
     public static final double kAA_P_Theta = 3;
+
+
+    public static HolonomicPathFollowerConfig kHolonomicPathFollowerConfig = new HolonomicPathFollowerConfig(
+      new PIDConstants(kXController.getP()),
+      new PIDConstants(kThetaController.getP()),
+      MAXSwerveConstants.kMaxDriveSpeed,
+      DriveConstants.kModuleLocations[0].getNorm(),
+      new ReplanningConfig()
+    );
+
   }
 
   public static final class DriveConstants {

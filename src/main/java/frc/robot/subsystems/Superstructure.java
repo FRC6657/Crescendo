@@ -5,6 +5,9 @@ package frc.robot.subsystems;
 
 import com.choreo.lib.Choreo;
 import com.choreo.lib.ChoreoTrajectory;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -77,6 +80,7 @@ public class Superstructure {
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
     Logger.recordOutput("Superstructure/Latest Event", "Superstructure Initialized");
+
   }
 
   public void update3DPose() {
@@ -103,7 +107,7 @@ public class Superstructure {
     //             climb.changeSetpoint(ClimbConstants.kMaxHeight),
     //             Commands.runOnce(() -> climbersUp = true)));
 
-    return climb.changeSetpoint(ClimbConstants.kMaxHeight -0.5);
+    return climb.changeSetpoint(ClimbConstants.kMaxHeight - 0.5);
   }
 
   public Command lowerClimbers() {
@@ -352,7 +356,7 @@ public class Superstructure {
         .handleInterrupt(() -> drivebase.choreoStop());
   }
 
-  public Command testPivot(){
+  public Command testPivot() {
     return outtake.changePivotSetpoint(96);
   }
 
@@ -416,4 +420,9 @@ public class Superstructure {
         Commands.runOnce(() -> currentScoringMode = ScoringMode.Amp),
         ampMode());
   }
+
+  public Command choreoAuto(String autoName){
+    return AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory(autoName)).beforeStarting(Commands.runOnce(() -> drivebase.setPose(Choreo.getTrajectory(autoName).getInitialPose())));
+  }
+
 }

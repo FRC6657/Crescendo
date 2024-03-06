@@ -1,11 +1,15 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -35,13 +39,17 @@ import frc.robot.subsystems.outtake.OuttakeIO_Real;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;
 import frc.robot.subsystems.vision.Vision;
 import java.io.IOException;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 public class Robot extends LoggedRobot {
 
@@ -53,13 +61,14 @@ public class Robot extends LoggedRobot {
     REAL
   }
 
-  // Control the mode of the robot
+  // Control the mode of the robo
   public static final RobotMode mode = Robot.isReal() ? RobotMode.REAL : RobotMode.SIM;
   // public static final RobotMode mode = RobotMode.REPLAY;
 
   // Auto Command
-  private final LoggedDashboardChooser<Command> autoChooser =
-      new LoggedDashboardChooser<>("Auto Chooser");
+  //private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Chooser");
+
+  private SendableChooser<Command> autoChooser;
 
   private Command autoCommand;
 
@@ -132,6 +141,17 @@ public class Robot extends LoggedRobot {
     }
     Logger.start();
 
+    NamedCommands.registerCommand("Fire", superstructure.shootPiece());
+    NamedCommands.registerCommand("ExtendIntake", superstructure.extendIntake());
+    NamedCommands.registerCommand("RetractIntake", superstructure.retractIntake());
+    NamedCommands.registerCommand("Ready", superstructure.readyPiece());
+
+    autoChooser = AutoBuilder.buildAutoChooser();
+
+    autoChooser.addOption("EventTest", superstructure.choreoAuto("EventTest"));
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
     // Set the default command for the drivebase for TeleOP driving
     drivebase.setDefaultCommand(
         drivebase.runVelocityFieldRelative(
@@ -147,11 +167,11 @@ public class Robot extends LoggedRobot {
                         * DriveConstants.kMaxAngularVelocity
                         * 0.25)));
 
-    autoChooser.addDefaultOption("None", null);
-    autoChooser.addOption("testAuto", superstructure.testAuto());
-    autoChooser.addOption("1 Meter Test", superstructure.meterTestAuto());
-    autoChooser.addOption("interupt Choreo Test", superstructure.interuptChoreoTest());
-    autoChooser.addOption("2Center", superstructure.twoCenter());
+    // autoChooser.addDefaultOption("None", null);
+    // autoChooser.addOption("testAuto", superstructure.testAuto());
+    // autoChooser.addOption("1 Meter Test", superstructure.meterTestAuto());
+    // autoChooser.addOption("interupt Choreo Test", superstructure.interuptChoreoTest());
+    // autoChooser.addOption("2Center", superstructure.twoCenter());
 
     driver.a().whileTrue(drivebase.goToShotPoint());
 
@@ -211,7 +231,6 @@ public class Robot extends LoggedRobot {
         // sideResult.stdDevs);
       }
     }
-
   }
 
   @Override
@@ -226,7 +245,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
 
-    autoCommand = autoChooser.get();
+    autoCommand = autoChooser.getSelected();
 
     if (autoCommand != null) {
       autoCommand.schedule();
@@ -238,8 +257,8 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousExit() {
-    if (autoChooser.get() != null) {
-      CommandScheduler.getInstance().cancel(autoChooser.get());
+    if (autoChooser.getSelected() != null) {
+      CommandScheduler.getInstance().cancel(autoChooser.getSelected());
       CommandScheduler.getInstance().schedule(drivebase.stop());
     }
   }

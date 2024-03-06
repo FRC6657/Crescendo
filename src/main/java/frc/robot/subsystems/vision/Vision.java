@@ -35,7 +35,8 @@ public class Vision {
     if (RobotBase.isSimulation()) {
       visionSim = new VisionSystemSim("main");
       try {
-        visionSim.addAprilTags(new AprilTagFieldLayout(Filesystem.getDeployDirectory() + "/fields/BlueTags.json"));
+        visionSim.addAprilTags(
+            new AprilTagFieldLayout(Filesystem.getDeployDirectory() + "/fields/BlueTags.json"));
       } catch (IOException e) {
       }
 

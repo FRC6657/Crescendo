@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.DriveConstants;
@@ -25,6 +26,9 @@ import frc.robot.Constants.MAXSwerveConstants;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 public class MAXSwerve extends SubsystemBase {
 
@@ -70,6 +74,24 @@ public class MAXSwerve extends SubsystemBase {
     poseEstimator =
         new SwerveDrivePoseEstimator(
             kinematics, gyroInputs.yawPosition, getModulePositions(), new Pose2d());
+
+
+    AutoBuilder.configureHolonomic(
+      this::getPose,
+      this::setPose,
+      this::getChassisSpeeds,
+      this::runChassisSpeeds,
+      Constants.AutoConstants.kHolonomicPathFollowerConfig,
+      () -> {
+        var alliance = DriverStation.getAlliance();
+        if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+        }
+        return false;
+      },
+      this
+    );
+
   }
 
   /** This code runs at 50hz and is responsible for updating the IO and pose estimator */
@@ -181,6 +203,11 @@ public class MAXSwerve extends SubsystemBase {
     return states;
   }
 
+  @AutoLogOutput(key = "SwerveStates/ChassisSpeeds")
+  private ChassisSpeeds getChassisSpeeds() {
+    return kinematics.toChassisSpeeds(getModuleStates());
+  }
+
   // Returns the distance and angle of each module
   private SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] positions = new SwerveModulePosition[4];
@@ -208,6 +235,7 @@ public class MAXSwerve extends SubsystemBase {
 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
+    System.out.println("resetting pose");
     if (RobotBase.isReal()) {
       poseEstimator.resetPosition(gyroInputs.yawPosition, getModulePositions(), pose);
     } else {
