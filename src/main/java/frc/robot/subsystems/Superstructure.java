@@ -7,7 +7,6 @@ import com.choreo.lib.Choreo;
 import com.choreo.lib.ChoreoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -80,7 +79,6 @@ public class Superstructure {
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
     Logger.recordOutput("Superstructure/Latest Event", "Superstructure Initialized");
-
   }
 
   public void update3DPose() {
@@ -421,8 +419,10 @@ public class Superstructure {
         ampMode());
   }
 
-  public Command choreoAuto(String autoName){
-    return AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory(autoName)).beforeStarting(Commands.runOnce(() -> drivebase.setPose(Choreo.getTrajectory(autoName).getInitialPose())));
+  public Command choreoAuto(String autoName) {
+    return AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory(autoName))
+        .beforeStarting(
+            Commands.runOnce(
+                () -> drivebase.setPose(Choreo.getTrajectory(autoName).getInitialPose())));
   }
-
 }

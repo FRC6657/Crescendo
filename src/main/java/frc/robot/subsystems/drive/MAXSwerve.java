@@ -1,5 +1,6 @@
 package frc.robot.subsystems.drive;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
@@ -26,9 +27,6 @@ import frc.robot.Constants.MAXSwerveConstants;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 
 public class MAXSwerve extends SubsystemBase {
 
@@ -75,23 +73,20 @@ public class MAXSwerve extends SubsystemBase {
         new SwerveDrivePoseEstimator(
             kinematics, gyroInputs.yawPosition, getModulePositions(), new Pose2d());
 
-
     AutoBuilder.configureHolonomic(
-      this::getPose,
-      this::setPose,
-      this::getChassisSpeeds,
-      this::runChassisSpeeds,
-      Constants.AutoConstants.kHolonomicPathFollowerConfig,
-      () -> {
-        var alliance = DriverStation.getAlliance();
-        if (alliance.isPresent()) {
+        this::getPose,
+        this::setPose,
+        this::getChassisSpeeds,
+        this::runChassisSpeeds,
+        Constants.AutoConstants.kHolonomicPathFollowerConfig,
+        () -> {
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
             return alliance.get() == DriverStation.Alliance.Red;
-        }
-        return false;
-      },
-      this
-    );
-
+          }
+          return false;
+        },
+        this);
   }
 
   /** This code runs at 50hz and is responsible for updating the IO and pose estimator */

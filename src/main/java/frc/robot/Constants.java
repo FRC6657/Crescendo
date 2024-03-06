@@ -134,15 +134,13 @@ public class Constants {
     public static final double kAA_P_Y = 3;
     public static final double kAA_P_Theta = 3;
 
-
-    public static HolonomicPathFollowerConfig kHolonomicPathFollowerConfig = new HolonomicPathFollowerConfig(
-      new PIDConstants(kXController.getP()),
-      new PIDConstants(kThetaController.getP()),
-      MAXSwerveConstants.kMaxDriveSpeed,
-      DriveConstants.kModuleLocations[0].getNorm(),
-      new ReplanningConfig()
-    );
-
+    public static HolonomicPathFollowerConfig kHolonomicPathFollowerConfig =
+        new HolonomicPathFollowerConfig(
+            new PIDConstants(kXController.getP()),
+            new PIDConstants(kThetaController.getP()),
+            MAXSwerveConstants.kMaxDriveSpeed,
+            DriveConstants.kModuleLocations[0].getNorm(),
+            new ReplanningConfig());
   }
 
   public static final class DriveConstants {
