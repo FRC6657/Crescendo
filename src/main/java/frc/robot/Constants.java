@@ -56,11 +56,11 @@ public class Constants {
             new Translation3d(-0.343236, 0, 0.531201), new Rotation3d(0, -0.485314, Math.PI));
     public static final Transform3d kSideCameraPose =
         new Transform3d(
-            new Translation3d(-0.242086, 0.170791, 0.511322),
-            new Rotation3d(0, 0.122173, -1.28248701081 + Math.PI));
+            new Translation3d(-0.246587, 0.172519, 0.509174),
+            new Rotation3d(Math.PI, 0.122173+Math.PI, -1.28248701081));
 
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(0.4, 0.4, 0.4);
-    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.4);
+    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);
 
     public static final class CameraInformation {
       public final String name;

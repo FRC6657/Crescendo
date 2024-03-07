@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -201,6 +202,9 @@ public class Robot extends LoggedRobot {
       }
     }
 
+    Logger.recordOutput("SideCameraPos", new Pose3d(drivebase.getPose()).transformBy(VisionConstants.kSideCameraPose));
+    Logger.recordOutput("BackCameraPos", new Pose3d(drivebase.getPose()).transformBy(VisionConstants.kBackCameraPose));
+    
     var backResult = vision.getBackCameraResult();
     var sideResult = vision.getSideCameraResult();
 
