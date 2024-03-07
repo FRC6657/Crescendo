@@ -57,7 +57,7 @@ public class Constants {
     public static final Transform3d kSideCameraPose =
         new Transform3d(
             new Translation3d(-0.246587, 0.172519, 0.509174),
-            new Rotation3d(Math.PI, 0.122173+Math.PI, -1.28248701081));
+            new Rotation3d(Math.PI, 0.122173 + Math.PI, -1.28248701081));
 
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(0.4, 0.4, 0.4);
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);
