@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
@@ -35,6 +36,8 @@ import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO_Real;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.util.NoteVisualizer;
+
 import java.io.IOException;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -140,6 +143,8 @@ public class Robot extends LoggedRobot {
 
     autoChooser.addOption("EventTest", superstructure.choreoAuto("EventTest"));
 
+    NoteVisualizer.setRobotPoseSupplier(drivebase::getPose);
+
     // Set the default command for the drivebase for TeleOP driving
     drivebase.setDefaultCommand(
         drivebase.runVelocityFieldRelative(
@@ -161,7 +166,7 @@ public class Robot extends LoggedRobot {
     // autoChooser.addOption("interupt Choreo Test", superstructure.interuptChoreoTest());
     // autoChooser.addOption("2Center", superstructure.twoCenter());
 
-    driver.a().whileTrue(drivebase.goToShotPoint());
+    driver.a().whileTrue(drivebase.goToShotPoint().andThen(Commands.print("ShotPointEnded")));
 
     driver
         .rightTrigger()

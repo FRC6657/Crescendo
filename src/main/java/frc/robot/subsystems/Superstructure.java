@@ -26,6 +26,8 @@ import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drive.MAXSwerve;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.outtake.Outtake;
+import frc.robot.util.NoteVisualizer;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -261,7 +263,7 @@ public class Superstructure {
                 Commands.runOnce(() -> currentNoteState = noteState.None))
             .onlyIf(() -> currentScoringMode == ScoringMode.Speaker);
 
-    return Commands.sequence(commands);
+    return Commands.sequence(commands).andThen(NoteVisualizer.shoot());
   }
 
   public Command speakerMode() {

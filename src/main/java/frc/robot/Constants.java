@@ -122,7 +122,7 @@ public class Constants {
 
     public static final PIDController kXController = new PIDController(5, 0, 0);
     public static final PIDController kYController = new PIDController(5, 0, 0);
-    public static final PIDController kThetaController = new PIDController(3, 0, 0);
+    public static final PIDController kThetaController = new PIDController(5, 0, 0);
     public static final double kPXController = 1;
     public static final double kPYController = 1;
     public static final double kPThetaController = 1;
