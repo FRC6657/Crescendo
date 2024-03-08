@@ -381,8 +381,8 @@ public class Constants {
 
     public static MotionMagicConfigs kPivotMotionMagicConfig =
         new MotionMagicConfigs()
-            .withMotionMagicCruiseVelocity(Units.degreesToRotations(300))
-            .withMotionMagicAcceleration(Units.degreesToRotations(400));
+            .withMotionMagicCruiseVelocity(Units.degreesToRotations(600))
+            .withMotionMagicAcceleration(Units.degreesToRotations(00));
 
     public static Slot0Configs kFlyWheelSlot0 =
         new Slot0Configs()

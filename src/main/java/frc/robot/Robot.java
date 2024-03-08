@@ -37,7 +37,6 @@ import frc.robot.subsystems.outtake.OuttakeIO_Real;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.NoteVisualizer;
-
 import java.io.IOException;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;

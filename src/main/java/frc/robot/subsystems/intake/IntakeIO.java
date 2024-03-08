@@ -20,7 +20,7 @@ public interface IntakeIO {
     public double rollerMotorVoltage = 0.0; // Volts
     public double rollerMotorCurrent = 0.0; // Amps
 
-    public boolean beamBroken = false;
+    public double tofDistance = 0;
   }
 
   public default void updateInputs(IntakeIOInputs inputs) {}

@@ -8,11 +8,12 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.util.TOFSensor;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class IntakeIO_Real implements IntakeIO {
 
@@ -23,7 +24,7 @@ public class IntakeIO_Real implements IntakeIO {
   TalonFX rollerMotor = new TalonFX(Constants.CANID.kIntakeRollers);
 
   // Intake TOF Sensor
-  DigitalInput sensor = new DigitalInput(3);
+  TOFSensor sensor = new TOFSensor(7);
 
   // Variables to store/log the setpoints
   @AutoLogOutput(key = "Intake/Angle Setpoint")
@@ -96,6 +97,8 @@ public class IntakeIO_Real implements IntakeIO {
     rollerMotor.setInverted(true);
     rollerMotor.setNeutralMode(NeutralModeValue.Brake);
 
+    sensor.setRange(160000, 6000000, 0, 27);
+
     // Feed the PID with default values
     changePivotSetpoint(IntakeConstants.kMaxPivotAngle);
     changeRollerSpeed(0);
@@ -129,7 +132,8 @@ public class IntakeIO_Real implements IntakeIO {
         pivotSetpoint.withPosition(
             Units.degreesToRotations(angleSetpoint))); // Degrees to Native Rotations
 
-    inputs.beamBroken = !sensor.get();
+    inputs.tofDistance = sensor.getMappedDistance();
+    Logger.recordOutput("TOF Raw Distance", sensor.getRawOutput());
   }
 
   /**

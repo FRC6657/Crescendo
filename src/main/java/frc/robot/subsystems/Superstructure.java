@@ -27,7 +27,6 @@ import frc.robot.subsystems.drive.MAXSwerve;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.util.NoteVisualizer;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -69,12 +68,12 @@ public class Superstructure {
     this.outtake = outtake;
     this.climb = climb;
 
-    noteDetector = new Trigger(() -> true);
+    noteDetector = new Trigger(intake::noteDetected);
 
     noteDetector.onTrue(
         Commands.sequence(
                 Commands.runOnce(() -> currentNoteState = noteState.Processing),
-                Commands.waitSeconds(0.4),
+                Commands.waitSeconds(0),
                 retractIntake(),
                 Commands.waitUntil(intake::atSetpoint),
                 chamberNote(),
@@ -134,7 +133,7 @@ public class Superstructure {
     return Commands.sequence(
         logEvent("Extending Intake"),
         intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
-        intake.changeRollerSpeed(0.6));
+        intake.changeRollerSpeed(0.7));
   }
 
   public Command retractIntake() {
@@ -172,8 +171,8 @@ public class Superstructure {
         Commands.sequence(
                 logEvent("Unchambering Note"),
                 Commands.runOnce(() -> currentNoteState = noteState.Processing),
-                intake.changeRollerSpeed(0.3),
-                outtake.changeRPMSetpoint(-300),
+                intake.changeRollerSpeed(0.35),
+                outtake.changeRPMSetpoint(-600),
                 Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
                 Commands.waitSeconds(0),
                 intake.changeRollerSpeed(0),
@@ -209,7 +208,7 @@ public class Superstructure {
     commands[1] =
         Commands.sequence(
                 logEvent("Readying Robot for Speaker"),
-                outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
+                outtake.changeRPMSetpoint(2500),
                 Commands.runOnce(() -> readyToShoot = true))
             .onlyIf(
                 () ->
@@ -253,10 +252,11 @@ public class Superstructure {
     commands[2] =
         Commands.sequence(
                 logEvent("Scoring Speaker"),
-                outtake.changeRPMSetpoint(OuttakeConstants.kMaxFlywheelRpm),
+                outtake.changeRPMSetpoint(2500),
                 outtake.waitUntilFlywheelAtSetpoint(),
                 intake.changeRollerSpeed(-0.6),
                 Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
+                Commands.waitSeconds(0.1),
                 outtake.changeRPMSetpoint(0),
                 intake.changeRollerSpeed(0),
                 Commands.runOnce(() -> readyToShoot = false),
