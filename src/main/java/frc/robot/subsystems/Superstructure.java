@@ -9,7 +9,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -18,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OuttakeConstants;
@@ -37,7 +35,7 @@ public class Superstructure {
   Climb climb;
   Trigger noteDetector;
 
-  private enum noteState {
+  public enum noteState {
     Processing,
     Intake,
     Outtake,
@@ -45,7 +43,7 @@ public class Superstructure {
   };
 
   @AutoLogOutput(key = "Superstructure/Note State")
-  noteState currentNoteState = noteState.None;
+  private noteState currentNoteState = noteState.None;
 
   private enum ScoringMode {
     Amp,
@@ -58,7 +56,6 @@ public class Superstructure {
   @AutoLogOutput(key = "Superstructure/Ready")
   private boolean readyToShoot = false;
 
-  @AutoLogOutput(key = "Superstructure/Climbers Up")
   private boolean climbersUp = false;
 
   public Superstructure(MAXSwerve drivebase, Intake intake, Outtake outtake, Climb climb) {
@@ -97,17 +94,15 @@ public class Superstructure {
   }
 
   public Command raiseClimbers() {
-    // return stowOuttake()
-    //     .onlyIf(() -> (readyToShoot && currentScoringMode == ScoringMode.Amp))
-    //     .andThen(Commands.runOnce(() -> readyToShoot = false))
-    //     .beforeStarting(logEvent("Raising Climbers"))
-    //     .andThen(
-    //         Commands.sequence(
-    //             outtake.waitUntilPivotAtSetpoint(),
-    //             climb.changeSetpoint(ClimbConstants.kMaxHeight),
-    //             Commands.runOnce(() -> climbersUp = true)));
-
-    return climb.changeSetpoint(ClimbConstants.kMaxHeight - 0.5);
+    return stowOuttake()
+        .onlyIf(() -> (readyToShoot && currentScoringMode == ScoringMode.Amp))
+        .andThen(Commands.runOnce(() -> readyToShoot = false))
+        .beforeStarting(logEvent("Raising Climbers"))
+        .andThen(
+            Commands.sequence(
+                Commands.waitUntil(outtake::atPivotSetpoint),
+                climb.changeSetpoint(ClimbConstants.kMaxHeight - 0.5),
+                Commands.runOnce(() -> climbersUp = true)));
   }
 
   public Command lowerClimbers() {
@@ -126,14 +121,14 @@ public class Superstructure {
         logEvent("Raising Outtake"),
         lowerClimbers().onlyIf(() -> climbersUp).andThen(Commands.waitUntil(() -> !climbersUp)),
         outtake.changePivotSetpoint(OuttakeConstants.kMaxPivotAngle),
-        outtake.waitUntilPivotAtSetpoint());
+        Commands.waitUntil(outtake::atPivotSetpoint));
   }
 
   public Command extendIntake() {
     return Commands.sequence(
         logEvent("Extending Intake"),
         intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
-        intake.changeRollerSpeed(0.7));
+        intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed));
   }
 
   public Command retractIntake() {
@@ -150,8 +145,8 @@ public class Superstructure {
         outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
         intake.changeRollerSpeed(0),
         intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
-        outtake.waitUntilFlywheelAtSetpoint(),
-        outtake.waitUntilPivotAtSetpoint(),
+        Commands.waitUntil(outtake::atPivotSetpoint),
+        Commands.waitUntil(outtake::atFlywheelSetpoint),
         Commands.waitUntil(intake::atSetpoint));
   }
 
@@ -171,10 +166,9 @@ public class Superstructure {
         Commands.sequence(
                 logEvent("Unchambering Note"),
                 Commands.runOnce(() -> currentNoteState = noteState.Processing),
-                intake.changeRollerSpeed(0.35),
-                outtake.changeRPMSetpoint(-600),
+                intake.changeRollerSpeed(IntakeConstants.kFeedSpeed),
+                outtake.changeRPMSetpoint(-OuttakeConstants.kFeedRPM),
                 Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
-                Commands.waitSeconds(0),
                 intake.changeRollerSpeed(0),
                 outtake.changeRPMSetpoint(0),
                 Commands.runOnce(() -> currentNoteState = noteState.Intake))
@@ -208,7 +202,7 @@ public class Superstructure {
     commands[1] =
         Commands.sequence(
                 logEvent("Readying Robot for Speaker"),
-                outtake.changeRPMSetpoint(2500),
+                outtake.changeRPMSetpoint(OuttakeConstants.kSpeakerRPM),
                 Commands.runOnce(() -> readyToShoot = true))
             .onlyIf(
                 () ->
@@ -222,8 +216,8 @@ public class Superstructure {
     return Commands.sequence(
             logEvent("Chambering Note"),
             Commands.runOnce(() -> currentNoteState = noteState.Processing),
-            intake.changeRollerSpeed(-0.8),
-            outtake.changeRPMSetpoint(300),
+            intake.changeRollerSpeed(IntakeConstants.kFeedSpeed),
+            outtake.changeRPMSetpoint(OuttakeConstants.kFeedRPM),
             Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
             outtake.changeRPMSetpoint(0),
             intake.changeRollerSpeed(0),
@@ -240,8 +234,7 @@ public class Superstructure {
     commands[1] =
         Commands.sequence(
                 logEvent("Scoring Amp"),
-                outtake.waitUntilPivotAtSetpoint(), // we might not need this
-                outtake.changeRPMSetpoint(600),
+                outtake.changeRPMSetpoint(OuttakeConstants.kAmpRPM),
                 Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
                 outtake.changeRPMSetpoint(0),
                 outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
@@ -252,9 +245,9 @@ public class Superstructure {
     commands[2] =
         Commands.sequence(
                 logEvent("Scoring Speaker"),
-                outtake.changeRPMSetpoint(2500),
-                outtake.waitUntilFlywheelAtSetpoint(),
-                intake.changeRollerSpeed(-0.6),
+                outtake.changeRPMSetpoint(OuttakeConstants.kSpeakerRPM),
+                Commands.waitUntil(outtake::atFlywheelSetpoint),
+                intake.changeRollerSpeed(-IntakeConstants.kFeedSpeed),
                 Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
                 Commands.waitSeconds(0.1),
                 outtake.changeRPMSetpoint(0),
@@ -278,25 +271,10 @@ public class Superstructure {
         .unless(() -> currentScoringMode == ScoringMode.Amp);
   }
 
-  public Command ampStart() {
-    return Commands.sequence(
-        Commands.runOnce(() -> currentScoringMode = ScoringMode.Amp),
-        Commands.runOnce(() -> currentNoteState = noteState.Outtake));
+  public Command firstReset() {
+    return Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll());
   }
 
-  public Command speakerStart() {
-    return Commands.sequence(
-        Commands.runOnce(() -> currentScoringMode = ScoringMode.Speaker),
-        Commands.runOnce(() -> currentNoteState = noteState.Intake));
-  }
-
-  public Command nothingStart() {
-    return Commands.sequence(
-        Commands.runOnce(() -> currentScoringMode = ScoringMode.Speaker),
-        Commands.runOnce(() -> currentNoteState = noteState.None));
-  }
-
-  // hopefully we can get rid of this later on
   public Command secondReset() {
     return Commands.sequence(
         intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
@@ -308,8 +286,8 @@ public class Superstructure {
         Commands.runOnce(() -> readyToShoot = false));
   }
 
-  public Command firstReset() {
-    return Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll());
+  public void overrideNoteState(noteState state) {
+    currentNoteState = state;
   }
 
   private boolean isRed() {
@@ -318,108 +296,6 @@ public class Superstructure {
       isRed = (DriverStation.getAlliance().get() == Alliance.Red);
     }
     return isRed;
-  }
-
-  private Command runPath(String pathName, boolean isFirstPath) {
-
-    ChoreoTrajectory traj = Choreo.getTrajectory(pathName);
-    var thetaController = AutoConstants.kThetaController;
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-    Command setPoseCommand =
-        Commands.either(
-            Commands.runOnce(
-                () ->
-                    drivebase.setPose(
-                        !isRed() ? traj.getInitialPose() : traj.flipped().getInitialPose()),
-                drivebase),
-            Commands.none(),
-            () -> isFirstPath);
-
-    Command swerveCommand =
-        Choreo.choreoSwerveCommand(
-            traj, // Choreo trajectory from above
-            drivebase::getPose,
-            AutoConstants.kXController,
-            AutoConstants.kYController,
-            thetaController,
-            (ChassisSpeeds speeds) -> drivebase.runChassisSpeeds(speeds),
-            this::isRed, // Whether or not to mirror the path based on alliance (this assumes
-            // the path is created for the blue alliance)
-            drivebase);
-    return Commands.sequence(
-            Commands.runOnce(
-                () -> Logger.recordOutput("Superstructure/Current Path", traj.getPoses())),
-            setPoseCommand,
-            swerveCommand,
-            Commands.runOnce(() -> drivebase.choreoStop(), drivebase))
-        .until(intake::noteDetected)
-        .handleInterrupt(() -> drivebase.choreoStop());
-  }
-
-  public Command testPivot() {
-    return outtake.changePivotSetpoint(96);
-  }
-
-  // Autos
-
-  public Command testAuto() {
-    return Commands.sequence(
-        speakerStart(),
-        shootPiece(),
-        extendIntake(),
-        Commands.waitUntil(() -> intake.atSetpoint()), // would be nice if we could get rid of this
-        runPath("testPath.1", true),
-        retractIntake(),
-        runPath("testPath.2", false),
-        Commands.waitUntil(() -> currentNoteState == noteState.Intake),
-        shootPiece());
-  }
-
-  public Command meterTestAuto() {
-    return runPath("1MeterTest", true);
-  }
-
-  public Command interuptChoreoTest() {
-    return Commands.sequence(
-        extendIntake(),
-        Commands.waitUntil(intake::atSetpoint),
-        runPath("interuptChoreoTest", true));
-  }
-
-  public Command twoCenter() {
-    return Commands.sequence(
-        speakerStart(),
-        shootPiece(),
-        extendIntake(),
-        runPath("2CenterTest.1", true),
-        retractIntake(),
-        Commands
-            .parallel( // this is so it will be ready to shoot right when it gets back. Might not be
-                // needed
-                runPath("2CenterTest.2", false),
-                Commands.sequence(
-                    Commands.runOnce(() -> currentNoteState = noteState.Intake)
-                        .onlyIf(RobotBase::isSimulation),
-                    Commands.waitUntil(() -> currentNoteState == noteState.Intake),
-                    readyPiece())),
-        shootPiece(),
-        extendIntake(),
-        Commands.waitUntil(intake::atSetpoint),
-        runPath("2CenterTest.3", false),
-        retractIntake(),
-        Commands.runOnce(() -> currentNoteState = noteState.Intake).onlyIf(RobotBase::isSimulation),
-        runPath("2CenterTest.4", true),
-        Commands.waitUntil(() -> currentNoteState == noteState.Intake),
-        shootPiece());
-  }
-
-  public Command ifTest() {
-    return Commands.sequence(
-        Commands.runOnce(() -> currentNoteState = noteState.Outtake),
-        Commands.runOnce(() -> readyToShoot = true),
-        Commands.runOnce(() -> currentScoringMode = ScoringMode.Amp),
-        ampMode());
   }
 
   public Pose2d getChoreoInitialPose(String autoName) {
@@ -433,8 +309,9 @@ public class Superstructure {
   }
 
   public Command choreoAuto(String autoName) {
-
-    return AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory(autoName))
-        .beforeStarting(Commands.runOnce(() -> drivebase.setPose(getChoreoInitialPose(autoName))));
+    return Commands.sequence(
+        Commands.runOnce(() -> drivebase.setPose(getChoreoInitialPose(autoName))),
+        Commands.runOnce(() -> currentNoteState = noteState.Intake),
+        AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory(autoName)));
   }
 }

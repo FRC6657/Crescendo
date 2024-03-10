@@ -16,9 +16,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MAXSwerveConstants;
-import frc.robot.Constants.OuttakeConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Superstructure;
+import frc.robot.subsystems.Superstructure.noteState;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimberIO;
 import frc.robot.subsystems.climb.ClimberIO_Real;
@@ -69,6 +69,7 @@ public class Robot extends LoggedRobot {
   // Driver Controllers
   private CommandXboxController driver = new CommandXboxController(0);
   private CommandGenericHID operator = new CommandGenericHID(1);
+  private CommandGenericHID debug = new CommandGenericHID(5);
 
   // Subsystems
   private MAXSwerve drivebase =
@@ -140,7 +141,7 @@ public class Robot extends LoggedRobot {
     NamedCommands.registerCommand("RetractIntake", superstructure.retractIntake());
     NamedCommands.registerCommand("Ready", superstructure.readyPiece());
 
-    autoChooser.addOption("EventTest", superstructure.choreoAuto("EventTest"));
+    autoChooser.addOption("CenterFender-S02", superstructure.choreoAuto("CenterFender-S02"));
 
     NoteVisualizer.setRobotPoseSupplier(drivebase::getPose);
 
@@ -159,32 +160,30 @@ public class Robot extends LoggedRobot {
                         * DriveConstants.kMaxAngularVelocity
                         * 0.25)));
 
-    // autoChooser.addDefaultOption("None", null);
-    // autoChooser.addOption("testAuto", superstructure.testAuto());
-    // autoChooser.addOption("1 Meter Test", superstructure.meterTestAuto());
-    // autoChooser.addOption("interupt Choreo Test", superstructure.interuptChoreoTest());
-    // autoChooser.addOption("2Center", superstructure.twoCenter());
+    autoChooser.addDefaultOption("None", null);
 
     driver.a().whileTrue(drivebase.goToShotPoint().andThen(Commands.print("ShotPointEnded")));
-
     driver
         .rightTrigger()
         .onTrue(superstructure.extendIntake())
         .onFalse(superstructure.retractIntake());
-    driver.y().onTrue(superstructure.shootPiece());
+    driver.leftTrigger().onTrue(superstructure.shootPiece());
 
     operator.button(1).onTrue(superstructure.ampMode());
     operator.button(2).onTrue(superstructure.speakerMode());
-    operator.button(3).onTrue(outtake.changePivotSetpoint(OuttakeConstants.kPivotAmpAngle));
-    operator.button(4).onTrue(superstructure.extendIntake());
-    operator.button(4).onFalse(superstructure.retractIntake());
-    operator.button(5).onTrue(superstructure.shootPiece());
-
+    operator.button(3).onTrue(superstructure.readyPiece());
     operator.button(6).onTrue(superstructure.raiseClimbers());
     operator.button(7).onTrue(superstructure.lowerClimbers());
 
     operator.button(9).onTrue(superstructure.firstReset());
     operator.button(9).onFalse(superstructure.secondReset());
+
+    debug
+        .button(1)
+        .onTrue(Commands.runOnce(() -> superstructure.overrideNoteState(noteState.Intake)));
+    debug
+        .button(2)
+        .onTrue(Commands.runOnce(() -> superstructure.overrideNoteState(noteState.Outtake)));
   }
 
   @Override

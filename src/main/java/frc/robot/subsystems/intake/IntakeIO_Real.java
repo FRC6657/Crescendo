@@ -13,7 +13,6 @@ import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.util.TOFSensor;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public class IntakeIO_Real implements IntakeIO {
 
@@ -119,10 +118,6 @@ public class IntakeIO_Real implements IntakeIO {
 
     // Update the roller inputs
     inputs.rollerMotorVelocity = rollerMotor.getVelocity().getValueAsDouble() * 60; // RPM
-    inputs.rollerMotorAcceleration =
-        rollerMotor.getAcceleration().getValueAsDouble() * 60; // RPM per second
-    // inputs.rollerMotorAcceleration = (inputs.rollerMotorVelocity - lastVelocity) *
-    // CodeConstants.kMainLoopFrequency; // RPM per second
     inputs.rollerMotorTemp = rollerMotor.getDeviceTemp().getValueAsDouble(); // Celcius
     inputs.rollerMotorVoltage = rollerMotor.getMotorVoltage().getValueAsDouble(); // Volts
     inputs.rollerMotorCurrent = rollerMotor.getSupplyCurrent().getValueAsDouble(); // Amps
@@ -133,7 +128,6 @@ public class IntakeIO_Real implements IntakeIO {
             Units.degreesToRotations(angleSetpoint))); // Degrees to Native Rotations
 
     inputs.tofDistance = sensor.getMappedDistance();
-    Logger.recordOutput("TOF Raw Distance", sensor.getRawOutput());
   }
 
   /**

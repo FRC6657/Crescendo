@@ -323,7 +323,8 @@ public class Constants {
     public static final double kPivotCurrentLimit = 30;
     public static final double kRollersCurrentLimit = 20;
 
-    public static final double kFloorInSpeed = 0.7;
+    public static final double kGroundIntakeSpeed = 0.75;
+    public static final double kFeedSpeed = 0.75;
 
     public static Slot0Configs kPivotSlot0 =
         new Slot0Configs()
@@ -368,8 +369,12 @@ public class Constants {
     public static final double kMinFlywheelRpm = -3190;
     public static final double kMaxFlywheelRpm = 3190;
 
-    public static final double kPivotCurrentLimit = 40;
+    public static final double kPivotCurrentLimit = 30;
     public static final double kFlywheelCurrentLimit = 30;
+
+    public static final double kFeedRPM = 600;
+    public static final double kSpeakerRPM = 2750;
+    public static final double kAmpRPM = 1000;
 
     public static Slot0Configs kPivotSlot0 =
         new Slot0Configs()

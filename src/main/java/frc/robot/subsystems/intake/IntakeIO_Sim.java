@@ -59,7 +59,9 @@ public class IntakeIO_Sim implements IntakeIO {
     inputs.rollerMotorVelocity = rollerSim.getAngularVelocityRPM(); // RPM
     inputs.rollerMotorTemp = 0; // Celcius
     inputs.rollerMotorVoltage = rollerVoltage; // Volts
-    inputs.rollerMotorCurrent = rollerSim.getCurrentDrawAmps(); // Amps
+    inputs.rollerMotorCurrent = rollerSim.getCurrentDrawAmps(); // Amps]
+
+    inputs.tofDistance = 27;
   }
 
   /**

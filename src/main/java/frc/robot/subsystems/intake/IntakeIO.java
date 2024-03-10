@@ -15,7 +15,6 @@ public interface IntakeIO {
     public boolean atSetpoint = false;
 
     public double rollerMotorVelocity = 0.0; // RPM
-    public double rollerMotorAcceleration = 0.0; // RPM per second
     public double rollerMotorTemp = 0.0; // Celcius
     public double rollerMotorVoltage = 0.0; // Volts
     public double rollerMotorCurrent = 0.0; // Amps

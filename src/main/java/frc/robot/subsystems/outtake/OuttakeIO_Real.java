@@ -27,11 +27,8 @@ public class OuttakeIO_Real implements OuttakeIO {
   // Chamber Beam Break Sensor
   DigitalInput beambreak = new DigitalInput(2);
 
-  @AutoLogOutput(key = "Outtake/Raw Angle Setpoint")
+  @AutoLogOutput(key = "Outtake/Angle Setpoint")
   private double rawAngleSetpoint = OuttakeConstants.kMinPivotAngle;
-
-  @AutoLogOutput(key = "Outtake/Profiled Angle Setpoint")
-  private double profiledAngleSetpoint = OuttakeConstants.kMinPivotAngle;
 
   // Variables to store/log the setpoints
   @AutoLogOutput(key = "Outtake/RPM Setpoint")

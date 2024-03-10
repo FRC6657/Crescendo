@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -48,12 +47,12 @@ public class Outtake extends SubsystemBase {
     return outtakeInputs.beamBroken;
   }
 
-  public Command waitUntilPivotAtSetpoint() {
-    return Commands.waitUntil(() -> outtakeInputs.pivotAtSetpoint);
+  public boolean atFlywheelSetpoint() {
+    return outtakeInputs.flywheelAtSetpoint;
   }
 
-  public Command waitUntilFlywheelAtSetpoint() {
-    return Commands.waitUntil(() -> outtakeInputs.flywheelAtSetpoint);
+  public boolean atPivotSetpoint() {
+    return outtakeInputs.pivotAtSetpoint;
   }
 
   @Override
