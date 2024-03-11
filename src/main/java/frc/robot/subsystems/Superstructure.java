@@ -3,10 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.subsystems;
 
-import com.choreo.lib.Choreo;
-import com.choreo.lib.ChoreoTrajectory;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -301,17 +297,14 @@ public class Superstructure {
 
   public Command autoStart(Pose2d bluePos, Pose2d redPos) {
     return Commands.sequence(
-      Commands.runOnce(()-> drivebase.setPose(isRed() ? redPos : bluePos)),
-      Commands.runOnce(() -> currentNoteState = noteState.Intake),
-      drivebase.goToShotPoint().alongWith(readyPiece()),
-      shootPiece()
-    );
+        Commands.runOnce(() -> drivebase.setPose(isRed() ? redPos : bluePos)),
+        Commands.runOnce(() -> currentNoteState = noteState.Intake),
+        drivebase.goToShotPoint().alongWith(readyPiece()),
+        shootPiece());
   }
 
-  public Command CenterFenderS0(){
+  public Command CenterFenderS0() {
     return Commands.sequence(
-      autoStart(AutoConstants.BLUE_CENTER_FENDER, AutoConstants.RED_CENTER_FENDER)
-    );
+        autoStart(AutoConstants.BLUE_CENTER_FENDER, AutoConstants.RED_CENTER_FENDER));
   }
-
 }

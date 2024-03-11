@@ -132,9 +132,16 @@ public class Constants {
     public static final double kAA_P_Y = 3;
     public static final double kAA_P_Theta = 3;
 
-    //Change to account for red or blue
-    public static final Pose2d BLUE_CENTER_FENDER = new Pose2d(new Translation2d(1.3799530267715454, 5.540942192077637), new Rotation2d(0));
-    public static final Pose2d RED_CENTER_FENDER = new Pose2d(new Translation2d(10.3799530267715454, 5.540942192077637), new Rotation2d(0));
+    // Starting Positions
+    public static final Pose2d BLUE_CENTER_FENDER =
+        new Pose2d(new Translation2d(1.375, 5.55), new Rotation2d(0));
+    public static final Pose2d RED_CENTER_FENDER =
+        new Pose2d(new Translation2d(15.175, 5.55), new Rotation2d(Math.PI));
+    public static final Pose2d BLUE_AMP_FENDER = new Pose2d(0.695, 6.735, new Rotation2d(1.05));
+    public static final Pose2d RED_AMP_FENDER = new Pose2d(15.875, 6.735, new Rotation2d(2.091));
+    public static final Pose2d BLUE_SOURCE_FENDER = new Pose2d(0.695, 4.385, new Rotation2d(-1.05));
+    public static final Pose2d RED_SOURCE_FENDER =
+        new Pose2d(15.875, 4.385, new Rotation2d(-2.091));
 
     public static HolonomicPathFollowerConfig kHolonomicPathFollowerConfig =
         new HolonomicPathFollowerConfig(
