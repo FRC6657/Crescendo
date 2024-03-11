@@ -141,7 +141,7 @@ public class Robot extends LoggedRobot {
     NamedCommands.registerCommand("RetractIntake", superstructure.retractIntake());
     NamedCommands.registerCommand("Ready", superstructure.readyPiece());
 
-    autoChooser.addOption("CenterFender02", superstructure.choreoAuto("CenterFender02"));
+    autoChooser.addOption("CenterFenderS0", superstructure.CenterFenderS0());
 
     NoteVisualizer.setRobotPoseSupplier(drivebase::getPose);
 

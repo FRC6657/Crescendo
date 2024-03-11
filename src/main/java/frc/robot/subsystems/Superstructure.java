@@ -299,27 +299,19 @@ public class Superstructure {
     return isRed;
   }
 
-  public Pose2d getChoreoInitialPose(String autoName) {
-
-    ChoreoTrajectory traj = Choreo.getTrajectory(autoName);
-
-    Pose2d bluePose = traj.getInitialPose();
-    Pose2d redPose = traj.flipped().getInitialPose();
-
-    return isRed() ? redPose : bluePose;
-  }
-
-  public Command choreoAuto(String autoName) {
+  public Command autoStart(Pose2d bluePos, Pose2d redPos) {
     return Commands.sequence(
-        Commands.runOnce(()-> drivebase.setPose(AutoConstants.FENDER_POSE)),
-        Commands.runOnce(() -> currentNoteState = noteState.Intake),
-        drivebase.goToShotPoint(),
-        shootPiece(),
-        extendIntake(),
-        Commands.runOnce(() -> drivebase.setPose(getChoreoInitialPose(autoName))),
-        AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory(autoName)),
-        drivebase.goToShotPoint(),
-        Commands.waitUntil(()-> currentNoteState != noteState.Processing),
-        shootPiece());
+      Commands.runOnce(()-> drivebase.setPose(isRed() ? redPos : bluePos)),
+      Commands.runOnce(() -> currentNoteState = noteState.Intake),
+      drivebase.goToShotPoint().alongWith(readyPiece()),
+      shootPiece()
+    );
   }
+
+  public Command CenterFenderS0(){
+    return Commands.sequence(
+      autoStart(AutoConstants.BLUE_CENTER_FENDER, AutoConstants.RED_CENTER_FENDER)
+    );
+  }
+
 }
