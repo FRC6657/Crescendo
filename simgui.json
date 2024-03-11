@@ -6,11 +6,6 @@
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d"
     },
     "windows": {
-      "/FMSInfo": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/Auto Chooser": {
         "window": {
           "visible": true
@@ -18,7 +13,7 @@
       }
     }
   },
-  "NetworkTables Info": {
-    "visible": true
+  "NetworkTables View": {
+    "visible": false
   }
 }

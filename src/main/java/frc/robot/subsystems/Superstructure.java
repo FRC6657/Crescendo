@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OuttakeConstants;
@@ -310,8 +311,15 @@ public class Superstructure {
 
   public Command choreoAuto(String autoName) {
     return Commands.sequence(
-        Commands.runOnce(() -> drivebase.setPose(getChoreoInitialPose(autoName))),
+        Commands.runOnce(()-> drivebase.setPose(AutoConstants.FENDER_POSE)),
         Commands.runOnce(() -> currentNoteState = noteState.Intake),
-        AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory(autoName)));
+        drivebase.goToShotPoint(),
+        shootPiece(),
+        extendIntake(),
+        Commands.runOnce(() -> drivebase.setPose(getChoreoInitialPose(autoName))),
+        AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory(autoName)),
+        drivebase.goToShotPoint(),
+        Commands.waitUntil(()-> currentNoteState != noteState.Processing),
+        shootPiece());
   }
 }
