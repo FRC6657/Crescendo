@@ -33,11 +33,11 @@ import frc.robot.subsystems.drive.MAXSwerveIO_Sim;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO_Real;
 import frc.robot.subsystems.intake.IntakeIO_Sim;
+import frc.robot.subsystems.led.*; // LED Package
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO_Real;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.led.*;//LED Package
 import frc.robot.util.NoteVisualizer;
 import java.io.IOException;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -107,7 +107,7 @@ public class Robot extends LoggedRobot {
       new Intake(mode == RobotMode.REAL ? new IntakeIO_Real() : new IntakeIO_Sim());
 
   private Led led = new Led();
-  
+
   private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
 
   private Alliance currentAlliance = Alliance.Blue;
@@ -184,7 +184,7 @@ public class Robot extends LoggedRobot {
     operator.button(9).onTrue(superstructure.firstReset());
     operator.button(9).onFalse(superstructure.secondReset());
 
-  operator.button(4).onTrue(new InstantCommand(led::amplifySignal));
+    operator.button(4).onTrue(new InstantCommand(led::amplifySignal));
 
     debug
         .button(1)

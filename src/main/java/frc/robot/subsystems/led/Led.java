@@ -64,9 +64,9 @@ public class Led extends SubsystemBase {
             (flashTimer % 256)
                 / 255.0; // makes the signal fade out and bounce in on subsequent flashes
         changeColor(
-            (int)Math.round(ampColor.red * colorMultiplier),
-            (int)Math.round(ampColor.green * colorMultiplier),
-            (int)Math.round(ampColor.blue * colorMultiplier));
+            (int) Math.round(ampColor.red * colorMultiplier),
+            (int) Math.round(ampColor.green * colorMultiplier),
+            (int) Math.round(ampColor.blue * colorMultiplier));
       } else {
         changeColor(defaultColor.red, defaultColor.green, defaultColor.blue);
         flashTimer =
