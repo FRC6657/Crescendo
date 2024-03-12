@@ -54,19 +54,19 @@ public class Led extends SubsystemBase {
     if (flashTimer
         > 0) { // start the flash if it is being called by an input, rather than the periodic
       // function which will only call if the flash timer has already started
-      flashTimer = 511; // 511 = 256*2-1 this gives two flashes
+      flashTimer = 512; // 511 = 256*2 this gives two flashes
     } else {
       flashTimer -= 4; // speed a flash will disapate.
       if (flashTimer
           > 0) { // if it is 0 or less than zero, the time has run out and it is time to set it back
         // to the deafult color
-        int colorMultiplier =
-            (flashTimer % 255)
-                / 255; // makes the signal fade out and bounce in on subsequent flashes
+        double colorMultiplier =
+            (flashTimer % 256)
+                / 255.0; // makes the signal fade out and bounce in on subsequent flashes
         changeColor(
-            ampColor.red * colorMultiplier,
-            ampColor.green * colorMultiplier,
-            ampColor.blue * colorMultiplier);
+            (int)Math.round(ampColor.red * colorMultiplier),
+            (int)Math.round(ampColor.green * colorMultiplier),
+            (int)Math.round(ampColor.blue * colorMultiplier));
       } else {
         changeColor(defaultColor.red, defaultColor.green, defaultColor.blue);
         flashTimer =
