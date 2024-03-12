@@ -105,7 +105,7 @@ public class Robot extends LoggedRobot {
   private Intake intake =
       new Intake(mode == RobotMode.REAL ? new IntakeIO_Real() : new IntakeIO_Sim());
 
-  private Led led = new Led();
+  //private Led led = new Led();
 
   private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
 
