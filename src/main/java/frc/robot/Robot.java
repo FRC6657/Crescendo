@@ -36,6 +36,7 @@ import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO_Real;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.led.*;//LED Package
 import frc.robot.util.NoteVisualizer;
 import java.io.IOException;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -104,7 +105,7 @@ public class Robot extends LoggedRobot {
   private Intake intake =
       new Intake(mode == RobotMode.REAL ? new IntakeIO_Real() : new IntakeIO_Sim());
 
-  // private Led led = new Led();
+  private Led led = new Led();
 
   private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
 
