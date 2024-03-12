@@ -33,7 +33,7 @@ import frc.robot.subsystems.drive.MAXSwerveIO_Sim;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO_Real;
 import frc.robot.subsystems.intake.IntakeIO_Sim;
-import frc.robot.subsystems.led.*; // LED Package
+import frc.robot.subsystems.led.*;
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO_Real;
 import frc.robot.subsystems.outtake.OuttakeIO_Sim;

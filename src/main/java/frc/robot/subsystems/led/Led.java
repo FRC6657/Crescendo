@@ -52,8 +52,8 @@ public class Led extends SubsystemBase {
 
   public void amplifySignal() {
     if (flashTimer
-        > 0) { // start the flash if it is being called by an input, rather than the periodic
-      // function which will only call if the flash timer has already started
+        <= 0) { // the periodic method calls amplifySignal whenever flashTimer is greater than 0
+      // this will cause the flash timer to be reset only if it is called from outside periodic
       flashTimer = 512; // 511 = 256*2 this gives two flashes
     } else {
       flashTimer -= 4; // speed a flash will disapate.
