@@ -311,7 +311,7 @@ public class MAXSwerve extends SubsystemBase {
               double angle = Math.atan(m);
 
               Pose2d desiredPos =
-                  new Pose2d(aX, aY, new Rotation2d(angle).plus(new Rotation2d(isBlue ? 0 : 0)));
+                  new Pose2d(aX, aY, new Rotation2d(angle).plus(new Rotation2d(isBlue ? 0 : Math.PI)));
 
               Logger.recordOutput("AutoAim/DesiredShotPos", desiredPos);
 

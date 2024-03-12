@@ -25,6 +25,9 @@ import frc.robot.util.NoteVisualizer;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
+
 public class Superstructure {
   MAXSwerve drivebase;
   Intake intake;
@@ -62,7 +65,7 @@ public class Superstructure {
     this.outtake = outtake;
     this.climb = climb;
 
-    noteDetector = new Trigger(intake::noteDetected);
+    noteDetector = new Trigger(() ->false);
 
     noteDetector.onTrue(
         Commands.sequence(
@@ -75,6 +78,16 @@ public class Superstructure {
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
     Logger.recordOutput("Superstructure/Latest Event", "Superstructure Initialized");
+  }
+
+  public Command processNote(){
+    return Commands.sequence(
+                Commands.runOnce(() -> currentNoteState = noteState.Processing),
+                Commands.waitSeconds(0),
+                retractIntake(),
+                Commands.waitUntil(intake::atSetpoint),
+                chamberNote(),
+                relocateNote());
   }
 
   public void update3DPose() {
@@ -163,7 +176,7 @@ public class Superstructure {
         Commands.sequence(
                 logEvent("Unchambering Note"),
                 Commands.runOnce(() -> currentNoteState = noteState.Processing),
-                intake.changeRollerSpeed(IntakeConstants.kFeedSpeed),
+                intake.changeRollerSpeed(-IntakeConstants.kFeedSpeed),
                 outtake.changeRPMSetpoint(-OuttakeConstants.kFeedRPM),
                 Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
                 intake.changeRollerSpeed(0),
@@ -244,7 +257,7 @@ public class Superstructure {
                 logEvent("Scoring Speaker"),
                 outtake.changeRPMSetpoint(OuttakeConstants.kSpeakerRPM),
                 Commands.waitUntil(outtake::atFlywheelSetpoint),
-                intake.changeRollerSpeed(-IntakeConstants.kFeedSpeed),
+                intake.changeRollerSpeed(IntakeConstants.kFeedSpeed),
                 Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
                 Commands.waitSeconds(0.1),
                 outtake.changeRPMSetpoint(0),
@@ -306,5 +319,22 @@ public class Superstructure {
   public Command CenterFenderS0() {
     return Commands.sequence(
         autoStart(AutoConstants.BLUE_CENTER_FENDER, AutoConstants.RED_CENTER_FENDER));
+  }
+
+  public Command CenterFenderS02(){
+    return Commands.sequence(
+      CenterFenderS0(),
+      extendIntake(),
+      Commands.waitUntil(intake::atSetpoint),
+      Commands.print("Before path"),
+      AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("CenterFender02")),
+      processNote(),
+      
+      drivebase.goToShotPoint(),
+      Commands.print("after shotpoint"),
+      Commands.waitUntil(() -> currentNoteState == noteState.Intake),
+      Commands.waitSeconds(1),
+      shootPiece()
+    );
   }
 }

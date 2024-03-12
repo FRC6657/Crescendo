@@ -142,6 +142,7 @@ public class Robot extends LoggedRobot {
     NamedCommands.registerCommand("Ready", superstructure.readyPiece());
 
     autoChooser.addOption("CenterFenderS0", superstructure.CenterFenderS0());
+    autoChooser.addOption("CenterFenderS02", superstructure.CenterFenderS02());
 
     NoteVisualizer.setRobotPoseSupplier(drivebase::getPose);
 

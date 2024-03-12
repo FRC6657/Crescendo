@@ -82,6 +82,7 @@ public class OuttakeIO_Real implements OuttakeIO {
     flywheelConfigs.Slot0 = OuttakeConstants.kFlyWheelSlot0; // PID Constants
     flywheelConfigs.CurrentLimits = OuttakeConstants.kPivotCurrentConfigs; // Current Limits
     flywheelConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    followerFlywheel.getConfigurator().apply(flywheelConfigs);
     flywheelConfigurator.apply(flywheelConfigs);
 
     // Flywheel Status Signals

@@ -73,9 +73,9 @@ public class Constants {
     }
 
     public static final CameraInformation kBackCameraInfo =
-        new CameraInformation("Camera_Rear", kBackCameraPose);
+        new CameraInformation("Camera_Back", kBackCameraPose);
     public static final CameraInformation kSideCameraInfo =
-        new CameraInformation("Camera_Front", kSideCameraPose);
+        new CameraInformation("Camera_Side", kSideCameraPose);
 
     public static final class CameraResult {
       public final Pose2d estimatedPose;
@@ -335,7 +335,7 @@ public class Constants {
     public static final double kRollersCurrentLimit = 20;
 
     public static final double kGroundIntakeSpeed = 0.75;
-    public static final double kFeedSpeed = 0.75;
+    public static final double kFeedSpeed = -0.5;
 
     public static Slot0Configs kPivotSlot0 =
         new Slot0Configs()
@@ -383,7 +383,7 @@ public class Constants {
     public static final double kPivotCurrentLimit = 30;
     public static final double kFlywheelCurrentLimit = 30;
 
-    public static final double kFeedRPM = 600;
+    public static final double kFeedRPM = 400;
     public static final double kSpeakerRPM = 2750;
     public static final double kAmpRPM = 1000;
 
