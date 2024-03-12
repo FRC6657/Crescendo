@@ -33,8 +33,7 @@ public class Led extends SubsystemBase {
 
   /** Creates a new Led. */
   public Led() {
-
-    led = new AddressableLED(1); // PWM port
+    led = new AddressableLED(9); // PWM port
     ledBuffer = new AddressableLEDBuffer(56);
     led.setLength(ledBuffer.getLength());
   }
