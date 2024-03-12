@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
@@ -105,8 +106,8 @@ public class Robot extends LoggedRobot {
   private Intake intake =
       new Intake(mode == RobotMode.REAL ? new IntakeIO_Real() : new IntakeIO_Sim());
 
-  //private Led led = new Led();
-
+  private Led led = new Led();
+  
   private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
 
   private Alliance currentAlliance = Alliance.Blue;
@@ -135,6 +136,9 @@ public class Robot extends LoggedRobot {
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
         break;
     }
+
+    led.startLED();
+
     Logger.start();
 
     NamedCommands.registerCommand("Fire", superstructure.shootPiece());
@@ -179,6 +183,8 @@ public class Robot extends LoggedRobot {
 
     operator.button(9).onTrue(superstructure.firstReset());
     operator.button(9).onFalse(superstructure.secondReset());
+
+  operator.button(4).onTrue(new InstantCommand(led::amplifySignal));
 
     debug
         .button(1)
