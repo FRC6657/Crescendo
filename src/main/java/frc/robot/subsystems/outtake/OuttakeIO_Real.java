@@ -25,7 +25,7 @@ public class OuttakeIO_Real implements OuttakeIO {
   TalonFX leaderFlywheel = new TalonFX(Constants.CANID.kLeftFlywheel);
 
   // Chamber Beam Break Sensor
-  DigitalInput beambreak = new DigitalInput(2);
+  DigitalInput beambreak = new DigitalInput(8);
 
   @AutoLogOutput(key = "Outtake/Angle Setpoint")
   private double rawAngleSetpoint = OuttakeConstants.kMinPivotAngle;

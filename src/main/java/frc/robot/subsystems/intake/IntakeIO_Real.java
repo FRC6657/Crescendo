@@ -23,7 +23,7 @@ public class IntakeIO_Real implements IntakeIO {
   TalonFX rollerMotor = new TalonFX(Constants.CANID.kIntakeRollers);
 
   // Intake TOF Sensor
-  TOFSensor sensor = new TOFSensor(7);
+  TOFSensor sensor = new TOFSensor(9);
 
   // Variables to store/log the setpoints
   @AutoLogOutput(key = "Intake/Angle Setpoint")
