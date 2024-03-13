@@ -24,8 +24,12 @@ import frc.robot.subsystems.drive.MAXSwerve;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.util.NoteVisualizer;
+
+import java.nio.file.Path;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.opencv.objdetect.FaceDetectorYN;
 
 public class Superstructure {
   MAXSwerve drivebase;
@@ -57,6 +61,9 @@ public class Superstructure {
 
   private boolean climbersUp = false;
 
+  private boolean inTeleop = false;
+
+
   public Superstructure(MAXSwerve drivebase, Intake intake, Outtake outtake, Climb climb) {
 
     this.drivebase = drivebase;
@@ -64,17 +71,18 @@ public class Superstructure {
     this.outtake = outtake;
     this.climb = climb;
 
-    // noteDetector = new Trigger(intake::noteDetected);
+    noteDetector = new Trigger(() -> (intake.noteDetected() && inTeleop));
 
-    // noteDetector.onTrue(
-    //     Commands.sequence(
-    //             Commands.runOnce(() -> currentNoteState = noteState.Processing),
-    //             Commands.waitSeconds(0),
-    //             retractIntake(),
-    //             Commands.waitUntil(intake::atSetpoint),
-    //             chamberNote(),
-    //             relocateNote())
-    //         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+    noteDetector.onTrue(
+        Commands.sequence(
+          logEvent("triggered!"),
+                Commands.runOnce(() -> currentNoteState = noteState.Processing),
+                Commands.waitSeconds(0),
+                retractIntake(),
+                Commands.waitUntil(intake::atSetpoint),
+                chamberNote(),
+                relocateNote())
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
     Logger.recordOutput("Superstructure/Latest Event", "Superstructure Initialized");
   }
@@ -92,7 +100,7 @@ public class Superstructure {
     return Commands.runOnce(() -> Logger.recordOutput("Superstructure/Latest Event", event));
   }
 
-  public Command grabNote() {
+  public Command processNote() {
     return Commands.sequence(
             Commands.runOnce(() -> currentNoteState = noteState.Processing),
             Commands.waitSeconds(0),
@@ -102,6 +110,11 @@ public class Superstructure {
             relocateNote())
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
+
+  public void setNoteDetectorState(boolean inTeleop){
+    this.inTeleop = inTeleop;
+  }
+  
 
   public Command raiseClimbers() {
     return stowOuttake()
@@ -138,9 +151,7 @@ public class Superstructure {
     return Commands.sequence(
         logEvent("Extending Intake"),
         intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
-        intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed),
-        Commands.waitUntil(intake::noteDetected),
-        grabNote());
+        intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed));
   }
 
   public Command retractIntake() {
@@ -178,7 +189,7 @@ public class Superstructure {
         Commands.sequence(
                 logEvent("Unchambering Note"),
                 Commands.runOnce(() -> currentNoteState = noteState.Processing),
-                intake.changeRollerSpeed(IntakeConstants.kFeedSpeed),
+                intake.changeRollerSpeed(-IntakeConstants.kFeedSpeed),
                 outtake.changeRPMSetpoint(-OuttakeConstants.kFeedRPM),
                 Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
                 intake.changeRollerSpeed(0),
@@ -259,7 +270,7 @@ public class Superstructure {
                 logEvent("Scoring Speaker"),
                 outtake.changeRPMSetpoint(OuttakeConstants.kSpeakerRPM),
                 Commands.waitUntil(outtake::atFlywheelSetpoint),
-                intake.changeRollerSpeed(-IntakeConstants.kFeedSpeed),
+                intake.changeRollerSpeed(IntakeConstants.kFeedSpeed),
                 Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
                 Commands.waitSeconds(0.1),
                 outtake.changeRPMSetpoint(0),
@@ -283,24 +294,18 @@ public class Superstructure {
         .unless(() -> currentScoringMode == ScoringMode.Amp);
   }
 
-  public Command intakeOutPath(String pathName) {
+  public Command intakeOutPath(String pathName, boolean waitForIntake) {
     return Commands.sequence(
-        Commands.parallel(
-            extendIntake(),
-            Commands.sequence(
-                AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory(pathName)),
-                retractIntake(),
-                drivebase.goToShotPoint())),
-        Commands.waitUntil(() -> currentNoteState != noteState.Processing),
-        shootPiece());
-  }
-
-  public Command intakeInPath(String pathName) {
-    return Commands.sequence(
-        AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory(pathName)),
-        drivebase.goToShotPoint(),
-        Commands.waitUntil(() -> currentNoteState != noteState.Processing),
-        shootPiece());
+        extendIntake(),
+        Commands.waitUntil(intake::atSetpoint).unless(() -> waitForIntake),
+        Commands.race(
+          Commands.waitUntil(intake::noteDetected),
+          Commands.sequence(
+            AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory(pathName)),
+            retractIntake()
+          )
+        )
+    );
   }
 
   public Command firstReset() {
@@ -344,15 +349,26 @@ public class Superstructure {
   }
 
   public Command CenterFenderS02() {
-    return Commands.sequence(CenterFenderS0(), intakeInPath("CenterFenderS02"));
+    return Commands.sequence(
+      CenterFenderS0(),
+      AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("CenterFenderS02"))
+      // CenterFenderS0(), 
+      // intakeOutPath("CenterFenderS02", true),
+      // Commands.parallel(
+      //   processNote(),
+      //   drivebase.goToShotPoint()
+      // ),
+      // Commands.waitUntil(() -> currentNoteState != noteState.Processing),
+      // shootPiece()
+    );
   }
 
-  public Command ChoreoIntakeTest() {
-    return Commands.sequence(
-        CenterFenderS0(),
-        intakeOutPath("CenterFender03IntakeTest"),
-        drivebase.goToShotPoint(),
-        Commands.waitUntil(() -> currentNoteState != noteState.Processing),
-        shootPiece());
-  }
+  // public Command ChoreoIntakeTest() {
+  //   return Commands.sequence(
+  //       CenterFenderS0(),
+  //       intakeOutPath("CenterFender03IntakeTest"),
+  //       drivebase.goToShotPoint(),
+  //       Commands.waitUntil(() -> currentNoteState != noteState.Processing),
+  //       shootPiece());
+  // }
 }

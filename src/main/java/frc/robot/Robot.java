@@ -236,6 +236,8 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
 
+    superstructure.setNoteDetectorState(false);
+
     autoCommand = autoChooser.get();
 
     if (autoCommand != null) {
@@ -255,7 +257,9 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    superstructure.setNoteDetectorState(true);
+  }
 
   @Override
   public void teleopPeriodic() {}
