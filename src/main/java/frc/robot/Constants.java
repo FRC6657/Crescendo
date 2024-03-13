@@ -3,9 +3,6 @@ package frc.robot;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -143,13 +140,6 @@ public class Constants {
     public static final Pose2d RED_SOURCE_FENDER =
         new Pose2d(15.875, 4.385, new Rotation2d(-2.091));
 
-    public static HolonomicPathFollowerConfig kHolonomicPathFollowerConfig =
-        new HolonomicPathFollowerConfig(
-            new PIDConstants(kXController.getP()),
-            new PIDConstants(kThetaController.getP()),
-            MAXSwerveConstants.kMaxDriveSpeed,
-            DriveConstants.kModuleLocations[0].getNorm(),
-            new ReplanningConfig());
   }
 
   public static final class DriveConstants {

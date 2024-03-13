@@ -3,10 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.subsystems;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathPlannerPath;
+import com.choreo.lib.Choreo;
+import com.choreo.lib.ChoreoTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -22,14 +23,11 @@ import frc.robot.Constants.OuttakeConstants;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drive.MAXSwerve;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.led.LEDs;
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.util.NoteVisualizer;
-
-import java.nio.file.Path;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-import org.opencv.objdetect.FaceDetectorYN;
 
 public class Superstructure {
   MAXSwerve drivebase;
@@ -63,8 +61,7 @@ public class Superstructure {
 
   private boolean inTeleop = false;
 
-
-  public Superstructure(MAXSwerve drivebase, Intake intake, Outtake outtake, Climb climb) {
+  public Superstructure(MAXSwerve drivebase, Intake intake, Outtake outtake, Climb climb, LEDs led) {
 
     this.drivebase = drivebase;
     this.intake = intake;
@@ -72,17 +69,7 @@ public class Superstructure {
     this.climb = climb;
 
     noteDetector = new Trigger(() -> (intake.noteDetected() && inTeleop));
-
-    noteDetector.onTrue(
-        Commands.sequence(
-          logEvent("triggered!"),
-                Commands.runOnce(() -> currentNoteState = noteState.Processing),
-                Commands.waitSeconds(0),
-                retractIntake(),
-                Commands.waitUntil(intake::atSetpoint),
-                chamberNote(),
-                relocateNote())
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+    noteDetector.onTrue(processNote());
 
     Logger.recordOutput("Superstructure/Latest Event", "Superstructure Initialized");
   }
@@ -103,7 +90,6 @@ public class Superstructure {
   public Command processNote() {
     return Commands.sequence(
             Commands.runOnce(() -> currentNoteState = noteState.Processing),
-            Commands.waitSeconds(0),
             retractIntake(),
             Commands.waitUntil(intake::atSetpoint),
             chamberNote(),
@@ -111,10 +97,9 @@ public class Superstructure {
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
 
-  public void setNoteDetectorState(boolean inTeleop){
+  public void setNoteDetectorState(boolean inTeleop) {
     this.inTeleop = inTeleop;
   }
-  
 
   public Command raiseClimbers() {
     return stowOuttake()
@@ -299,11 +284,11 @@ public class Superstructure {
         extendIntake(),
         Commands.waitUntil(intake::atSetpoint).unless(() -> waitForIntake),
         Commands.race(
-          Commands.waitUntil(intake::noteDetected),
-          Commands.sequence(
-            AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory(pathName)),
-            retractIntake()
-          )
+            Commands.waitUntil(intake::noteDetected),
+            Commands.sequence(
+                runChoreoPath(pathName),
+                retractIntake()
+            )
         )
     );
   }
@@ -335,6 +320,47 @@ public class Superstructure {
     return isRed;
   }
 
+  private Command runChoreoPath(String pathName, boolean resetPose) {
+
+    ChoreoTrajectory traj = Choreo.getTrajectory(pathName);
+    var thetaController = AutoConstants.kThetaController;
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+    Command setPoseCommand =
+        Commands.either(
+            Commands.runOnce(
+                () ->
+                    drivebase.setPose(
+                        !isRed() ? traj.getInitialPose() : traj.flipped().getInitialPose()),
+                drivebase),
+            Commands.none(),
+            () -> resetPose);
+
+    Command swerveCommand =
+        Choreo.choreoSwerveCommand(
+            traj, // Choreo trajectory from above
+            drivebase::getPose,
+            AutoConstants.kXController,
+            AutoConstants.kYController,
+            thetaController,
+            (ChassisSpeeds speeds) -> drivebase.runChassisSpeeds(speeds),
+            this::isRed, // Whether or not to mirror the path based on alliance (this assumes
+            // the path is created for the blue alliance)
+            drivebase);
+    return Commands.sequence(
+            Commands.runOnce(
+                () -> Logger.recordOutput("Superstructure/CurrentPath", traj.getPoses())),
+            setPoseCommand,
+            swerveCommand,
+            Commands.runOnce(() -> drivebase.stop(), drivebase))
+        .until(intake::noteDetected)
+        .handleInterrupt(() -> drivebase.stop());
+  }
+
+  public Command runChoreoPath(String pathName){
+    return runChoreoPath(pathName, false);
+  }
+
   public Command autoStart(Pose2d bluePos, Pose2d redPos) {
     return Commands.sequence(
         Commands.runOnce(() -> drivebase.setPose(isRed() ? redPos : bluePos)),
@@ -350,25 +376,26 @@ public class Superstructure {
 
   public Command CenterFenderS02() {
     return Commands.sequence(
-      CenterFenderS0(),
-      AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("CenterFenderS02"))
-      // CenterFenderS0(), 
-      // intakeOutPath("CenterFenderS02", true),
-      // Commands.parallel(
-      //   processNote(),
-      //   drivebase.goToShotPoint()
-      // ),
-      // Commands.waitUntil(() -> currentNoteState != noteState.Processing),
-      // shootPiece()
+        CenterFenderS0(),
+        intakeOutPath("CenterFenderS02", true),
+        Commands.parallel(
+          processNote(),
+          drivebase.goToShotPoint()
+        ),
+        shootPiece()
     );
   }
 
-  // public Command ChoreoIntakeTest() {
-  //   return Commands.sequence(
-  //       CenterFenderS0(),
-  //       intakeOutPath("CenterFender03IntakeTest"),
-  //       drivebase.goToShotPoint(),
-  //       Commands.waitUntil(() -> currentNoteState != noteState.Processing),
-  //       shootPiece());
-  // }
+  public Command CenterFenderS03(){
+    return Commands.sequence(
+      CenterFenderS0(),
+      intakeOutPath("CenterFenderS03", true),
+      Commands.parallel(
+        processNote(),
+        drivebase.goToShotPoint()
+      ),
+      shootPiece()
+    );
+  }
+
 }

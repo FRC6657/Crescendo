@@ -1,6 +1,5 @@
 package frc.robot;
 
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -106,9 +105,9 @@ public class Robot extends LoggedRobot {
   private Intake intake =
       new Intake(mode == RobotMode.REAL ? new IntakeIO_Real() : new IntakeIO_Sim());
 
-  private Led led = new Led();
+  private LEDs led = new LEDs();
 
-  private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb);
+  private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb, led);
 
   private Alliance currentAlliance = Alliance.Blue;
 
@@ -141,13 +140,10 @@ public class Robot extends LoggedRobot {
 
     Logger.start();
 
-    NamedCommands.registerCommand("Fire", superstructure.shootPiece());
-    NamedCommands.registerCommand("ExtendIntake", superstructure.extendIntake());
-    NamedCommands.registerCommand("RetractIntake", superstructure.retractIntake());
-    NamedCommands.registerCommand("Ready", superstructure.readyPiece());
-
+    autoChooser.addDefaultOption("None", null);
     autoChooser.addOption("CenterFenderS0", superstructure.CenterFenderS0());
     autoChooser.addOption("CenterFenderS02", superstructure.CenterFenderS02());
+    autoChooser.addOption("CenterFenderS03", superstructure.CenterFenderS03());
 
     NoteVisualizer.setRobotPoseSupplier(drivebase::getPose);
 
@@ -166,7 +162,7 @@ public class Robot extends LoggedRobot {
                         * DriveConstants.kMaxAngularVelocity
                         * 0.25)));
 
-    autoChooser.addDefaultOption("None", null);
+    
 
     driver.a().whileTrue(drivebase.goToShotPoint().andThen(Commands.print("ShotPointEnded")));
     driver

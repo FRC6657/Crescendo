@@ -1,6 +1,5 @@
 package frc.robot.subsystems.drive;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
@@ -19,7 +18,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.DriveConstants;
@@ -73,20 +71,6 @@ public class MAXSwerve extends SubsystemBase {
         new SwerveDrivePoseEstimator(
             kinematics, gyroInputs.yawPosition, getModulePositions(), new Pose2d());
 
-    AutoBuilder.configureHolonomic(
-        this::getPose,
-        this::setPose,
-        this::getChassisSpeeds,
-        this::runChassisSpeeds,
-        Constants.AutoConstants.kHolonomicPathFollowerConfig,
-        () -> {
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
-        },
-        this);
   }
 
   /** This code runs at 50hz and is responsible for updating the IO and pose estimator */
@@ -149,12 +133,6 @@ public class MAXSwerve extends SubsystemBase {
    */
   public Command stop() {
     return runVelocity(() -> new ChassisSpeeds());
-  }
-
-  public void choreoStop() {
-    for (int i = 0; i < 4; i++) {
-      modules[i].stop();
-    }
   }
 
   /**

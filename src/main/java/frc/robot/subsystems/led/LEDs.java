@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Led extends SubsystemBase {
+public class LEDs extends SubsystemBase {
   AddressableLED led;
   AddressableLEDBuffer ledBuffer;
   int flashTimer = 0; // used to smoothly flash signals to the human player
@@ -32,7 +32,7 @@ public class Led extends SubsystemBase {
   } // color that will be flashed when we signal to human player to amplify the speaker
 
   /** Creates a new Led. */
-  public Led() {
+  public LEDs() {
     led = new AddressableLED(9); // PWM port
     ledBuffer = new AddressableLEDBuffer(56);
     led.setLength(ledBuffer.getLength());
