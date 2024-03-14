@@ -74,6 +74,8 @@ public class Constants {
     public static final CameraInformation kSideCameraInfo =
         new CameraInformation("Camera_Side", kSideCameraPose);
 
+    public static final String kNoteCameraName = "NoteCamera";
+
     public static final class CameraResult {
       public final Pose2d estimatedPose;
       public final Matrix<N3, N1> stdDevs;
@@ -129,6 +131,9 @@ public class Constants {
     public static final double kAA_P_Y = 3;
     public static final double kAA_P_Theta = 3;
 
+    // Note Aim
+    public static final double kNA_P = 3;
+
     // Starting Positions
     public static final Pose2d BLUE_CENTER_FENDER =
         new Pose2d(new Translation2d(1.375, 5.55), new Rotation2d(0));
@@ -139,7 +144,6 @@ public class Constants {
     public static final Pose2d BLUE_SOURCE_FENDER = new Pose2d(0.695, 4.385, new Rotation2d(-1.05));
     public static final Pose2d RED_SOURCE_FENDER =
         new Pose2d(15.875, 4.385, new Rotation2d(-2.091));
-
   }
 
   public static final class DriveConstants {

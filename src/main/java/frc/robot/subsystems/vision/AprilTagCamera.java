@@ -20,7 +20,7 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 
-public class Camera {
+public class AprilTagCamera {
 
   private PhotonCamera camera;
   private PhotonCameraSim cameraSim;
@@ -28,12 +28,12 @@ public class Camera {
 
   private double lastEstTimestamp = 0;
 
-  public Camera(String name, Transform3d cameraTransform) {
+  public AprilTagCamera(String name, Transform3d cameraTransform) {
     camera = new PhotonCamera(name);
 
     var cameraProp = new SimCameraProperties();
     cameraProp.setCalibration(1280, 800, Rotation2d.fromDegrees(90));
-    cameraProp.setCalibError(0.1, 0.10);
+    cameraProp.setCalibError(0.1, 0.1);
     cameraProp.setFPS(15);
     cameraProp.setAvgLatencyMs(50);
     cameraProp.setLatencyStdDevMs(15);

@@ -22,6 +22,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MAXSwerveConstants;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -70,7 +71,6 @@ public class MAXSwerve extends SubsystemBase {
     poseEstimator =
         new SwerveDrivePoseEstimator(
             kinematics, gyroInputs.yawPosition, getModulePositions(), new Pose2d());
-
   }
 
   /** This code runs at 50hz and is responsible for updating the IO and pose estimator */
@@ -214,6 +214,33 @@ public class MAXSwerve extends SubsystemBase {
     } else {
       poseEstimator.resetPosition(pose.getRotation(), getModulePositions(), pose);
     }
+  }
+
+  @SuppressWarnings("resource")
+  public Command noteAim(
+      DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier rSpeed, DoubleSupplier noteX) {
+
+    var thetaController = new PIDController(AutoConstants.kNA_P, 0, 0);
+
+    return this.run(
+            () -> {
+              var xSpeedVal = -MathUtil.applyDeadband(xSpeed.getAsDouble(), 0.05) * 2;
+              var ySpeedVal = -MathUtil.applyDeadband(ySpeed.getAsDouble(), 0.05) * 2;
+              var rSpeedVal = -MathUtil.applyDeadband(rSpeed.getAsDouble(), 0.05) * 1.5;
+              var noteXVal = noteX.getAsDouble();
+
+              ChassisSpeeds speeds =
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      new ChassisSpeeds(xSpeedVal, ySpeedVal, rSpeedVal), lastHeading);
+
+              if (noteXVal != 0) {
+                rSpeedVal = MathUtil.clamp(thetaController.calculate(noteXVal, 0), -2, 2);
+                speeds = new ChassisSpeeds(xSpeedVal, ySpeedVal, rSpeedVal);
+              }
+
+              this.runChassisSpeeds(speeds);
+            })
+        .beforeStarting(() -> thetaController.reset());
   }
 
   @SuppressWarnings("resource")

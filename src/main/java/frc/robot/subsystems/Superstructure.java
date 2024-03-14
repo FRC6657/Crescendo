@@ -61,7 +61,8 @@ public class Superstructure {
 
   private boolean inTeleop = false;
 
-  public Superstructure(MAXSwerve drivebase, Intake intake, Outtake outtake, Climb climb, LEDs led) {
+  public Superstructure(
+      MAXSwerve drivebase, Intake intake, Outtake outtake, Climb climb, LEDs led) {
 
     this.drivebase = drivebase;
     this.intake = intake;
@@ -285,12 +286,7 @@ public class Superstructure {
         Commands.waitUntil(intake::atSetpoint).unless(() -> waitForIntake),
         Commands.race(
             Commands.waitUntil(intake::noteDetected),
-            Commands.sequence(
-                runChoreoPath(pathName),
-                retractIntake()
-            )
-        )
-    );
+            Commands.sequence(runChoreoPath(pathName), retractIntake())));
   }
 
   public Command firstReset() {
@@ -357,7 +353,7 @@ public class Superstructure {
         .handleInterrupt(() -> drivebase.stop());
   }
 
-  public Command runChoreoPath(String pathName){
+  public Command runChoreoPath(String pathName) {
     return runChoreoPath(pathName, false);
   }
 
@@ -378,24 +374,15 @@ public class Superstructure {
     return Commands.sequence(
         CenterFenderS0(),
         intakeOutPath("CenterFenderS02", true),
-        Commands.parallel(
-          processNote(),
-          drivebase.goToShotPoint()
-        ),
-        shootPiece()
-    );
+        Commands.parallel(processNote(), drivebase.goToShotPoint()),
+        shootPiece());
   }
 
-  public Command CenterFenderS03(){
+  public Command CenterFenderS03() {
     return Commands.sequence(
-      CenterFenderS0(),
-      intakeOutPath("CenterFenderS03", true),
-      Commands.parallel(
-        processNote(),
-        drivebase.goToShotPoint()
-      ),
-      shootPiece()
-    );
+        CenterFenderS0(),
+        intakeOutPath("CenterFenderS03", true),
+        Commands.parallel(processNote(), drivebase.goToShotPoint()),
+        shootPiece());
   }
-
 }

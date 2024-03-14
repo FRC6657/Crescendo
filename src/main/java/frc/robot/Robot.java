@@ -49,7 +49,11 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
 
-  Vision vision = new Vision(VisionConstants.kBackCameraInfo, VisionConstants.kSideCameraInfo);
+  Vision vision =
+      new Vision(
+          VisionConstants.kBackCameraInfo,
+          VisionConstants.kSideCameraInfo,
+          VisionConstants.kNoteCameraName);
 
   public static enum RobotMode {
     SIM,
@@ -107,7 +111,8 @@ public class Robot extends LoggedRobot {
 
   private LEDs led = new LEDs();
 
-  private Superstructure superstructure = new Superstructure(drivebase, intake, outtake, climb, led);
+  private Superstructure superstructure =
+      new Superstructure(drivebase, intake, outtake, climb, led);
 
   private Alliance currentAlliance = Alliance.Blue;
 
@@ -155,16 +160,19 @@ public class Robot extends LoggedRobot {
                     -MathUtil.applyDeadband(driver.getLeftY(), 0.05)
                         * MAXSwerveConstants.kMaxDriveSpeed
                         * 0.7,
-                    -MathUtil.applyDeadband(driver.getLeftX(), 0.15)
+                    -MathUtil.applyDeadband(driver.getLeftX(), 0.05)
                         * MAXSwerveConstants.kMaxDriveSpeed
                         * 0.7,
-                    -MathUtil.applyDeadband(driver.getRightX(), 0.15)
+                    -MathUtil.applyDeadband(driver.getRightX(), 0.05)
                         * DriveConstants.kMaxAngularVelocity
-                        * 0.25)));
+                        * 0.4)));
 
-    
-
-    driver.a().whileTrue(drivebase.goToShotPoint().andThen(Commands.print("ShotPointEnded")));
+    // driver.a().whileTrue(drivebase.goToShotPoint().andThen(Commands.print("ShotPointEnded")));
+    driver
+        .a()
+        .whileTrue(
+            drivebase.noteAim(
+                driver::getLeftY, driver::getLeftX, driver::getRightX, vision::getNoteX));
     driver
         .rightTrigger()
         .onTrue(superstructure.extendIntake())

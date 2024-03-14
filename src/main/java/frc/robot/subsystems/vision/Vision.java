@@ -5,6 +5,7 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -22,24 +23,23 @@ import org.photonvision.simulation.VisionSystemSim;
 
 public class Vision {
 
-  private Camera backCamera;
-  private Camera sideCamera;
+  private AprilTagCamera backCamera;
+  private AprilTagCamera sideCamera;
+  //private NoteCamera noteCamera;
 
   private VisionSystemSim visionSim;
 
-  public Vision(CameraInformation backCameraInfo, CameraInformation sideCameraInfo) {
+  public Vision(
+      CameraInformation backCameraInfo, CameraInformation sideCameraInfo, String noteCameraName) {
 
-    backCamera = new Camera(backCameraInfo.name, backCameraInfo.cameraPose);
-    sideCamera = new Camera(sideCameraInfo.name, sideCameraInfo.cameraPose);
+    backCamera = new AprilTagCamera(backCameraInfo.name, backCameraInfo.cameraPose);
+    sideCamera = new AprilTagCamera(sideCameraInfo.name, sideCameraInfo.cameraPose);
+
+    //noteCamera = new NoteCamera(noteCameraName);
 
     if (RobotBase.isSimulation()) {
       visionSim = new VisionSystemSim("main");
-      try {
-        visionSim.addAprilTags(
-            new AprilTagFieldLayout(Filesystem.getDeployDirectory() + "/fields/BlueTags.json"));
-      } catch (IOException e) {
-      }
-
+      visionSim.addAprilTags(AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo));
       visionSim.addCamera(backCamera.getCameraSim(), VisionConstants.kBackCameraPose);
       visionSim.addCamera(sideCamera.getCameraSim(), VisionConstants.kSideCameraPose);
     }
@@ -51,6 +51,11 @@ public class Vision {
 
   public CameraResult getSideCameraResult() {
     return sideCamera.getCameraResult();
+  }
+
+  public double getNoteX() {
+    //return noteCamera.getNoteX();
+    return 0;
   }
 
   public void simulationPeriodic(Pose2d robotSimPose) {
