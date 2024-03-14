@@ -434,11 +434,8 @@ public class Constants {
       }
     }
 
-    public static final Color kDisabledColor = new Color(255, 100, 50); // Orange
-    public static final Color kAmpColor = new Color(128, 0, 255); // Purple
-    public static final Color kSpeakerColor = new Color(0, 255, 0); //Green
+    public static final Color kDisabledColor = new Color(255, 10, 0); // Orange
+    public static final Color kEnabledColor = new Color(0, 255, 0); // Green
     public static final Color kProcessingColor = new Color(255, 0, 0); // Red
-
   }
-
 }

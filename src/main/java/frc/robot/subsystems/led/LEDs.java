@@ -6,6 +6,8 @@ package frc.robot.subsystems.led;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.LEDConstants.Color;
@@ -21,6 +23,7 @@ public class LEDs extends SubsystemBase {
     ledBuffer = new AddressableLEDBuffer(56);
     led.setLength(ledBuffer.getLength());
     led.start();
+    changeColor(LEDConstants.kDisabledColor);
   }
 
   public void changeColor(Color color) {
@@ -28,6 +31,10 @@ public class LEDs extends SubsystemBase {
       ledBuffer.setRGB(i, color.red, color.green, color.blue);
     }
     led.setData(ledBuffer);
+  }
+
+  public Command changeColorCommand(Color color) {
+    return Commands.runOnce(() -> changeColor(color));
   }
 
   public void amplifySignal() {
@@ -43,12 +50,17 @@ public class LEDs extends SubsystemBase {
         double colorMultiplier =
             (flashTimer % 256)
                 / 255.0; // makes the signal fade out and bounce in on subsequent flashes
-        changeColor(new Color(
-            (int) Math.round(LEDConstants.kAmpColor.red * colorMultiplier),
-            (int) Math.round(LEDConstants.kAmpColor.green * colorMultiplier),
-            (int) Math.round(LEDConstants.kAmpColor.blue * colorMultiplier)));
+        changeColor(
+            new Color(
+                (int) Math.round(LEDConstants.kEnabledColor.red * colorMultiplier),
+                (int) Math.round(LEDConstants.kEnabledColor.green * colorMultiplier),
+                (int) Math.round(LEDConstants.kEnabledColor.blue * colorMultiplier)));
       } else {
-        changeColor(new Color(LEDConstants.kSpeakerColor.red, LEDConstants.kSpeakerColor.green, LEDConstants.kSpeakerColor.blue));
+        changeColor(
+            new Color(
+                LEDConstants.kEnabledColor.red,
+                LEDConstants.kEnabledColor.green,
+                LEDConstants.kEnabledColor.blue));
         flashTimer =
             0; // makes sure that it is not called by periotic after the flash timer has run its
         // course
@@ -58,7 +70,11 @@ public class LEDs extends SubsystemBase {
 
   public void cancelSignal() { // turns off a signal and returns to default color
     flashTimer = 0;
-    changeColor(new Color(LEDConstants.kSpeakerColor.red, LEDConstants.kSpeakerColor.green, LEDConstants.kSpeakerColor.blue));
+    changeColor(
+        new Color(
+            LEDConstants.kEnabledColor.red,
+            LEDConstants.kEnabledColor.green,
+            LEDConstants.kEnabledColor.blue));
   }
 
   @Override

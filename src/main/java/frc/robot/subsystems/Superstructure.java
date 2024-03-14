@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.OuttakeConstants;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drive.MAXSwerve;
@@ -37,7 +38,7 @@ public class Superstructure {
   LEDs leds;
   Trigger noteDetector;
 
-  //Enum for tracking the position of the note
+  // Enum for tracking the position of the note
   public enum noteState {
     Processing,
     Intake,
@@ -48,7 +49,7 @@ public class Superstructure {
   @AutoLogOutput(key = "Superstructure/Note State")
   private noteState currentNoteState = noteState.None;
 
-  //Enum for tracking the robot scoring mode
+  // Enum for tracking the robot scoring mode
   private enum ScoringMode {
     Amp,
     Speaker
@@ -62,7 +63,8 @@ public class Superstructure {
 
   private boolean climbersUp = false;
 
-  public Superstructure(MAXSwerve drivebase, Intake intake, Outtake outtake, Climb climb, LEDs leds) {
+  public Superstructure(
+      MAXSwerve drivebase, Intake intake, Outtake outtake, Climb climb, LEDs leds) {
 
     this.drivebase = drivebase;
     this.intake = intake;
@@ -70,16 +72,16 @@ public class Superstructure {
     this.climb = climb;
     this.leds = leds;
 
-    //Automatically run process note when the note is detected, but only in teleop
+    // Automatically run process note when the note is detected, but only in teleop
     noteDetector = new Trigger(() -> (intake.noteDetected() && DriverStation.isTeleop()));
     noteDetector.onTrue(processNote());
 
-    //Seed the latest event key
+    // Seed the latest event key
     Logger.recordOutput("Superstructure/Latest Event", "Superstructure Initialized");
   }
 
-  //Method for updating the 3D poses of the mechanisms from their current positions.
-  //This is used to visualize the robot in 3D with Advantage Scope
+  // Method for updating the 3D poses of the mechanisms from their current positions.
+  // This is used to visualize the robot in 3D with Advantage Scope
   public void update3DPose() {
     Pose3d[] mechanismPoses = new Pose3d[4];
     mechanismPoses[0] = outtake.get3DPose();
@@ -89,26 +91,28 @@ public class Superstructure {
     Logger.recordOutput("3D Poses", mechanismPoses);
   }
 
-  //Shorthand method for keeping track of what the superstructure is doing
+  // Shorthand method for keeping track of what the superstructure is doing
   public Command logEvent(String event) {
     return Commands.runOnce(() -> Logger.recordOutput("Superstructure/Latest Event", event));
   }
 
-  //Command to process the note after it has been intook.
-  //This command is uninterruptible, as it is a critical process
+  // Command to process the note after it has been intook.
+  // This command is uninterruptible, as it is a critical process
   public Command processNote() {
     return Commands.sequence(
+            leds.changeColorCommand(LEDConstants.kProcessingColor),
             Commands.runOnce(() -> currentNoteState = noteState.Processing),
             retractIntake(),
             Commands.waitUntil(intake::atSetpoint),
             chamberNote(),
-            relocateNote())
+            relocateNote(),
+            leds.changeColorCommand(LEDConstants.kEnabledColor))
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
 
-  //Command to raise the climbers.
-  //This command will also lower the outtake if it is raised
-  //This is to prevent collisions between subsystems
+  // Command to raise the climbers.
+  // This command will also lower the outtake if it is raised
+  // This is to prevent collisions between subsystems
   public Command raiseClimbers() {
     return stowOuttake()
         .onlyIf(() -> (readyToShoot && currentScoringMode == ScoringMode.Amp))
@@ -121,17 +125,17 @@ public class Superstructure {
                 Commands.runOnce(() -> climbersUp = true)));
   }
 
-  //Command to lower the climbers
+  // Command to lower the climbers
   public Command lowerClimbers() {
-    return climb.changeSetpoint(0.1).beforeStarting(logEvent("Lowering Climbers")).andThen(
-      Commands.sequence(
-        Commands.waitUntil(climb::atSetpoint),
-        Commands.runOnce(() -> climbersUp = false)
-      )
-    );
+    return climb
+        .changeSetpoint(0.1)
+        .beforeStarting(logEvent("Lowering Climbers"))
+        .andThen(
+            Commands.sequence(
+                Commands.waitUntil(climb::atSetpoint), Commands.runOnce(() -> climbersUp = false)));
   }
 
-  //Command to stow the outtake
+  // Command to stow the outtake
   public Command stowOuttake() {
     return Commands.sequence(
         logEvent("Stowing Outtake"),
@@ -139,8 +143,8 @@ public class Superstructure {
         outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle));
   }
 
-  //Command to raise the outtake
-  //This command will also lower the climbers if they are raised
+  // Command to raise the outtake
+  // This command will also lower the climbers if they are raised
   public Command raiseOuttake() {
     return Commands.sequence(
         logEvent("Raising Outtake"),
@@ -149,7 +153,7 @@ public class Superstructure {
         Commands.waitUntil(outtake::atPivotSetpoint));
   }
 
-  //Command to extend the intake
+  // Command to extend the intake
   public Command extendIntake() {
     return Commands.sequence(
         logEvent("Extending Intake"),
@@ -157,7 +161,7 @@ public class Superstructure {
         intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed));
   }
 
-  //Command to retract the intake
+  // Command to retract the intake
   public Command retractIntake() {
     return Commands.sequence(
         logEvent("Retracting Intake"),
@@ -165,7 +169,7 @@ public class Superstructure {
         intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
   }
 
-  //Command to return the robot to its default position
+  // Command to return the robot to its default position
   public Command zeroRobot() {
     return Commands.sequence(
         logEvent("Zeroing Robot"),
@@ -178,8 +182,8 @@ public class Superstructure {
         Commands.waitUntil(intake::atSetpoint));
   }
 
-  //Command to move the note to the desired position
-  //The desired position is dependant on the current scoring mode
+  // Command to move the note to the desired position
+  // The desired position is dependant on the current scoring mode
   public Command relocateNote() {
 
     Command[] commands = new Command[4];
@@ -212,8 +216,8 @@ public class Superstructure {
     return Commands.sequence(commands);
   }
 
-  //Readys the robot to shoot the current piece
-  //The behavior of this command is dependant on the current scoring mode
+  // Readys the robot to shoot the current piece
+  // The behavior of this command is dependant on the current scoring mode
   public Command readyPiece() {
 
     Command[] commands = new Command[2];
@@ -244,8 +248,8 @@ public class Superstructure {
     return Commands.sequence(commands);
   }
 
-  //Command to move the note from the intake to the outtake
-  //This command is uninterruptible, as it is a critical process
+  // Command to move the note from the intake to the outtake
+  // This command is uninterruptible, as it is a critical process
   public Command chamberNote() {
     return Commands.sequence(
             logEvent("Chambering Note"),
@@ -259,8 +263,8 @@ public class Superstructure {
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
 
-  //Command to shoot the current piece
-  //The behavior of this command is dependant on the current scoring mode
+  // Command to shoot the current piece
+  // The behavior of this command is dependant on the current scoring mode
   public Command shootPiece() {
 
     Command[] commands = new Command[3];
@@ -295,24 +299,24 @@ public class Superstructure {
     return Commands.sequence(commands).andThen(NoteVisualizer.shoot());
   }
 
-  //Command to switch the robot to speaker mode
-  //This command will also relocate the note if it is in the wrong position
+  // Command to switch the robot to speaker mode
+  // This command will also relocate the note if it is in the wrong position
   public Command speakerMode() {
     return Commands.sequence(
             Commands.runOnce(() -> currentScoringMode = ScoringMode.Speaker), relocateNote())
         .unless(() -> currentScoringMode == ScoringMode.Speaker);
   }
 
-  //Command to switch the robot to amp mode
-  //This command will also relocate the note if it is in the wrong position
+  // Command to switch the robot to amp mode
+  // This command will also relocate the note if it is in the wrong position
   public Command ampMode() {
     return Commands.sequence(
             Commands.runOnce(() -> currentScoringMode = ScoringMode.Amp), relocateNote())
         .unless(() -> currentScoringMode == ScoringMode.Amp);
   }
 
-  //Command to run a path with the intake extended
-  //The path will end when the note is detected, or when it reaches the end
+  // Command to run a path with the intake extended
+  // The path will end when the note is detected, or when it reaches the end
   public Command intakePath(String pathName, boolean waitForIntake) {
     return Commands.sequence(
         extendIntake(),
@@ -322,26 +326,25 @@ public class Superstructure {
             Commands.sequence(runChoreoPath(pathName), retractIntake())));
   }
 
-  //Command to run a path with the intake extending and retracting along the way
-  public Command intakePath(String pathName, double intakeExtendSecond, double intakeRetractSecond) {
+  // Command to run a path with the intake extending and retracting along the way
+  public Command intakePath(
+      String pathName, double intakeExtendSecond, double intakeRetractSecond) {
     return Commands.parallel(
-      runChoreoPath(pathName),
-      Commands.sequence(
-        Commands.waitSeconds(intakeExtendSecond),
-        extendIntake(),
-        Commands.waitSeconds(intakeRetractSecond),
-        retractIntake()
-      )
-    );
+        runChoreoPath(pathName),
+        Commands.sequence(
+            Commands.waitSeconds(intakeExtendSecond),
+            extendIntake(),
+            Commands.waitSeconds(intakeRetractSecond),
+            retractIntake()));
   }
 
-  //The first step in fully reseting the robot's current state.
-  //This will cancel all commands currently running even if they are "uninterruptible"
+  // The first step in fully reseting the robot's current state.
+  // This will cancel all commands currently running even if they are "uninterruptible"
   public Command firstReset() {
     return Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll());
   }
 
-  //The second step in fully reseting the robot's current state.
+  // The second step in fully reseting the robot's current state.
   public Command secondReset() {
     return Commands.sequence(
         zeroRobot(),
@@ -350,13 +353,13 @@ public class Superstructure {
         Commands.runOnce(() -> readyToShoot = false));
   }
 
-  //Command for overriding the current note state
-  //Useful for debugging in simulation
+  // Command for overriding the current note state
+  // Useful for debugging in simulation
   public void overrideNoteState(noteState state) {
     currentNoteState = state;
   }
-  
-  //Boolean value for current alliance color
+
+  // Boolean value for current alliance color
   private boolean isRed() {
     boolean isRed = false;
     if (DriverStation.getAlliance().isPresent()) {
@@ -365,7 +368,7 @@ public class Superstructure {
     return isRed;
   }
 
-  //Command for running a choreo trajectory
+  // Command for running a choreo trajectory
   private Command runChoreoPath(String pathName, boolean resetPose) {
 
     ChoreoTrajectory traj = Choreo.getTrajectory(pathName);
@@ -402,13 +405,13 @@ public class Superstructure {
         .handleInterrupt(() -> drivebase.stop());
   }
 
-  //Autonomous Stuff
+  // Autonomous Stuff
   public Command runChoreoPath(String pathName) {
     return runChoreoPath(pathName, false);
   }
 
-  //Convinience command for starting the autonomous
-  //This will seed the robot's pose and shoot the robot's preloaded piece
+  // Convinience command for starting the autonomous
+  // This will seed the robot's pose and shoot the robot's preloaded piece
   public Command autoStart(Pose2d bluePos, Pose2d redPos) {
     return Commands.sequence(
         Commands.runOnce(() -> drivebase.setPose(isRed() ? redPos : bluePos)),
