@@ -13,7 +13,7 @@
         "wheelRadius": 0.0381
     },
     "paths": {
-        "CenterFenderS02": {
+        "CenF-S02": {
             "waypoints": [
                 {
                     "x": 1.9667,
@@ -159,7 +159,7 @@
             "eventMarkers": [],
             "isTrajectoryStale": true
         },
-        "CenterFenderS03": {
+        "CenF-S03": {
             "waypoints": [
                 {
                     "x": 1.903869390487671,
