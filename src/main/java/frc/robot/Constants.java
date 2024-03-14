@@ -420,4 +420,25 @@ public class Constants {
             .withSupplyCurrentThreshold(kFlywheelCurrentLimit)
             .withSupplyTimeThreshold(0);
   }
+
+  public static final class LEDConstants {
+    public static class Color {
+      public int red;
+      public int green;
+      public int blue;
+
+      public Color(int red, int green, int blue) {
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
+      }
+    }
+
+    public static final Color kDisabledColor = new Color(255, 100, 50); // Orange
+    public static final Color kAmpColor = new Color(128, 0, 255); // Purple
+    public static final Color kSpeakerColor = new Color(0, 255, 0); //Green
+    public static final Color kProcessingColor = new Color(255, 0, 0); // Red
+
+  }
+
 }

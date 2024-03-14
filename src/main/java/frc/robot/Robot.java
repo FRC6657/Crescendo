@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.MAXSwerveConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Superstructure;
@@ -141,8 +142,6 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    led.startLED();
-
     Logger.start();
 
     autoChooser.addDefaultOption("None", null);
@@ -234,19 +233,21 @@ public class Robot extends LoggedRobot {
     }
   }
 
-  @Override
-  public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void teleopInit() {
+    led.changeColor(LEDConstants.kSpeakerColor);
+  }
 
   @Override
-  public void disabledExit() {}
+  public void disabledInit() {
+    led.changeColor(LEDConstants.kDisabledColor);
+  }
 
   @Override
   public void autonomousInit() {
 
-    superstructure.setNoteDetectorState(false);
+    led.changeColor(LEDConstants.kSpeakerColor);
 
     autoCommand = autoChooser.get();
 
@@ -256,26 +257,12 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {}
-
-  @Override
   public void autonomousExit() {
     if (autoChooser.get() != null) {
       CommandScheduler.getInstance().cancel(autoChooser.get());
       CommandScheduler.getInstance().schedule(drivebase.stop());
     }
   }
-
-  @Override
-  public void teleopInit() {
-    superstructure.setNoteDetectorState(true);
-  }
-
-  @Override
-  public void teleopPeriodic() {}
-
-  @Override
-  public void teleopExit() {}
 
   @Override
   public void simulationPeriodic() {
