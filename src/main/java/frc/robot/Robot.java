@@ -168,12 +168,20 @@ public class Robot extends LoggedRobot {
                         * DriveConstants.kMaxAngularVelocity
                         * 0.4)));
 
-    driver.a().whileTrue(drivebase.goToShotPoint().andThen(Commands.print("ShotPointEnded")));
-    // driver
-    //     .a()
-    //     .whileTrue(
-    //         drivebase.noteAim(
-    //             driver::getLeftY, driver::getLeftX, driver::getRightX, vision::getNoteX));
+    driver
+      .a()
+      .whileTrue(
+        Commands.either(
+          drivebase.noteAim(driver::getLeftY, driver::getLeftX, driver::getRightX, vision::getNoteX),
+          Commands.either(
+            drivebase.goToShotPoint(),
+            drivebase.goToAmpPoint(),
+            superstructure::inSpeakerMode
+          ),
+          intake::extended
+        )
+      );
+
     driver
         .rightTrigger()
         .onTrue(superstructure.extendIntake())
