@@ -335,10 +335,10 @@ public class Superstructure {
         Commands.sequence(
             Commands.waitSeconds(intakeExtendSecond),
             extendIntake(),
-            Commands.race(
-                Commands.sequence(Commands.waitSeconds(intakeRetractSecond), retractIntake()),
-                Commands.sequence(Commands.waitUntil(intake::noteDetected))),
-            processNote().unless(intake::pivotSetpointIsMax)));
+            Commands.sequence(
+                Commands.sequence(Commands.waitSeconds(intakeRetractSecond), retractIntake())
+                    .until(intake::noteDetected),
+                processNote().unless(intake::pivotSetpointIsMax))));
   }
 
   public Command intakePath(String pathName, double intakeRetractSecond) {
@@ -347,10 +347,10 @@ public class Superstructure {
         Commands.waitUntil(intake::atSetpoint),
         Commands.parallel(
             runChoreoPath(pathName),
-            Commands.race(
-                Commands.sequence(Commands.waitSeconds(intakeRetractSecond), retractIntake()),
-                Commands.sequence(Commands.waitUntil((intake::noteDetected))))),
-        processNote().unless(intake::pivotSetpointIsMax));
+            Commands.sequence(
+                Commands.sequence(Commands.waitSeconds(intakeRetractSecond), retractIntake())
+                    .until(intake::noteDetected),
+                processNote().unless(intake::pivotSetpointIsMax))));
   }
 
   // The first step in fully reseting the robot's current state.
