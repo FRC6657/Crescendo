@@ -54,6 +54,7 @@ public class IntakeIO_Sim implements IntakeIO {
     inputs.pivotMotorVoltage = pivotVoltage; // Volts
     inputs.pivotMotorCurrent = pivotSim.getCurrentDrawAmps(); // Amps
     inputs.atSetpoint = pivotPID.atSetpoint();
+    inputs.pivotMotorSetpoint = angleSetpoint;
 
     // Roller Inputs
     inputs.rollerMotorVelocity = rollerSim.getAngularVelocityRPM(); // RPM

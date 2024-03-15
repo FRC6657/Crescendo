@@ -115,6 +115,7 @@ public class IntakeIO_Real implements IntakeIO {
     inputs.pivotMotorVoltage = pivotMotor.getMotorVoltage().getValueAsDouble(); // Volts
     inputs.pivotMotorCurrent = pivotMotor.getSupplyCurrent().getValueAsDouble(); // Amps
     inputs.atSetpoint = MathUtil.isNear(angleSetpoint, inputs.pivotMotorPosition, 2);
+    inputs.pivotMotorSetpoint = angleSetpoint;
 
     // Update the roller inputs
     inputs.rollerMotorVelocity = rollerMotor.getVelocity().getValueAsDouble() * 60; // RPM

@@ -145,9 +145,11 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     autoChooser.addDefaultOption("None", null);
-    autoChooser.addOption("CenterFenderS0", superstructure.CenterFenderS0());
-    autoChooser.addOption("CenterFenderS02", superstructure.CenterFenderS02());
-    autoChooser.addOption("CenterFenderS03", superstructure.CenterFenderS03());
+    autoChooser.addOption("CenF-S0", superstructure.CenFS0());
+    autoChooser.addOption("CenF-S02", superstructure.CenterFenderS02());
+    autoChooser.addOption("CenF-S03", superstructure.CenFS03());
+    autoChooser.addOption("AmpF-S0", superstructure.AmpFS0());
+    autoChooser.addOption("test", superstructure.testAuto());
 
     NoteVisualizer.setRobotPoseSupplier(drivebase::getPose);
 

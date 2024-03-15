@@ -42,6 +42,10 @@ public class Intake extends SubsystemBase {
     return intakeInputs.atSetpoint;
   }
 
+  public boolean pivotSetpointIsMax() {
+    return intakeInputs.pivotMotorSetpoint == IntakeConstants.kMaxPivotAngle;
+  }
+
   @Override
   public void periodic() {
     intakeIO.updateInputs(intakeInputs);
