@@ -149,7 +149,7 @@ public class Robot extends LoggedRobot {
     autoChooser.addOption("CenF-S02", superstructure.CenterFenderS02());
     autoChooser.addOption("CenF-S03", superstructure.CenFS03());
     autoChooser.addOption("AmpF-S0", superstructure.AmpFS0());
-    autoChooser.addOption("AmpF-S041", superstructure.AmpFS041());
+    //autoChooser.addOption("AmpF-S041", superstructure.AmpFS041());
 
     NoteVisualizer.setRobotPoseSupplier(drivebase::getPose);
 
@@ -177,7 +177,9 @@ public class Robot extends LoggedRobot {
                 Commands.either(
                     drivebase.goToShotPoint(),
                     drivebase.goToAmpPoint(),
-                    superstructure::inSpeakerMode),
+                    superstructure::inSpeakerMode).andThen(
+                      superstructure.shootPiece()
+                    ),
                 intake::extended));
 
     driver

@@ -259,7 +259,7 @@ public class Superstructure {
             Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
             outtake.changeRPMSetpoint(0),
             intake.changeRollerSpeed(0),
-            Commands.runOnce(() -> currentNoteState = noteState.Outtake))
+            Commands.runOnce(() -> currentNoteState = noteState.Outtake)).onlyIf(intake::hasNote)
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
 
@@ -320,7 +320,7 @@ public class Superstructure {
   public Command intakePath(String pathName, boolean waitForIntake) {
     return Commands.sequence(
         extendIntake(),
-        Commands.waitUntil(intake::atSetpoint).unless(() -> waitForIntake),
+        Commands.waitUntil(intake::atSetpoint).onlyIf(() -> waitForIntake),
         Commands.race(
             Commands.waitUntil(intake::noteDetected),
             Commands.sequence(runChoreoPath(pathName), retractIntake())));
@@ -448,7 +448,8 @@ public class Superstructure {
     return Commands.sequence(
         CenFS0(),
         intakePath("CenF-S02", true),
-        Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
+        Commands.parallel(processNote().andThen(readyPiece()).onlyIf(intake::hasNote), drivebase.goToShotPoint()),
+        retractIntake(),
         shootPiece());
   }
 
