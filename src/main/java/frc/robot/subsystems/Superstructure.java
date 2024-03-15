@@ -327,7 +327,7 @@ public class Superstructure {
   }
 
   // Command to run a path with the intake extending and retracting along the way
-  //The intake retract early and process the note if it is detected
+  //The intake retracts early and processes the note if it is detected
   public Command intakePath(
       String pathName, double intakeExtendSecond, double intakeRetractSecond) {
     return Commands.parallel(
