@@ -17,6 +17,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.CodeConstants;
@@ -350,6 +351,25 @@ public class MAXSwerve extends SubsystemBase {
                     && thetaController.atSetpoint()));
   }
 
+  public Command goToAmpPoint() {
+
+    return Commands.runOnce(
+        () -> {
+          boolean isBlue = true;
+
+          if (DriverStation.getAlliance().isPresent()) {
+            isBlue = DriverStation.getAlliance().get() == DriverStation.Alliance.Blue;
+          }
+
+          Pose2d blueAmpPos = new Pose2d(1.9, 7.771, new Rotation2d(-Math.PI / 2));
+          Pose2d redAmpPos = new Pose2d(14.65, 7.771, new Rotation2d(-Math.PI / 2));
+
+          Pose2d desiredPos = isBlue ? blueAmpPos : redAmpPos;
+
+          goToPose(desiredPos).schedule();
+        });
+  }
+
   @SuppressWarnings("resource")
   public Command goToPose(Pose2d targetPose) {
 
@@ -365,7 +385,7 @@ public class MAXSwerve extends SubsystemBase {
 
     return this.run(
             () -> {
-              Logger.recordOutput("GoToLocation", targetPose);
+              Logger.recordOutput("AutoAim/DesiredShotPos", targetPose);
 
               var xSpeed =
                   xController.calculate(

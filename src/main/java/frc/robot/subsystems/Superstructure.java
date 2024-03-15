@@ -334,8 +334,18 @@ public class Superstructure {
         Commands.sequence(
             Commands.waitSeconds(intakeExtendSecond),
             extendIntake(),
-            Commands.waitSeconds(intakeRetractSecond),
-            retractIntake()));
+            Commands.race(
+              Commands.sequence(
+                Commands.waitSeconds(intakeRetractSecond),
+                retractIntake()
+              ),
+              Commands.sequence(
+                Commands.waitUntil(intake::noteDetected),
+                processNote()
+              )
+            )
+        )
+    );
   }
 
   // The first step in fully reseting the robot's current state.
@@ -366,6 +376,10 @@ public class Superstructure {
       isRed = (DriverStation.getAlliance().get() == Alliance.Red);
     }
     return isRed;
+  }
+
+  public boolean inSpeakerMode() {
+    return currentScoringMode == ScoringMode.Speaker;
   }
 
   // Command for running a choreo trajectory

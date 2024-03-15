@@ -42,6 +42,10 @@ public class Intake extends SubsystemBase {
     return intakeInputs.atSetpoint;
   }
 
+  public boolean extended() {
+    return intakeInputs.pivotMotorPosition < 0 && intakeInputs.atSetpoint;
+  }
+
   @Override
   public void periodic() {
     intakeIO.updateInputs(intakeInputs);
