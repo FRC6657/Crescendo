@@ -7,8 +7,6 @@ import com.choreo.lib.Choreo;
 import com.choreo.lib.ChoreoTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -351,8 +349,8 @@ public class Superstructure {
             runChoreoPath(pathName),
             Commands.race(
                 Commands.sequence(Commands.waitSeconds(intakeRetractSecond), retractIntake()),
-                Commands.sequence(Commands.waitUntil(intake::noteDetected))),
-            processNote().unless(intake::pivotSetpointIsMax)));
+                Commands.sequence(Commands.waitUntil((intake::noteDetected))))),
+        processNote().unless(intake::pivotSetpointIsMax));
   }
 
   // The first step in fully reseting the robot's current state.
@@ -476,14 +474,5 @@ public class Superstructure {
         intakePath("AmpF-S041.2", 1.3),
         drivebase.goToShotPoint(),
         shootPiece());
-  }
-
-  public Command testAuto() {
-    return Commands.sequence(
-        AmpFS0(),
-        drivebase.goToPose(
-            new Pose2d(
-                new Translation2d(2.428072929382324, 7.0167131423950195), new Rotation2d(0))),
-        drivebase.goToShotPoint());
   }
 }
