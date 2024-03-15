@@ -169,18 +169,16 @@ public class Robot extends LoggedRobot {
                         * 0.4)));
 
     driver
-      .a()
-      .whileTrue(
-        Commands.either(
-          drivebase.noteAim(driver::getLeftY, driver::getLeftX, driver::getRightX, vision::getNoteX),
-          Commands.either(
-            drivebase.goToShotPoint(),
-            drivebase.goToAmpPoint(),
-            superstructure::inSpeakerMode
-          ),
-          intake::extended
-        )
-      );
+        .a()
+        .whileTrue(
+            Commands.either(
+                drivebase.noteAim(
+                    driver::getLeftY, driver::getLeftX, driver::getRightX, vision::getNoteX),
+                Commands.either(
+                    drivebase.goToShotPoint(),
+                    drivebase.goToAmpPoint(),
+                    superstructure::inSpeakerMode),
+                intake::extended));
 
     driver
         .rightTrigger()
