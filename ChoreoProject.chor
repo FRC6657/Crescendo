@@ -1,7 +1,7 @@
 {
     "version": "v0.3",
     "robotConfiguration": {
-        "mass": 60,
+        "mass": 71.61837776965554,
         "rotationalInertia": 5.77,
         "motorMaxTorque": 0.7248618784530386,
         "motorMaxVelocity": 4704,
@@ -415,7 +415,7 @@
             "usesDefaultFieldObstacles": true,
             "circleObstacles": [],
             "eventMarkers": [],
-            "isTrajectoryStale": false
+            "isTrajectoryStale": true
         },
         "AmpF-S041": {
             "waypoints": [
