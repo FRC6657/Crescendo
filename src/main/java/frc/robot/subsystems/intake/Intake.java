@@ -38,7 +38,7 @@ public class Intake extends SubsystemBase {
     return (intakeInputs.tofDistance < 23 && intakeInputs.pivotMotorPosition < 0);
   }
 
-  public boolean hasNote(){
+  public boolean hasNote() {
     return intakeInputs.tofDistance < 23;
   }
 

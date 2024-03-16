@@ -1,4 +1,4 @@
- // Copyright (c) FIRST and other WPILib contributors.
+// Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
@@ -7,7 +7,6 @@ package frc.robot.subsystems.led;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -45,11 +44,11 @@ public class LEDs extends SubsystemBase {
   }
 
   public Command enableBlinkMode() {
-    return Commands.runOnce(()-> blinkMode = true);
+    return Commands.runOnce(() -> blinkMode = true);
   }
 
   public Command disableBlinkMode() {
-    return Commands.runOnce(()-> blinkMode = false);
+    return Commands.runOnce(() -> blinkMode = false);
   }
 
   public void amplifySignal() {
@@ -94,40 +93,38 @@ public class LEDs extends SubsystemBase {
 
   public void blinkColor() {
     isReset = false;
-    blinkTimer ++;
+    blinkTimer++;
     blinkTimer %= blinkSpeed;
 
-    if(blinkTimer < blinkSpeed/2){
+    if (blinkTimer < blinkSpeed / 2) {
       changeColor(
-        new Color(
-            LEDConstants.kEnabledColor.red/4,
-            LEDConstants.kEnabledColor.green/4,
-            LEDConstants.kEnabledColor.blue/4));
+          new Color(
+              LEDConstants.kEnabledColor.red / 4,
+              LEDConstants.kEnabledColor.green / 4,
+              LEDConstants.kEnabledColor.blue / 4));
     } else {
       changeColor(
-        new Color(
-            LEDConstants.kEnabledColor.red,
-            LEDConstants.kEnabledColor.green,
-            LEDConstants.kEnabledColor.blue));
+          new Color(
+              LEDConstants.kEnabledColor.red,
+              LEDConstants.kEnabledColor.green,
+              LEDConstants.kEnabledColor.blue));
     }
   }
 
   @Override
   public void periodic() {
-    
+
     if (flashTimer > 0) {
       amplifySignal();
-    } else if(blinkMode && DriverStation.isEnabled()){
+    } else if (blinkMode && DriverStation.isEnabled()) {
       blinkColor();
-    } else if(!isReset) {
-      if(DriverStation.isEnabled()){
+    } else if (!isReset) {
+      if (DriverStation.isEnabled()) {
         changeColor(LEDConstants.kEnabledColor);
       } else {
         changeColor(LEDConstants.kDisabledColor);
       }
       isReset = true;
     }
-
-    
   }
 }
