@@ -184,6 +184,7 @@ public class Robot extends LoggedRobot {
                 intake::extended));
 
     driver
+
         .rightTrigger()
         .onTrue(superstructure.extendIntake())
         .onFalse(superstructure.retractIntake());
@@ -206,6 +207,7 @@ public class Robot extends LoggedRobot {
     debug
         .button(2)
         .onTrue(Commands.runOnce(() -> superstructure.overrideNoteState(noteState.Outtake)));
+   led.changeColor(LEDConstants.kDisabledColor);
   }
 
   @Override
@@ -242,6 +244,8 @@ public class Robot extends LoggedRobot {
             sideResult.estimatedPose, sideResult.timestamp, sideResult.stdDevs);
       }
     }
+
+   
   }
 
   @Override
@@ -251,7 +255,10 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledInit() {
-    led.changeColor(LEDConstants.kDisabledColor);
+    Commands.sequence(
+      led.disableBlinkMode(),
+      led.changeColorCommand(LEDConstants.kDisabledColor)
+    ).schedule();
   }
 
   @Override

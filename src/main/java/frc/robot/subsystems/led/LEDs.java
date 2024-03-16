@@ -6,6 +6,8 @@ package frc.robot.subsystems.led;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,8 +20,9 @@ public class LEDs extends SubsystemBase {
   int flashTimer = 0; // Used to smoothly flash signals to the human player
   int flashSpeed = 8; // Speed of color change during flashes
   int blinkTimer = 0; // Used to blink during blink mode
-  int blinkSpeed = 50; // Interval for a full blink
+  int blinkSpeed = 10; // Interval for a full blink
   boolean blinkMode = false;
+  boolean isReset = true;
 
   /** Creates a new Led. */
   public LEDs() {
@@ -39,6 +42,14 @@ public class LEDs extends SubsystemBase {
 
   public Command changeColorCommand(Color color) {
     return Commands.runOnce(() -> changeColor(color));
+  }
+
+  public Command enableBlinkMode() {
+    return Commands.runOnce(()-> blinkMode = true);
+  }
+
+  public Command disableBlinkMode() {
+    return Commands.runOnce(()-> blinkMode = false);
   }
 
   public void amplifySignal() {
@@ -82,15 +93,16 @@ public class LEDs extends SubsystemBase {
   }
 
   public void blinkColor() {
+    isReset = false;
     blinkTimer ++;
     blinkTimer %= blinkSpeed;
 
     if(blinkTimer < blinkSpeed/2){
       changeColor(
         new Color(
-            LEDConstants.kEnabledColor.red/2,
-            LEDConstants.kEnabledColor.green/2,
-            LEDConstants.kEnabledColor.blue/2));
+            LEDConstants.kEnabledColor.red/4,
+            LEDConstants.kEnabledColor.green/4,
+            LEDConstants.kEnabledColor.blue/4));
     } else {
       changeColor(
         new Color(
@@ -102,13 +114,20 @@ public class LEDs extends SubsystemBase {
 
   @Override
   public void periodic() {
-    led.setData(ledBuffer);
+    
     if (flashTimer > 0) {
       amplifySignal();
-    } else if(blinkMode){
+    } else if(blinkMode && DriverStation.isEnabled()){
       blinkColor();
-    } else {
-      changeColor(LEDConstants.kEnabledColor);
+    } else if(!isReset) {
+      if(DriverStation.isEnabled()){
+        changeColor(LEDConstants.kEnabledColor);
+      } else {
+        changeColor(LEDConstants.kDisabledColor);
+      }
+      isReset = true;
     }
+
+    
   }
 }

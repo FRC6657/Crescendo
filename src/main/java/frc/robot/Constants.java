@@ -326,7 +326,7 @@ public class Constants {
     public static final double kMinPivotAngle = -17;
     public static final double kMaxPivotAngle = 152.25;
 
-    public static final double kPivotCurrentLimit = 30;
+    public static final double kPivotCurrentLimit = 50;
     public static final double kRollersCurrentLimit = 20;
 
     public static final double kGroundIntakeSpeed = 0.75;

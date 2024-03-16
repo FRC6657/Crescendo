@@ -126,17 +126,20 @@ public class Superstructure {
             Commands.sequence(
                 Commands.waitUntil(outtake::atPivotSetpoint),
                 climb.changeSetpoint(ClimbConstants.kMaxHeight - 0.5),
+                leds.enableBlinkMode(),
                 Commands.runOnce(() -> climbersUp = true)));
   }
 
   // Command to lower the climbers
   public Command lowerClimbers() {
-    return climb
-        .changeSetpoint(0.1)
-        .beforeStarting(logEvent("Lowering Climbers"))
-        .andThen(
-            Commands.sequence(
-                Commands.waitUntil(climb::atSetpoint), Commands.runOnce(() -> climbersUp = false)));
+    return
+    Commands.sequence(
+      logEvent("Lowering Climbers"),
+      climb.changeSetpoint(0.1),
+      Commands.waitUntil(climb::atSetpoint),
+      Commands.runOnce(() -> climbersUp = false),
+      leds.disableBlinkMode()
+    );
   }
 
   // Command to stow the outtake
@@ -230,6 +233,7 @@ public class Superstructure {
         Commands.sequence(
                 logEvent("Readying Robot for Amp"),
                 outtake.changePivotSetpoint(OuttakeConstants.kPivotAmpAngle),
+                leds.enableBlinkMode(),
                 Commands.runOnce(() -> readyToShoot = true))
             .beforeStarting(
                 lowerClimbers()
@@ -243,6 +247,7 @@ public class Superstructure {
         Commands.sequence(
                 logEvent("Readying Robot for Speaker"),
                 outtake.changeRPMSetpoint(OuttakeConstants.kSpeakerRPM),
+                leds.enableBlinkMode(),
                 Commands.runOnce(() -> readyToShoot = true))
             .onlyIf(
                 () ->
@@ -278,13 +283,15 @@ public class Superstructure {
     commands[1] =
         Commands.sequence(
                 logEvent("Scoring Amp"),
+                Commands.waitUntil(outtake::atPivotSetpoint),
                 outtake.changeRPMSetpoint(OuttakeConstants.kAmpRPM),
                 Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
                 outtake.changeRPMSetpoint(0),
                 outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
                 Commands.runOnce(() -> currentNoteState = noteState.None),
-                Commands.runOnce(() -> readyToShoot = false))
-            .onlyIf(() -> currentScoringMode == ScoringMode.Amp);
+                Commands.runOnce(() -> readyToShoot = false),
+                leds.disableBlinkMode())
+            .onlyIf(() -> (currentScoringMode == ScoringMode.Amp && currentNoteState == noteState.Outtake));
 
     commands[2] =
         Commands.sequence(
@@ -297,10 +304,11 @@ public class Superstructure {
                 outtake.changeRPMSetpoint(0),
                 intake.changeRollerSpeed(0),
                 Commands.runOnce(() -> readyToShoot = false),
-                Commands.runOnce(() -> currentNoteState = noteState.None))
-            .onlyIf(() -> currentScoringMode == ScoringMode.Speaker);
+                Commands.runOnce(() -> currentNoteState = noteState.None),
+                leds.disableBlinkMode())
+            .onlyIf(() -> (currentScoringMode == ScoringMode.Speaker && currentNoteState == noteState.Intake) );
 
-    return Commands.sequence(commands).andThen(NoteVisualizer.shoot());
+    return Commands.sequence(commands);
   }
 
   // Command to switch the robot to speaker mode
