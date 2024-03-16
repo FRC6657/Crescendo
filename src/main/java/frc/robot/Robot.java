@@ -149,7 +149,7 @@ public class Robot extends LoggedRobot {
     autoChooser.addOption("CenF-S02", superstructure.CenterFenderS02());
     autoChooser.addOption("CenF-S03", superstructure.CenFS03());
     autoChooser.addOption("AmpF-S0", superstructure.AmpFS0());
-    //autoChooser.addOption("AmpF-S041", superstructure.AmpFS041());
+    // autoChooser.addOption("AmpF-S041", superstructure.AmpFS041());
     autoChooser.addOption("Accel Sysid", superstructure.accelSysid());
 
     NoteVisualizer.setRobotPoseSupplier(drivebase::getPose);
@@ -176,15 +176,13 @@ public class Robot extends LoggedRobot {
                 drivebase.noteAim(
                     driver::getLeftY, driver::getLeftX, driver::getRightX, vision::getNoteX),
                 Commands.either(
-                    drivebase.goToShotPoint(),
-                    drivebase.goToAmpPoint(),
-                    superstructure::inSpeakerMode).andThen(
-                      superstructure.shootPiece()
-                    ),
+                        drivebase.goToShotPoint(),
+                        drivebase.goToAmpPoint(),
+                        superstructure::inSpeakerMode)
+                    .andThen(superstructure.shootPiece()),
                 intake::extended));
 
     driver
-
         .rightTrigger()
         .onTrue(superstructure.extendIntake())
         .onFalse(superstructure.retractIntake());
@@ -207,7 +205,7 @@ public class Robot extends LoggedRobot {
     debug
         .button(2)
         .onTrue(Commands.runOnce(() -> superstructure.overrideNoteState(noteState.Outtake)));
-   led.changeColor(LEDConstants.kDisabledColor);
+    led.changeColor(LEDConstants.kDisabledColor);
   }
 
   @Override
@@ -244,8 +242,6 @@ public class Robot extends LoggedRobot {
             sideResult.estimatedPose, sideResult.timestamp, sideResult.stdDevs);
       }
     }
-
-   
   }
 
   @Override
@@ -255,10 +251,8 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledInit() {
-    Commands.sequence(
-      led.disableBlinkMode(),
-      led.changeColorCommand(LEDConstants.kDisabledColor)
-    ).schedule();
+    Commands.sequence(led.disableBlinkMode(), led.changeColorCommand(LEDConstants.kDisabledColor))
+        .schedule();
   }
 
   @Override

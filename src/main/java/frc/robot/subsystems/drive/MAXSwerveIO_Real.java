@@ -103,7 +103,9 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
   @Override
   public void updateInputs(MAXSwerveIOInputs inputs) {
 
-    arbFF = driveFeedforward.calculate(driveSetpoint, (driveSetpoint - lastDriveSetpoint) * CodeConstants.kMainLoopFrequency);
+    arbFF =
+        driveFeedforward.calculate(
+            driveSetpoint, (driveSetpoint - lastDriveSetpoint) * CodeConstants.kMainLoopFrequency);
     lastDriveSetpoint = driveSetpoint;
 
     Logger.recordOutput("DriveFFs/ " + moduleInformation.name, arbFF);

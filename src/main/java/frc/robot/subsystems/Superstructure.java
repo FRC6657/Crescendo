@@ -30,7 +30,6 @@ import frc.robot.subsystems.drive.MAXSwerve;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.led.LEDs;
 import frc.robot.subsystems.outtake.Outtake;
-import frc.robot.util.NoteVisualizer;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -132,14 +131,12 @@ public class Superstructure {
 
   // Command to lower the climbers
   public Command lowerClimbers() {
-    return
-    Commands.sequence(
-      logEvent("Lowering Climbers"),
-      climb.changeSetpoint(0.1),
-      Commands.waitUntil(climb::atSetpoint),
-      Commands.runOnce(() -> climbersUp = false),
-      leds.disableBlinkMode()
-    );
+    return Commands.sequence(
+        logEvent("Lowering Climbers"),
+        climb.changeSetpoint(0.1),
+        Commands.waitUntil(climb::atSetpoint),
+        Commands.runOnce(() -> climbersUp = false),
+        leds.disableBlinkMode());
   }
 
   // Command to stow the outtake
@@ -268,7 +265,8 @@ public class Superstructure {
             Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
             outtake.changeRPMSetpoint(0),
             intake.changeRollerSpeed(0),
-            Commands.runOnce(() -> currentNoteState = noteState.Outtake)).onlyIf(intake::hasNote)
+            Commands.runOnce(() -> currentNoteState = noteState.Outtake))
+        .onlyIf(intake::hasNote)
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
 
@@ -291,7 +289,10 @@ public class Superstructure {
                 Commands.runOnce(() -> currentNoteState = noteState.None),
                 Commands.runOnce(() -> readyToShoot = false),
                 leds.disableBlinkMode())
-            .onlyIf(() -> (currentScoringMode == ScoringMode.Amp && currentNoteState == noteState.Outtake));
+            .onlyIf(
+                () ->
+                    (currentScoringMode == ScoringMode.Amp
+                        && currentNoteState == noteState.Outtake));
 
     commands[2] =
         Commands.sequence(
@@ -306,7 +307,10 @@ public class Superstructure {
                 Commands.runOnce(() -> readyToShoot = false),
                 Commands.runOnce(() -> currentNoteState = noteState.None),
                 leds.disableBlinkMode())
-            .onlyIf(() -> (currentScoringMode == ScoringMode.Speaker && currentNoteState == noteState.Intake) );
+            .onlyIf(
+                () ->
+                    (currentScoringMode == ScoringMode.Speaker
+                        && currentNoteState == noteState.Intake));
 
     return Commands.sequence(commands);
   }
@@ -460,7 +464,8 @@ public class Superstructure {
     return Commands.sequence(
         CenFS0(),
         intakePath("CenF-S02", true),
-        Commands.parallel(processNote().andThen(readyPiece()).onlyIf(intake::hasNote), drivebase.goToShotPoint()),
+        Commands.parallel(
+            processNote().andThen(readyPiece()).onlyIf(intake::hasNote), drivebase.goToShotPoint()),
         retractIntake(),
         shootPiece());
   }
