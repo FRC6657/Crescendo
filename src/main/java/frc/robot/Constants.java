@@ -439,5 +439,6 @@ public class Constants {
     public static final Color kEnabledColor = new Color(0, 255, 0); // Green
     public static final Color kProcessingColor = new Color(255, 0, 0); // Red
     public static final Color kBlinkModeColor = new Color(8, 255, 8); // Also Green
+    public static final Color kAmpSignalColor = new Color(128, 16, 255); // Purple
   }
 }

@@ -16,7 +16,7 @@ public class LEDs extends SubsystemBase {
   AddressableLED led;
   AddressableLEDBuffer ledBuffer;
   int flashTimer = 0; // Used to smoothly flash signals to the human player
-  int flashSpeed = 4; // Speed of color change during flashes
+  int flashSpeed = 8; // Speed of color change during flashes
   int blinkTimer = 0; // Used to blink during blink mode
   int blinkSpeed = 50; // Interval for a full blink
   boolean blinkMode = false;
@@ -56,9 +56,9 @@ public class LEDs extends SubsystemBase {
                 / 255.0; // makes the signal fade out and bounce in on subsequent flashes
         changeColor(
             new Color(
-                (int) Math.round(LEDConstants.kEnabledColor.red * colorMultiplier),
-                (int) Math.round(LEDConstants.kEnabledColor.green * colorMultiplier),
-                (int) Math.round(LEDConstants.kEnabledColor.blue * colorMultiplier)));
+                (int) Math.round(LEDConstants.kAmpSignalColor.red * colorMultiplier),
+                (int) Math.round(LEDConstants.kAmpSignalColor.green * colorMultiplier),
+                (int) Math.round(LEDConstants.kAmpSignalColor.blue * colorMultiplier)));
       } else {
         changeColor(
             new Color(
