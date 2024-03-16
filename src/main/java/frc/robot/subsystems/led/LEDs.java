@@ -1,4 +1,4 @@
-// Copyright (c) FIRST and other WPILib contributors.
+ // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
@@ -15,7 +15,11 @@ import frc.robot.Constants.LEDConstants.Color;
 public class LEDs extends SubsystemBase {
   AddressableLED led;
   AddressableLEDBuffer ledBuffer;
-  int flashTimer = 0; // used to smoothly flash signals to the human player
+  int flashTimer = 0; // Used to smoothly flash signals to the human player
+  int flashSpeed = 4; // Speed of color change during flashes
+  int blinkTimer = 0; // Used to blink during blink mode
+  int blinkSpeed = 50; // Interval for a full blink
+  boolean blinkMode = false;
 
   /** Creates a new Led. */
   public LEDs() {
@@ -43,7 +47,7 @@ public class LEDs extends SubsystemBase {
       // this will cause the flash timer to be reset only if it is called from outside periodic
       flashTimer = 512; // 511 = 256*2 this gives two flashes
     } else {
-      flashTimer -= 4; // speed a flash will disapate.
+      flashTimer -= flashSpeed; // speed a flash will disapate.
       if (flashTimer
           > 0) { // if it is 0 or less than zero, the time has run out and it is time to set it back
         // to the deafult color
@@ -77,11 +81,34 @@ public class LEDs extends SubsystemBase {
             LEDConstants.kEnabledColor.blue));
   }
 
+  public void blinkColor() {
+    blinkTimer ++;
+    blinkTimer %= blinkSpeed;
+
+    if(blinkTimer < blinkSpeed/2){
+      changeColor(
+        new Color(
+            LEDConstants.kEnabledColor.red/2,
+            LEDConstants.kEnabledColor.green/2,
+            LEDConstants.kEnabledColor.blue/2));
+    } else {
+      changeColor(
+        new Color(
+            LEDConstants.kEnabledColor.red,
+            LEDConstants.kEnabledColor.green,
+            LEDConstants.kEnabledColor.blue));
+    }
+  }
+
   @Override
   public void periodic() {
     led.setData(ledBuffer);
     if (flashTimer > 0) {
       amplifySignal();
+    } else if(blinkMode){
+      blinkColor();
+    } else {
+      changeColor(LEDConstants.kEnabledColor);
     }
   }
 }

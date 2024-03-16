@@ -119,12 +119,9 @@ public class Constants {
   public static final class AutoConstants {
     // Choreo
 
-    public static final PIDController kXController = new PIDController(5, 0, 0);
-    public static final PIDController kYController = new PIDController(5, 0, 0);
-    public static final PIDController kThetaController = new PIDController(5, 0, 0);
-    public static final double kPXController = 1;
-    public static final double kPYController = 1;
-    public static final double kPThetaController = 1;
+    public static final PIDController kXController = new PIDController(9, 0, 0);
+    public static final PIDController kYController = new PIDController(9, 0, 0);
+    public static final PIDController kThetaController = new PIDController(8, 0, 0);
 
     // Auto Align
     public static final double kAA_P_X = 3;
@@ -333,7 +330,7 @@ public class Constants {
     public static final double kRollersCurrentLimit = 20;
 
     public static final double kGroundIntakeSpeed = 0.75;
-    public static final double kFeedSpeed = -0.5;
+    public static final double kFeedSpeed = -0.65;
 
     public static Slot0Configs kPivotSlot0 =
         new Slot0Configs()
@@ -441,5 +438,6 @@ public class Constants {
     public static final Color kDisabledColor = new Color(255, 10, 0); // Orange
     public static final Color kEnabledColor = new Color(0, 255, 0); // Green
     public static final Color kProcessingColor = new Color(255, 0, 0); // Red
+    public static final Color kBlinkModeColor = new Color(8, 255, 8); // Also Green
   }
 }
