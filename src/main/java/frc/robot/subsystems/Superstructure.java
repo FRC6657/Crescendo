@@ -5,12 +5,15 @@ package frc.robot.subsystems;
 
 import com.choreo.lib.Choreo;
 import com.choreo.lib.ChoreoTrajectory;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -18,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.ClimbConstants;
+import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.OuttakeConstants;
@@ -259,7 +263,7 @@ public class Superstructure {
             Commands.waitUntil(outtake::beamBroken).unless(RobotBase::isSimulation),
             outtake.changeRPMSetpoint(0),
             intake.changeRollerSpeed(0),
-            Commands.runOnce(() -> currentNoteState = noteState.Outtake))
+            Commands.runOnce(() -> currentNoteState = noteState.Outtake)).onlyIf(intake::hasNote)
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
 
@@ -320,7 +324,7 @@ public class Superstructure {
   public Command intakePath(String pathName, boolean waitForIntake) {
     return Commands.sequence(
         extendIntake(),
-        Commands.waitUntil(intake::atSetpoint).unless(() -> waitForIntake),
+        Commands.waitUntil(intake::atSetpoint).onlyIf(() -> waitForIntake),
         Commands.race(
             Commands.waitUntil(intake::noteDetected),
             Commands.sequence(runChoreoPath(pathName), retractIntake())));
@@ -448,7 +452,8 @@ public class Superstructure {
     return Commands.sequence(
         CenFS0(),
         intakePath("CenF-S02", true),
-        Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
+        Commands.parallel(processNote().andThen(readyPiece()).onlyIf(intake::hasNote), drivebase.goToShotPoint()),
+        retractIntake(),
         shootPiece());
   }
 
@@ -474,5 +479,39 @@ public class Superstructure {
         intakePath("AmpF-S041.2", 1.3),
         drivebase.goToShotPoint(),
         shootPiece());
+  }
+
+  // Sysid at home
+  double maxVel = 4;
+  double target = maxVel;
+  SlewRateLimiter limiter = new SlewRateLimiter(5);
+  Timer timer = new Timer();
+  double previousVel = 0;
+
+  public double getAccelCurveValue() {
+
+    double vel = limiter.calculate(target);
+
+    if (vel == maxVel) {
+      timer.start();
+    }
+
+    if (timer.get() > 0.5) {
+      timer.reset();
+      target = 0;
+    }
+
+    Logger.recordOutput("Sysid/VelTarget", vel);
+    Logger.recordOutput("Sysid/Vel", drivebase.getChassisSpeeds().vxMetersPerSecond);
+    Logger.recordOutput("Sysid/Accel", (vel - previousVel) / CodeConstants.kMainLoopFrequency);
+    Logger.recordOutput("Sysid/Battery Voltage", RobotController.getBatteryVoltage());
+
+    return vel;
+  }
+
+  public Command accelSysid() {
+    return drivebase
+        .runVelocity(() -> new ChassisSpeeds(getAccelCurveValue(), 0, 0))
+        .beforeStarting(() -> limiter.reset(0));
   }
 }

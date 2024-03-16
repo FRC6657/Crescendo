@@ -178,7 +178,7 @@ public class MAXSwerve extends SubsystemBase {
   }
 
   @AutoLogOutput(key = "SwerveStates/ChassisSpeeds")
-  private ChassisSpeeds getChassisSpeeds() {
+  public ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
 
