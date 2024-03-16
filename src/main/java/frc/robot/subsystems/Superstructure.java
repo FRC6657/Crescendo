@@ -30,7 +30,6 @@ import frc.robot.subsystems.drive.MAXSwerve;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.led.LEDs;
 import frc.robot.subsystems.outtake.Outtake;
-import frc.robot.util.NoteVisualizer;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -451,12 +450,17 @@ public class Superstructure {
         shootPiece());
   }
 
+  public Command SouFS0() {
+    return Commands.sequence(
+      autoStart(AutoConstants.BLUE_SOURCE_FENDER, AutoConstants.RED_SOURCE_FENDER));
+  }
+
   public Command CenFS0() {
     return Commands.sequence(
         autoStart(AutoConstants.BLUE_CENTER_FENDER, AutoConstants.RED_CENTER_FENDER));
   }
 
-  public Command CenterFenderS02() {
+  public Command CenFS02() {
     return Commands.sequence(
         CenFS0(),
         intakePath("CenF-S02", true),
@@ -471,6 +475,27 @@ public class Superstructure {
         intakePath("CenF-S03", true),
         Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
         shootPiece());
+  }
+
+  public Command CenFS3214() {
+    return Commands.sequence(
+      CenFS0(),
+      intakePath("CenF-S03214.1", true),
+      Commands.parallel(processNote().andThen(readyPiece()), 
+      drivebase.goToShotPoint()),
+      shootPiece(),
+      intakePath("CenF-S03214.2", true),
+      Commands.parallel(processNote().andThen(readyPiece()), 
+      drivebase.goToShotPoint()),
+      shootPiece(),
+      intakePath("CenF-S03214.3", true),
+      Commands.parallel(processNote().andThen(readyPiece()), 
+      drivebase.goToShotPoint()),
+      shootPiece(),
+      intakePath("CenF-S03214.4", 1, 1.7),
+      drivebase.goToShotPoint(),
+      shootPiece()
+    );
   }
 
   public Command AmpFS0() {
