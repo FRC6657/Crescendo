@@ -482,9 +482,9 @@ public class Superstructure {
   }
 
   // Sysid at home
-  double maxVel = 4;
+  double maxVel = 2;
   double target = maxVel;
-  SlewRateLimiter limiter = new SlewRateLimiter(5);
+  SlewRateLimiter limiter = new SlewRateLimiter(4);
   Timer timer = new Timer();
   double previousVel = 0;
 
