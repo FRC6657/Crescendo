@@ -8,8 +8,11 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.SparkPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.Constants.CodeConstants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.DriveConstants.SwerveModuleInformation;
 import frc.robot.Constants.MAXSwerveConstants;
 import org.littletonrobotics.junction.Logger;
@@ -26,9 +29,17 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
   SparkPIDController drivePID;
   SparkPIDController turnPID;
 
+  SimpleMotorFeedforward driveFeedforward =
+      new SimpleMotorFeedforward(DriveConstants.kS, DriveConstants.kV, DriveConstants.kA);
+
   SwerveModuleInformation moduleInformation;
 
-  double setpoint = 0.0;
+  double turnSetpoint = 0.0;
+  double driveSetpoint = 0.0;
+
+  double arbFF = 0.0;
+
+  double lastDriveSetpoint = 0.0;
 
   public MAXSwerveIO_Real(SwerveModuleInformation moduleInformation) {
 
@@ -65,7 +76,6 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
     drivePID.setP(MAXSwerveConstants.kDriveP);
     drivePID.setI(MAXSwerveConstants.kDriveI);
     drivePID.setD(MAXSwerveConstants.kDriveD);
-    drivePID.setFF(MAXSwerveConstants.kDriveFF);
     drivePID.setOutputRange(MAXSwerveConstants.kDriveMinOutput, MAXSwerveConstants.kDriveMaxOutput);
 
     turnPID.setP(MAXSwerveConstants.kTurnP);
@@ -86,7 +96,6 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
         PeriodicFrame.kStatus2, (int) (1000 / CodeConstants.kMainLoopFrequency));
 
     driveMotor.burnFlash();
-
     turnMotor.burnFlash();
   }
 
@@ -94,33 +103,37 @@ public class MAXSwerveIO_Real implements MAXSwerveIO {
   @Override
   public void updateInputs(MAXSwerveIOInputs inputs) {
 
+    arbFF = driveFeedforward.calculate(driveSetpoint, (driveSetpoint - lastDriveSetpoint) * CodeConstants.kMainLoopFrequency);
+    lastDriveSetpoint = driveSetpoint;
+
+    Logger.recordOutput("DriveFFs/ " + moduleInformation.name, arbFF);
+
     inputs.drivePositionMeters = driveEncoder.getPosition();
     inputs.driveVelocityMPS = driveEncoder.getVelocity();
 
-    inputs.driveAppliedVolts = driveMotor.getAppliedOutput();
+    inputs.driveAppliedVolts = driveMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.driveCurrentAmps = driveMotor.getOutputCurrent();
 
     inputs.turnPositionRad = getTurnAngle();
     inputs.turnVelocityRadPerSec = turnEncoder.getVelocity();
-    inputs.turnAppliedVolts = turnMotor.getAppliedOutput();
+    inputs.turnAppliedVolts = turnMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.turnCurrentAmps = turnMotor.getOutputCurrent();
 
-    inputs.turnError = setpoint - inputs.turnPositionRad.getRadians();
-
-    Logger.recordOutput("Turn Voltage", turnMotor.getAppliedOutput());
+    inputs.turnError = turnSetpoint - inputs.turnPositionRad.getRadians();
   }
 
   /** Sets the drive MPS Setpoint */
   @Override
   public void setDriveMPS(double mps) {
-    drivePID.setReference(mps, ControlType.kVelocity);
+    driveSetpoint = mps;
+    drivePID.setReference(mps, ControlType.kVelocity, 0, arbFF);
   }
 
   /** Sets the turn angle setpoint */
   @Override
   public void setTurnAngle(Rotation2d angle) {
 
-    setpoint = angle.getRadians() - moduleInformation.moduleOffset.getRadians();
+    turnSetpoint = angle.getRadians() - moduleInformation.moduleOffset.getRadians();
 
     turnPID.setReference(
         angle.getRadians() - moduleInformation.moduleOffset.getRadians(), ControlType.kPosition);

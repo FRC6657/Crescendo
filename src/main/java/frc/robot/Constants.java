@@ -198,6 +198,10 @@ public class Constants {
 
     public static final double kMaxAngularVelocity =
         MAXSwerveConstants.kMaxDriveSpeed / kDrivebaseRadius;
+
+    public static final double kS = 0.1;
+    public static final double kV = 12d / MAXSwerveConstants.kMaxDriveSpeed; // v/m/s
+    public static final double kA = 0.4; // Accel/V
   }
 
   public static final class MAXSwerveConstants {
@@ -435,5 +439,6 @@ public class Constants {
     public static final Color kEnabledColor = new Color(0, 255, 0); // Green
     public static final Color kProcessingColor = new Color(255, 0, 0); // Red
     public static final Color kBlinkModeColor = new Color(8, 255, 8); // Also Green
+    public static final Color kAmpSignalColor = new Color(128, 16, 255); // Purple
   }
 }

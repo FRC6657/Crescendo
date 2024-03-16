@@ -150,6 +150,7 @@ public class Robot extends LoggedRobot {
     autoChooser.addOption("CenF-S03", superstructure.CenFS03());
     autoChooser.addOption("AmpF-S0", superstructure.AmpFS0());
     //autoChooser.addOption("AmpF-S041", superstructure.AmpFS041());
+    autoChooser.addOption("Accel Sysid", superstructure.accelSysid());
 
     NoteVisualizer.setRobotPoseSupplier(drivebase::getPose);
 
