@@ -316,7 +316,7 @@ public class Constants {
 
   public static final class IntakeConstants {
 
-    public static final double kGearingPivot = (1d / 20) * (16d / 36);
+    public static final double kGearingPivot = (1d / 12) * (16d / 36);
     public static final double kGearingRollers = (11d / 24);
 
     public static final double kMinPivotAngle = -17;
@@ -362,7 +362,7 @@ public class Constants {
 
   public static final class OuttakeConstants {
 
-    public static final double kGearingPivot = (1d / 12) * (16d / 36);
+    public static final double kGearingPivot = (1d / 20) * (16d / 36);
     public static final double kGearingFlywheel = (1d / 2);
 
     public static final double kMinPivotAngle = -10;
