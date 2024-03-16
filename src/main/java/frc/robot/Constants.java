@@ -201,6 +201,10 @@ public class Constants {
 
     public static final double kMaxAngularVelocity =
         MAXSwerveConstants.kMaxDriveSpeed / kDrivebaseRadius;
+
+    public static final double kS = 0.04;
+    public static final double kV = MAXSwerveConstants.kMaxDriveSpeed / 12; // m/s/v
+    public static final double kA = 0.85; // Accel/V
   }
 
   public static final class MAXSwerveConstants {
