@@ -490,9 +490,9 @@ public class Superstructure {
   }
 
   // Sysid at home
-  double maxVel = 2;
+  double maxVel = 4.5;
   double target = maxVel;
-  SlewRateLimiter limiter = new SlewRateLimiter(4);
+  SlewRateLimiter limiter = new SlewRateLimiter(5);
   Timer timer = new Timer();
   double previousVel = 0;
 
@@ -520,6 +520,10 @@ public class Superstructure {
   public Command accelSysid() {
     return drivebase
         .runVelocity(() -> new ChassisSpeeds(getAccelCurveValue(), 0, 0))
-        .beforeStarting(() -> limiter.reset(0));
+        .beforeStarting(
+          () -> {
+            limiter.reset(0);
+            timer.reset();
+          });
   }
 }
