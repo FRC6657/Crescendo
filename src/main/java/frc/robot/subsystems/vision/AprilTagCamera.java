@@ -30,6 +30,7 @@ public class AprilTagCamera {
 
   public AprilTagCamera(String name, Transform3d cameraTransform) {
     camera = new PhotonCamera(name);
+    camera.setDriverMode(false);
 
     var cameraProp = new SimCameraProperties();
     cameraProp.setCalibration(1280, 800, Rotation2d.fromDegrees(90));

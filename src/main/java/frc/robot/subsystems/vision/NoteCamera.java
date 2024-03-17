@@ -8,6 +8,7 @@ public class NoteCamera {
 
   public NoteCamera(String name) {
     camera = new PhotonCamera(name);
+    camera.setDriverMode(false);
   }
 
   public double getNoteX() {
