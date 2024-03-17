@@ -124,8 +124,8 @@ public class Constants {
     public static final PIDController kThetaController = new PIDController(8, 0, 0);
 
     // Auto Align
-    public static final double kAA_P_X = 3;
-    public static final double kAA_P_Y = 3;
+    public static final double kAA_P_X = 3.5;
+    public static final double kAA_P_Y = 3.5;
     public static final double kAA_P_Theta = 3;
 
     // Note Aim
@@ -194,14 +194,14 @@ public class Constants {
       new Translation2d(-kWheelBase / 2, -kTrackWidth / 2)
     };
 
-    public static final double kDrivebaseRadius = Math.hypot(kWheelBase, kTrackWidth) / 2;
+    public static double kDrivebaseRadius = Math.hypot(kWheelBase, kTrackWidth) / 2;
 
     public static final double kMaxAngularVelocity =
         MAXSwerveConstants.kMaxDriveSpeed / kDrivebaseRadius;
 
     public static final double kS = 0.1;
     public static final double kV = 12d / MAXSwerveConstants.kMaxDriveSpeed; // v/m/s
-    public static final double kA = 0.4; // Accel/V
+    public static final double kA = 0.45; // Accel/V
   }
 
   public static final class MAXSwerveConstants {
@@ -260,7 +260,7 @@ public class Constants {
     public static final double kDriveMinOutput = -1;
     public static final double kDriveMaxOutput = 1;
 
-    public static final double kTurnP = 1;
+    public static final double kTurnP = 1.2;
     public static final double kTurnI = 0;
     public static final double kTurnD = 0;
     public static final double kTurnFF = 0;
@@ -329,7 +329,7 @@ public class Constants {
     public static final double kPivotCurrentLimit = 50;
     public static final double kRollersCurrentLimit = 20;
 
-    public static final double kGroundIntakeSpeed = 0.75;
+    public static final double kGroundIntakeSpeed = 0.5;
     public static final double kFeedSpeed = -0.65;
 
     public static Slot0Configs kPivotSlot0 =

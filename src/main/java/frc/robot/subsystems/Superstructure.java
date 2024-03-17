@@ -457,7 +457,7 @@ public class Superstructure {
 
   public Command SouFS0() {
     return Commands.sequence(
-      autoStart(AutoConstants.BLUE_SOURCE_FENDER, AutoConstants.RED_SOURCE_FENDER));
+        autoStart(AutoConstants.BLUE_SOURCE_FENDER, AutoConstants.RED_SOURCE_FENDER));
   }
 
   public Command CenFS0() {
@@ -485,23 +485,19 @@ public class Superstructure {
 
   public Command CenFS3214() {
     return Commands.sequence(
-      CenFS0(),
-      intakePath("CenF-S03214.1", true),
-      Commands.parallel(processNote().andThen(readyPiece()), 
-      drivebase.goToShotPoint()),
-      shootPiece(),
-      intakePath("CenF-S03214.2", true),
-      Commands.parallel(processNote().andThen(readyPiece()), 
-      drivebase.goToShotPoint()),
-      shootPiece(),
-      intakePath("CenF-S03214.3", true),
-      Commands.parallel(processNote().andThen(readyPiece()), 
-      drivebase.goToShotPoint()),
-      shootPiece(),
-      intakePath("CenF-S03214.4", 1, 1.7),
-      drivebase.goToShotPoint(),
-      shootPiece()
-    );
+        CenFS0(),
+        intakePath("CenF-S03214.1", true),
+        Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
+        shootPiece(),
+        intakePath("CenF-S03214.2", true),
+        Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
+        shootPiece(),
+        intakePath("CenF-S03214.3", true),
+        Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
+        shootPiece(),
+        intakePath("CenF-S03214.4", 1, 1.7),
+        drivebase.goToShotPoint(),
+        shootPiece());
   }
 
   public Command AmpFS0() {
@@ -512,16 +508,16 @@ public class Superstructure {
   public Command AmpFS041() {
     return Commands.sequence(
         AmpFS0(),
-        intakePath("AmpF-S041.1", 1, 1.7),
+        intakePath("AmpF-S041.1", 3, 6),
         drivebase.goToShotPoint(),
         shootPiece(),
-        intakePath("AmpF-S041.2", 1.3),
+        intakePath("AmpF-S041.2", 2),
         drivebase.goToShotPoint(),
         shootPiece());
   }
 
   // Sysid at home
-  double maxVel = 4.5;
+  double maxVel = 3.5;
   double target = maxVel;
   SlewRateLimiter limiter = new SlewRateLimiter(5);
   Timer timer = new Timer();
@@ -552,9 +548,9 @@ public class Superstructure {
     return drivebase
         .runVelocity(() -> new ChassisSpeeds(getAccelCurveValue(), 0, 0))
         .beforeStarting(
-          () -> {
-            limiter.reset(0);
-            timer.reset();
-          });
+            () -> {
+              limiter.reset(0);
+              timer.reset();
+            });
   }
 }

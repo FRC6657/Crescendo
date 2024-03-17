@@ -15,6 +15,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -46,6 +47,8 @@ public class MAXSwerve extends SubsystemBase {
 
   // Track the last heading for when the gyro is disconnected/simulated
   private Rotation2d lastHeading = new Rotation2d();
+
+  private Rotation2d feildRelativeReset = new Rotation2d();
 
   /**
    * Creates a new MAXSwerve drivebase
@@ -129,6 +132,10 @@ public class MAXSwerve extends SubsystemBase {
         });
   }
 
+  public Command resetFeildRelative(){
+    return Commands.runOnce(() -> feildRelativeReset = getPose().getRotation());
+  }
+
   /*
    * Stops the drivebase
    */
@@ -144,7 +151,23 @@ public class MAXSwerve extends SubsystemBase {
    */
   public Command runVelocityFieldRelative(Supplier<ChassisSpeeds> speeds) {
     return this.runVelocity(
-        () -> ChassisSpeeds.fromFieldRelativeSpeeds(speeds.get(), getPose().getRotation()));
+        () -> ChassisSpeeds.fromFieldRelativeSpeeds(speeds.get(), feildRelativeValue().plus(feildRelativeReset)));
+  }
+
+  public Rotation2d feildRelativeValue(){
+    Rotation2d returnValue = getPose().getRotation();
+    if(isRed()){
+      returnValue.plus(new Rotation2d(Math.PI));
+    }
+    return returnValue;
+  }
+
+  private boolean isRed() {
+    boolean isRed = false;
+    if (DriverStation.getAlliance().isPresent()) {
+      isRed = (DriverStation.getAlliance().get() == Alliance.Red);
+    }
+    return isRed;
   }
 
   /**
@@ -251,9 +274,9 @@ public class MAXSwerve extends SubsystemBase {
     var yController = new PIDController(AutoConstants.kAA_P_Y, 0, 0);
     var thetaController = new PIDController(AutoConstants.kAA_P_Theta, 0, 0);
 
-    xController.setTolerance(0.02);
-    yController.setTolerance(0.02);
-    thetaController.setTolerance(Units.degreesToRadians(1));
+    xController.setTolerance(0.04);
+    yController.setTolerance(0.04);
+    thetaController.setTolerance(Units.degreesToRadians(2));
 
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 

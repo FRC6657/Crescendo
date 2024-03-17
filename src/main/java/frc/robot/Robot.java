@@ -149,7 +149,7 @@ public class Robot extends LoggedRobot {
     autoChooser.addOption("CenF-S02", superstructure.CenFS02());
     autoChooser.addOption("CenF-S03", superstructure.CenFS03());
     autoChooser.addOption("AmpF-S0", superstructure.AmpFS0());
-    // autoChooser.addOption("AmpF-S041", superstructure.AmpFS041());
+    autoChooser.addOption("AmpF-S041", superstructure.AmpFS041());
     autoChooser.addOption("Accel Sysid", superstructure.accelSysid());
     autoChooser.addOption("CenF-S03214", superstructure.CenFS3214());
 
@@ -183,6 +183,8 @@ public class Robot extends LoggedRobot {
                     .andThen(superstructure.shootPiece()),
                 intake::extended));
 
+    driver.y().onTrue(drivebase.resetFeildRelative());
+
     driver
         .rightTrigger()
         .onTrue(superstructure.extendIntake())
@@ -192,8 +194,8 @@ public class Robot extends LoggedRobot {
     operator.button(1).onTrue(superstructure.ampMode());
     operator.button(2).onTrue(superstructure.speakerMode());
     operator.button(3).onTrue(superstructure.readyPiece());
-    operator.button(6).onTrue(superstructure.raiseClimbers());
-    operator.button(7).onTrue(superstructure.lowerClimbers());
+    operator.button(7).onTrue(superstructure.raiseClimbers());
+    operator.button(8).onTrue(superstructure.lowerClimbers());
 
     operator.button(9).onTrue(superstructure.firstReset());
     operator.button(9).onFalse(superstructure.secondReset());
@@ -239,8 +241,8 @@ public class Robot extends LoggedRobot {
     if (sideResult.timestamp != 0.0) {
       Logger.recordOutput("Vision/SideGlobalEstimate", sideResult.estimatedPose);
       if (RobotBase.isReal()) {
-        drivebase.addVisionMeasurement(
-            sideResult.estimatedPose, sideResult.timestamp, sideResult.stdDevs);
+        // drivebase.addVisionMeasurement(
+        //     sideResult.estimatedPose, sideResult.timestamp, sideResult.stdDevs);
       }
     }
   }
