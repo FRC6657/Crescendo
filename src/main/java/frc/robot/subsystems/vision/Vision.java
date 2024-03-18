@@ -19,7 +19,6 @@ import frc.robot.Robot;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.simulation.VisionSystemSim;
 
 public class Vision {
@@ -85,7 +84,7 @@ public class Vision {
       tagPoses.add(field.getTags().get(i).pose);
     }
 
-    Logger.recordOutput("Vision/Tag Poses", tagPoses.toArray(new Pose3d[tagPoses.size()]));
+    // Logger.recordOutput("Vision/Tag Poses", tagPoses.toArray(new Pose3d[tagPoses.size()]));
   }
 
   public void resetSimPose(Pose2d pose) {

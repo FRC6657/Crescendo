@@ -117,8 +117,8 @@ public class Constants {
   }
 
   public static final class AutoConstants {
-    // Choreo
 
+    // Choreo
     public static final PIDController kXController = new PIDController(9, 0, 0);
     public static final PIDController kYController = new PIDController(9, 0, 0);
     public static final PIDController kThetaController = new PIDController(8, 0, 0);
@@ -128,8 +128,14 @@ public class Constants {
     public static final double kAA_P_Y = 3.5;
     public static final double kAA_P_Theta = 3;
 
+    public static final double kAA_T_Clamp = 3; // m/s
+    public static final double kAA_R_Clamp = 2 * Math.PI; // rad/s
+
+    public static final double kAA_T_Tolerance = Units.inchesToMeters(2); // m
+    public static final double kAA_R_Tolerance = Units.degreesToRadians(2); // rad
+
     // Note Aim
-    public static final double kNA_P = 3;
+    public static final double kNA_P = 1;
 
     // Starting Positions
     public static final Pose2d BLUE_CENTER_FENDER =

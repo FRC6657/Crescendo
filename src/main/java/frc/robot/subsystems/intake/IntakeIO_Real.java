@@ -36,7 +36,6 @@ public class IntakeIO_Real implements IntakeIO {
   private MotionMagicVoltage pivotSetpoint = new MotionMagicVoltage(IntakeConstants.kMaxPivotAngle);
 
   public IntakeIO_Real() {
-    
 
     // Motor Controller Configurations
 

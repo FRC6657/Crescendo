@@ -433,7 +433,7 @@ public class Superstructure {
             drivebase);
     return Commands.sequence(
             Commands.runOnce(
-                () -> Logger.recordOutput("Superstructure/CurrentPath", traj.getPoses())),
+                () -> Logger.recordOutput("Superstructure/CurrentPath", isRed() ? traj.flipped().getPoses() : traj.getPoses())),
             setPoseCommand,
             swerveCommand,
             Commands.runOnce(() -> drivebase.stop(), drivebase))

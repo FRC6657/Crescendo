@@ -19,7 +19,6 @@ import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.MAXSwerveConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Superstructure;
-import frc.robot.subsystems.Superstructure.noteState;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimberIO;
 import frc.robot.subsystems.climb.ClimberIO_Real;
@@ -75,7 +74,7 @@ public class Robot extends LoggedRobot {
   // Driver Controllers
   private CommandXboxController driver = new CommandXboxController(0);
   private CommandGenericHID operator = new CommandGenericHID(1);
-  private CommandGenericHID debug = new CommandGenericHID(5);
+  // private CommandGenericHID debug = new CommandGenericHID(5);
 
   // Subsystems
   private MAXSwerve drivebase =
@@ -150,8 +149,8 @@ public class Robot extends LoggedRobot {
     autoChooser.addOption("CenF-S03", superstructure.CenFS03());
     autoChooser.addOption("AmpF-S0", superstructure.AmpFS0());
     autoChooser.addOption("AmpF-S041", superstructure.AmpFS041());
-    autoChooser.addOption("Accel Sysid", superstructure.accelSysid());
-    autoChooser.addOption("CenF-S03214", superstructure.CenFS3214());
+    // autoChooser.addOption("Accel Sysid", superstructure.accelSysid());
+    // autoChooser.addOption("CenF-S03214", superstructure.CenFS3214());
 
     NoteVisualizer.setRobotPoseSupplier(drivebase::getPose);
 
@@ -178,12 +177,10 @@ public class Robot extends LoggedRobot {
                     driver::getLeftY, driver::getLeftX, driver::getRightX, vision::getNoteX),
                 Commands.either(
                         drivebase.goToShotPoint(),
-                        drivebase.goToAmpPoint(),
+                        drivebase.goToAmpPose(),
                         superstructure::inSpeakerMode)
                     .andThen(superstructure.shootPiece()),
                 intake::extended));
-
-    driver.y().onTrue(drivebase.resetFeildRelative());
 
     driver
         .rightTrigger()
@@ -202,12 +199,12 @@ public class Robot extends LoggedRobot {
 
     operator.button(4).onTrue(new InstantCommand(led::amplifySignal));
 
-    debug
-        .button(1)
-        .onTrue(Commands.runOnce(() -> superstructure.overrideNoteState(noteState.Intake)));
-    debug
-        .button(2)
-        .onTrue(Commands.runOnce(() -> superstructure.overrideNoteState(noteState.Outtake)));
+    // debug
+    //     .button(1)
+    //     .onTrue(Commands.runOnce(() -> superstructure.overrideNoteState(noteState.Intake)));
+    // debug
+    //     .button(2)
+    //     .onTrue(Commands.runOnce(() -> superstructure.overrideNoteState(noteState.Outtake)));
     led.changeColor(LEDConstants.kDisabledColor);
   }
 

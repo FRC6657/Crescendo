@@ -13,12 +13,10 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.CodeConstants;
@@ -47,8 +45,6 @@ public class MAXSwerve extends SubsystemBase {
 
   // Track the last heading for when the gyro is disconnected/simulated
   private Rotation2d lastHeading = new Rotation2d();
-
-  private Rotation2d feildRelativeReset = new Rotation2d();
 
   /**
    * Creates a new MAXSwerve drivebase
@@ -132,10 +128,6 @@ public class MAXSwerve extends SubsystemBase {
         });
   }
 
-  public Command resetFeildRelative(){
-    return Commands.runOnce(() -> feildRelativeReset = getPose().getRotation());
-  }
-
   /*
    * Stops the drivebase
    */
@@ -151,12 +143,13 @@ public class MAXSwerve extends SubsystemBase {
    */
   public Command runVelocityFieldRelative(Supplier<ChassisSpeeds> speeds) {
     return this.runVelocity(
-        () -> ChassisSpeeds.fromFieldRelativeSpeeds(speeds.get(), feildRelativeValue().plus(feildRelativeReset)));
+        () ->
+            ChassisSpeeds.fromFieldRelativeSpeeds(speeds.get(), getPose().getRotation().plus(new Rotation2d(isRed() ? Math.PI : 0))));
   }
 
-  public Rotation2d feildRelativeValue(){
+  public Rotation2d feildRelativeValue() {
     Rotation2d returnValue = getPose().getRotation();
-    if(isRed()){
+    if (isRed()) {
       returnValue.plus(new Rotation2d(Math.PI));
     }
     return returnValue;
@@ -240,6 +233,94 @@ public class MAXSwerve extends SubsystemBase {
     }
   }
 
+  public boolean chasePose(Pose2d destinationPose) {
+
+    Pose2d currentPose = getPose();
+
+    double xError = destinationPose.getTranslation().minus(currentPose.getTranslation()).getX();
+    double yError = destinationPose.getTranslation().minus(currentPose.getTranslation()).getY();
+    double thetaError = destinationPose.getRotation().minus(currentPose.getRotation()).getRadians();
+
+    boolean atX = MathUtil.isNear(0, xError, AutoConstants.kAA_T_Tolerance);
+    boolean atY = MathUtil.isNear(0, yError, AutoConstants.kAA_T_Tolerance);
+    boolean atTheta = MathUtil.isNear(0, thetaError, AutoConstants.kAA_R_Tolerance);
+
+    double xSpeed =
+        MathUtil.clamp(
+            xError * AutoConstants.kAA_P_X, -AutoConstants.kAA_T_Clamp, AutoConstants.kAA_T_Clamp);
+    double ySpeed =
+        MathUtil.clamp(
+            yError * AutoConstants.kAA_P_Y, -AutoConstants.kAA_T_Clamp, AutoConstants.kAA_T_Clamp);
+    double thetaSpeed =
+        MathUtil.clamp(
+            thetaError * AutoConstants.kAA_P_Theta,
+            -AutoConstants.kAA_R_Clamp,
+            AutoConstants.kAA_R_Clamp);
+
+    ChassisSpeeds speeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed), currentPose.getRotation());
+
+    Logger.recordOutput("AutoAim/DesiredShotPos", destinationPose);
+    Logger.recordOutput("AutoAim/X Error", xError);
+    Logger.recordOutput("AutoAim/Y Error", yError);
+    Logger.recordOutput("AutoAim/Theta Error", thetaError);
+
+    Logger.recordOutput("AutoAim/atX", atX);
+    Logger.recordOutput("AutoAim/atY", atY);
+    Logger.recordOutput("AutoAim/atTheta", atTheta);
+
+    this.runChassisSpeeds(speeds);
+
+    return (atX && atY && atTheta);
+  }
+
+  public Command goToPose(Pose2d targetPose) {
+    return this.run(() -> {}).until(() -> chasePose(targetPose));
+  }
+
+  public Command goToShotPoint(){
+    return this.run(() -> {}).until(() -> chasePose(getNearestShotPoint()));
+  }
+
+  public Command goToAmpPose(){
+    return this.run(() -> {}).until(() -> chasePose(new Pose2d(isRed() ? 14.65 : 1.9 ,7.771, new Rotation2d(-Math.PI / 2))));
+  }
+
+  public Pose2d getNearestShotPoint() {
+    Translation2d speakerCenter = (isRed()) ? new Translation2d(16.3, 5.549) : new Translation2d(0, 5.549);
+    double shotDistance = 1.75; // meters
+    double xLimit = isRed() ? 15.300000 : 1.216700;
+
+    double vX = getPose().getX() - speakerCenter.getX();
+    double vY = getPose().getY() - speakerCenter.getY();
+    double magV = Math.sqrt(vX * vX + vY * vY);
+    double aX = speakerCenter.getX() + vX / magV * shotDistance;
+    double aY = speakerCenter.getY() + vY / magV * shotDistance;
+
+    double m = (aY - getPose().getY()) / (aX - getPose().getX());
+    double angle = Math.atan(m);
+
+    Pose2d desiredPos = new Pose2d(aX, aY, new Rotation2d(angle).plus(new Rotation2d(isRed() ? Math.PI : 0)));
+
+    boolean side = desiredPos.getY() > 5.549;
+    double newY = 5.549 + (side ? 1.581139 : -1.581139);
+  
+    if(isRed()){
+      if(desiredPos.getX() > xLimit){ 
+        double newR = side ? 2.179042 : -2.179042;
+        desiredPos = new Pose2d(xLimit, newY, new Rotation2d(newR));
+      }
+    }else{
+      if(desiredPos.getX() < xLimit){
+        double newR = side ? 0.962551 : -0.962551;
+        desiredPos = new Pose2d(xLimit, newY, new Rotation2d(newR));
+      }
+    }
+
+    return desiredPos;
+  }
+
   @SuppressWarnings("resource")
   public Command noteAim(
       DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier rSpeed, DoubleSupplier noteX) {
@@ -255,7 +336,7 @@ public class MAXSwerve extends SubsystemBase {
 
               ChassisSpeeds speeds =
                   ChassisSpeeds.fromFieldRelativeSpeeds(
-                      new ChassisSpeeds(xSpeedVal, ySpeedVal, rSpeedVal), lastHeading);
+                      new ChassisSpeeds(xSpeedVal, ySpeedVal, rSpeedVal), getPose().getRotation().plus(new Rotation2d(isRed() ? Math.PI : 0)));
 
               if (noteXVal != 0) {
                 rSpeedVal = MathUtil.clamp(thetaController.calculate(noteXVal, 0), -2, 2);
@@ -267,177 +348,4 @@ public class MAXSwerve extends SubsystemBase {
         .beforeStarting(() -> thetaController.reset());
   }
 
-  @SuppressWarnings("resource")
-  public Command goToShotPoint() {
-
-    var xController = new PIDController(AutoConstants.kAA_P_X, 0, 0);
-    var yController = new PIDController(AutoConstants.kAA_P_Y, 0, 0);
-    var thetaController = new PIDController(AutoConstants.kAA_P_Theta, 0, 0);
-
-    xController.setTolerance(0.04);
-    yController.setTolerance(0.04);
-    thetaController.setTolerance(Units.degreesToRadians(2));
-
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-    return this.run(
-            () -> {
-              boolean isBlue = true;
-
-              if (DriverStation.getAlliance().isPresent()) {
-                isBlue = DriverStation.getAlliance().get() == DriverStation.Alliance.Blue;
-              }
-
-              // Translation2d speakerCenter = (DriverStation.getAlliance().get() == Alliance.Blue)
-              // ?
-              // new Translation2d(0.2167, 5.549) : new Translation2d(16.3, 5.549);
-              Translation2d speakerCenter =
-                  (isBlue) ? new Translation2d(0.2167, 5.549) : new Translation2d(16.3, 5.549);
-
-              double shotDistance = 1.75; // meters
-
-              // // Draw a circle of points around the speaker to visualize the shot line
-              // Pose2d[] speakerCirclePoints = new Pose2d[360];
-              // for (int i = 0; i < 360; i++) {
-              //   double angle = Math.toRadians(i / 360d) * 360;
-              //   speakerCirclePoints[i] =
-              //       new Pose2d(
-              //           new Translation2d(
-              //                   shotDistance * Math.cos(angle), shotDistance * Math.sin(angle))
-              //               .plus(speakerCenter),
-              //           new Rotation2d());
-              // }
-
-              // double distanceFromShotline =
-              //     getPose().getTranslation().getDistance(speakerCenter) - shotDistance;
-
-              // // Draw circle of points around the robot
-              // Pose2d[] robotCirclePoints = new Pose2d[360];
-              // for (int i = 0; i < 360; i++) {
-              //   double angle = Math.toRadians(i / 360d) * 360;
-              //   robotCirclePoints[i] =
-              //       new Pose2d(
-              //           new Translation2d(
-              //                   distanceFromShotline * Math.cos(angle),
-              //                   distanceFromShotline * Math.sin(angle))
-              //               .plus(getPose().getTranslation()),
-              //           new Rotation2d());
-              // }
-
-              // Logger.recordOutput("AutoAim/ShotLine", speakerCirclePoints);
-              // Logger.recordOutput("AutoAim/RobotCircle", robotCirclePoints);
-              // Logger.recordOutput(
-              //     "AutoAim/Directline",
-              //     new Pose2d[] {getPose(), new Pose2d(speakerCenter, new Rotation2d())});
-
-              double vX = getPose().getX() - speakerCenter.getX();
-              double vY = getPose().getY() - speakerCenter.getY();
-              double magV = Math.sqrt(vX * vX + vY * vY);
-              double aX = speakerCenter.getX() + vX / magV * shotDistance;
-              double aY = speakerCenter.getY() + vY / magV * shotDistance;
-
-              double m = (aY - getPose().getY()) / (aX - getPose().getX());
-              double angle = Math.atan(m);
-
-              Pose2d desiredPos =
-                  new Pose2d(
-                      aX, aY, new Rotation2d(angle).plus(new Rotation2d(isBlue ? 0 : Math.PI)));
-
-              Logger.recordOutput("AutoAim/DesiredShotPos", desiredPos);
-
-              var xSpeed =
-                  xController.calculate(
-                      getPose().getTranslation().getX(), desiredPos.getTranslation().getX());
-              var ySpeed =
-                  yController.calculate(
-                      getPose().getTranslation().getY(), desiredPos.getTranslation().getY());
-              var thetaSpeed =
-                  thetaController.calculate(
-                      getPose().getRotation().getRadians(), desiredPos.getRotation().getRadians());
-
-              this.runChassisSpeeds(
-                  ChassisSpeeds.fromFieldRelativeSpeeds(
-                      new ChassisSpeeds(
-                          MathUtil.clamp(xSpeed, -2, 2), MathUtil.clamp(ySpeed, -2, 2), thetaSpeed),
-                      getPose().getRotation()));
-            })
-        .beforeStarting(
-            () -> {
-              xController.reset();
-              yController.reset();
-              thetaController.reset();
-            })
-        .until(
-            () ->
-                (xController.atSetpoint()
-                    && yController.atSetpoint()
-                    && thetaController.atSetpoint()));
-  }
-
-  public Command goToAmpPoint() {
-
-    return Commands.runOnce(
-        () -> {
-          boolean isBlue = true;
-
-          if (DriverStation.getAlliance().isPresent()) {
-            isBlue = DriverStation.getAlliance().get() == DriverStation.Alliance.Blue;
-          }
-
-          Pose2d blueAmpPos = new Pose2d(1.9, 7.771, new Rotation2d(-Math.PI / 2));
-          Pose2d redAmpPos = new Pose2d(14.65, 7.771, new Rotation2d(-Math.PI / 2));
-
-          Pose2d desiredPos = isBlue ? blueAmpPos : redAmpPos;
-
-          goToPose(desiredPos).schedule();
-        });
-  }
-
-  @SuppressWarnings("resource")
-  public Command goToPose(Pose2d targetPose) {
-
-    var xController = new PIDController(AutoConstants.kAA_P_X, 0, 0);
-    var yController = new PIDController(AutoConstants.kAA_P_Y, 0, 0);
-    var thetaController = new PIDController(AutoConstants.kAA_P_Theta, 0, 0);
-
-    xController.setTolerance(0.02);
-    yController.setTolerance(0.02);
-    thetaController.setTolerance(Units.degreesToRadians(1));
-
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-    return this.run(
-            () -> {
-              Logger.recordOutput("AutoAim/DesiredShotPos", targetPose);
-
-              var xSpeed =
-                  xController.calculate(
-                      getPose().getTranslation().getX(), targetPose.getTranslation().getX());
-              var ySpeed =
-                  yController.calculate(
-                      getPose().getTranslation().getY(), targetPose.getTranslation().getY());
-              var thetaSpeed =
-                  thetaController.calculate(
-                      getPose().getRotation().getRadians(), targetPose.getRotation().getRadians());
-
-              this.runChassisSpeeds(
-                  ChassisSpeeds.fromFieldRelativeSpeeds(
-                      new ChassisSpeeds(
-                          MathUtil.clamp(xSpeed, -2, 2), MathUtil.clamp(ySpeed, -2, 2), thetaSpeed),
-                      getPose().getRotation()));
-            })
-        .beforeStarting(
-            () -> {
-              xController.reset();
-              yController.reset();
-              thetaController.reset();
-            })
-        .until(
-            () ->
-                (xController.atSetpoint()
-                    && yController.atSetpoint()
-                    && thetaController.atSetpoint()));
-  }
-
-  public void runTowardsPose(Pose2d pose) {}
 }

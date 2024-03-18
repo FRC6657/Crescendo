@@ -15,6 +15,8 @@ public class GyroIO_Real implements GyroIO {
   private final Pigeon2 pigeon = new Pigeon2(CANID.kPigeon);
   private final StatusSignal<Double> yaw = pigeon.getYaw();
   private final StatusSignal<Double> yawVelocity = pigeon.getAngularVelocityZDevice();
+  private final StatusSignal<Double> xAcceleration = pigeon.getAccelerationX();
+  private final StatusSignal<Double> yAcceleration = pigeon.getAccelerationY();
 
   /** Gyro IO for real robot */
   public GyroIO_Real() {
@@ -22,6 +24,8 @@ public class GyroIO_Real implements GyroIO {
     pigeon.getConfigurator().setYaw(0);
     yaw.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
     yawVelocity.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
+    xAcceleration.setUpdateFrequency(CodeConstants.kMainLoopFrequency / 2);
+    yAcceleration.setUpdateFrequency(CodeConstants.kMainLoopFrequency / 2);
     pigeon.optimizeBusUtilization();
   }
 
@@ -30,5 +34,7 @@ public class GyroIO_Real implements GyroIO {
     inputs.connected = BaseStatusSignal.refreshAll(yaw, yawVelocity).equals(StatusCode.OK);
     inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
+    inputs.xAcceleration = xAcceleration.getValueAsDouble();
+    inputs.yAcceleration = yAcceleration.getValueAsDouble();
   }
 }
