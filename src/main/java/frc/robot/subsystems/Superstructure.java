@@ -68,6 +68,7 @@ public class Superstructure {
 
   private boolean climbersUp = false;
 
+  @AutoLogOutput(key = "Superstructure/Ignore TOF")
   private boolean ignoreTOF = false;
 
   public Superstructure(
