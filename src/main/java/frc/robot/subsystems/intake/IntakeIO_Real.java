@@ -129,6 +129,7 @@ public class IntakeIO_Real implements IntakeIO {
             Units.degreesToRotations(angleSetpoint))); // Degrees to Native Rotations
 
     inputs.tofDistance = sensor.getMappedDistance();
+    inputs.tofRaw = sensor.getRawOutput();
   }
 
   /**

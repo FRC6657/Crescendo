@@ -21,6 +21,7 @@ public interface IntakeIO {
     public double rollerMotorCurrent = 0.0; // Amps
 
     public double tofDistance = 0;
+    public double tofRaw = 0;
   }
 
   public default void updateInputs(IntakeIOInputs inputs) {}

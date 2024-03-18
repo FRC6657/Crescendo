@@ -35,11 +35,20 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean noteDetected() {
-    return (intakeInputs.tofDistance < 23 && intakeInputs.pivotMotorPosition < 0);
+    if(tofUnplugged()){
+      return false;
+    }else{
+      return (intakeInputs.tofDistance < 23 && intakeInputs.pivotMotorPosition < 0);
+    }
   }
 
   public boolean hasNote() {
-    return intakeInputs.tofDistance < 23;
+    if(tofUnplugged()){
+      return false;
+    }
+    else{
+      return intakeInputs.tofDistance < 23;
+    }
   }
 
   public boolean atSetpoint() {
@@ -52,6 +61,10 @@ public class Intake extends SubsystemBase {
 
   public boolean pivotSetpointIsMax() {
     return intakeInputs.pivotMotorSetpoint == IntakeConstants.kMaxPivotAngle;
+  }
+
+  public boolean tofUnplugged(){
+    return intakeInputs.tofDistance < 0;
   }
 
   @Override
