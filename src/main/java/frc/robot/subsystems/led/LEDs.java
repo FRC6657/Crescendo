@@ -113,18 +113,17 @@ public class LEDs extends SubsystemBase {
 
   @Override
   public void periodic() {
-
-    if (flashTimer > 0) {
-      amplifySignal();
-    } else if (blinkMode && DriverStation.isEnabled()) {
-      blinkColor();
-    } else if (!isReset) {
-      if (DriverStation.isEnabled()) {
-        changeColor(LEDConstants.kEnabledColor);
-      } else {
-        changeColor(LEDConstants.kDisabledColor);
-      }
-      isReset = true;
+    if (DriverStation.isEnabled()){
+      if (flashTimer > 0) {
+        amplifySignal();
+      } else if (blinkMode) {
+        blinkColor();
+      } else if (!isReset) {
+        cancelSignal();
+        isReset = true;
+      } 
+    } else {
+      changeColor(LEDConstants.kDisabledColor);
     }
   }
 }
