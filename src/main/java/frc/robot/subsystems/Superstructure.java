@@ -30,6 +30,8 @@ import frc.robot.subsystems.drive.MAXSwerve;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.led.LEDs;
 import frc.robot.subsystems.outtake.Outtake;
+import frc.robot.util.TOFSensor;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -65,6 +67,8 @@ public class Superstructure {
   private boolean readyToShoot = false;
 
   private boolean climbersUp = false;
+
+  private boolean ignoreTOF = false;
 
   public Superstructure(
       MAXSwerve drivebase, Intake intake, Outtake outtake, Climb climb, LEDs leds) {
@@ -159,10 +163,14 @@ public class Superstructure {
 
   // Command to extend the intake
   public Command extendIntake() {
-    return Commands.sequence(
+
+    return Commands.either(
+      processNote(),
+      Commands.sequence(
         logEvent("Extending Intake"),
         intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
-        intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed));
+        intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed)),
+        () -> ignoreTOF);
   }
 
   // Command to retract the intake
@@ -266,7 +274,7 @@ public class Superstructure {
             outtake.changeRPMSetpoint(0),
             intake.changeRollerSpeed(0),
             Commands.runOnce(() -> currentNoteState = noteState.Outtake))
-        .onlyIf(intake::hasNote)
+        .onlyIf(() -> intake.hasNote() || ignoreTOF)
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
 
@@ -470,7 +478,7 @@ public class Superstructure {
         CenFS0(),
         intakePath("CenF-S02", true),
         Commands.parallel(
-            processNote().andThen(readyPiece()).onlyIf(intake::hasNote), drivebase.goToShotPoint()),
+            processNote().andThen(readyPiece()).onlyIf(() -> (intake.hasNote() || ignoreTOF)), drivebase.goToShotPoint()),
         retractIntake(),
         shootPiece());
   }
