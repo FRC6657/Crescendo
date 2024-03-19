@@ -79,7 +79,7 @@ public class Superstructure {
     this.leds = leds;
 
     // Automatically run process note when the note is detected, but only in teleop
-    noteDetector = new Trigger(() -> (intake.noteDetected() && DriverStation.isTeleop()));
+    noteDetector = new Trigger(() -> ((intake.noteDetected() && DriverStation.isTeleop()) && !ignoreTOF));
     noteDetector.onTrue(processNote());
 
     // Seed the latest event key
@@ -108,7 +108,9 @@ public class Superstructure {
     return Commands.sequence(
             leds.changeColorCommand(LEDConstants.kProcessingColor),
             Commands.runOnce(() -> currentNoteState = noteState.Processing),
-            retractIntake(),
+            logEvent("Extending Intake"),
+            intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
+            intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed),
             Commands.waitUntil(intake::atSetpoint),
             chamberNote(),
             relocateNote(),
@@ -162,22 +164,22 @@ public class Superstructure {
 
   // Command to extend the intake
   public Command extendIntake() {
-
-    return Commands.either(
-        processNote(),
-        Commands.sequence(
+        return Commands.sequence(
             logEvent("Extending Intake"),
             intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
-            intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed)),
-        () -> ignoreTOF);
+            intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed));
   }
 
   // Command to retract the intake
   public Command retractIntake() {
-    return Commands.sequence(
+    return 
+    Commands.either(
+      processNote(),
+      Commands.sequence(
         logEvent("Retracting Intake"),
         intake.changeRollerSpeed(0),
-        intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
+        intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle)),
+        () -> ignoreTOF);
   }
 
   // Command to return the robot to its default position
