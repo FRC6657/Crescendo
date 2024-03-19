@@ -464,6 +464,33 @@ public class Superstructure {
         autoStart(AutoConstants.BLUE_SOURCE_FENDER, AutoConstants.RED_SOURCE_FENDER));
   }
 
+  public Command SouFS0145() {
+    return Commands.sequence(
+      SouFS0(),
+      intakePath("SouF-S0143.1", true),
+      Commands.parallel(
+            processNote().andThen(readyPiece()).onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
+            drivebase.goToShotPoint()),
+      shootPiece(),
+      intakePath("SouF-S0143.2", true),
+      Commands.parallel(
+            processNote().andThen(readyPiece()).onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
+            drivebase.goToShotPoint()),
+      shootPiece(),
+      intakePath("SouF-S0143.3", true),
+      Commands.parallel(
+            processNote().andThen(readyPiece()).onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
+            drivebase.goToShotPoint()),
+      shootPiece(),
+      intakePath("SouF-S0143.4", 1, 1.7),
+      Commands.parallel(
+            processNote().andThen(readyPiece()).onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
+            drivebase.goToShotPoint()),
+      shootPiece()
+      
+    );
+  }
+
   public Command CenFS0() {
     return Commands.sequence(
         autoStart(AutoConstants.BLUE_CENTER_FENDER, AutoConstants.RED_CENTER_FENDER));

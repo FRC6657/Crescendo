@@ -149,6 +149,7 @@ public class Robot extends LoggedRobot {
     autoChooser.addOption("CenF-S03", superstructure.CenFS03());
     autoChooser.addOption("AmpF-S0", superstructure.AmpFS0());
     autoChooser.addOption("AmpF-S041", superstructure.AmpFS041());
+    autoChooser.addOption("SouF-S0145", superstructure.SouFS0145());
     // autoChooser.addOption("Accel Sysid", superstructure.accelSysid());
     // autoChooser.addOption("CenF-S03214", superstructure.CenFS3214());
 
