@@ -144,7 +144,8 @@ public class MAXSwerve extends SubsystemBase {
   public Command runVelocityFieldRelative(Supplier<ChassisSpeeds> speeds) {
     return this.runVelocity(
         () ->
-            ChassisSpeeds.fromFieldRelativeSpeeds(speeds.get(), getPose().getRotation().plus(new Rotation2d(isRed() ? Math.PI : 0))));
+            ChassisSpeeds.fromFieldRelativeSpeeds(
+                speeds.get(), getPose().getRotation().plus(new Rotation2d(isRed() ? Math.PI : 0))));
   }
 
   public Rotation2d feildRelativeValue() {
@@ -279,16 +280,20 @@ public class MAXSwerve extends SubsystemBase {
     return this.run(() -> {}).until(() -> chasePose(targetPose));
   }
 
-  public Command goToShotPoint(){
+  public Command goToShotPoint() {
     return this.run(() -> {}).until(() -> chasePose(getNearestShotPoint()));
   }
 
-  public Command goToAmpPose(){
-    return this.run(() -> {}).until(() -> chasePose(new Pose2d(isRed() ? 14.65 : 1.9 ,7.771, new Rotation2d(-Math.PI / 2))));
+  public Command goToAmpPose() {
+    return this.run(() -> {})
+        .until(
+            () ->
+                chasePose(new Pose2d(isRed() ? 14.65 : 1.9, 7.771, new Rotation2d(-Math.PI / 2))));
   }
 
   public Pose2d getNearestShotPoint() {
-    Translation2d speakerCenter = (isRed()) ? new Translation2d(16.3, 5.549) : new Translation2d(0, 5.549);
+    Translation2d speakerCenter =
+        (isRed()) ? new Translation2d(16.3, 5.549) : new Translation2d(0, 5.549);
     double shotDistance = 1.75; // meters
     double xLimit = isRed() ? 15.300000 : 1.216700;
 
@@ -301,18 +306,19 @@ public class MAXSwerve extends SubsystemBase {
     double m = (aY - getPose().getY()) / (aX - getPose().getX());
     double angle = Math.atan(m);
 
-    Pose2d desiredPos = new Pose2d(aX, aY, new Rotation2d(angle).plus(new Rotation2d(isRed() ? Math.PI : 0)));
+    Pose2d desiredPos =
+        new Pose2d(aX, aY, new Rotation2d(angle).plus(new Rotation2d(isRed() ? Math.PI : 0)));
 
     boolean side = desiredPos.getY() > 5.549;
     double newY = 5.549 + (side ? 1.581139 : -1.581139);
-  
-    if(isRed()){
-      if(desiredPos.getX() > xLimit){ 
+
+    if (isRed()) {
+      if (desiredPos.getX() > xLimit) {
         double newR = side ? 2.179042 : -2.179042;
         desiredPos = new Pose2d(xLimit, newY, new Rotation2d(newR));
       }
-    }else{
-      if(desiredPos.getX() < xLimit){
+    } else {
+      if (desiredPos.getX() < xLimit) {
         double newR = side ? 0.962551 : -0.962551;
         desiredPos = new Pose2d(xLimit, newY, new Rotation2d(newR));
       }
@@ -336,7 +342,8 @@ public class MAXSwerve extends SubsystemBase {
 
               ChassisSpeeds speeds =
                   ChassisSpeeds.fromFieldRelativeSpeeds(
-                      new ChassisSpeeds(xSpeedVal, ySpeedVal, rSpeedVal), getPose().getRotation().plus(new Rotation2d(isRed() ? Math.PI : 0)));
+                      new ChassisSpeeds(xSpeedVal, ySpeedVal, rSpeedVal),
+                      getPose().getRotation().plus(new Rotation2d(isRed() ? Math.PI : 0)));
 
               if (noteXVal != 0) {
                 rSpeedVal = MathUtil.clamp(thetaController.calculate(noteXVal, 0), -2, 2);
@@ -347,5 +354,4 @@ public class MAXSwerve extends SubsystemBase {
             })
         .beforeStarting(() -> thetaController.reset());
   }
-
 }

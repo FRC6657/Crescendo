@@ -116,7 +116,8 @@ public class AprilTagCamera {
     try {
       var estimate = getEstimatedGlobalPose().get();
       var estPose = estimate.estimatedPose;
-      return new CameraResult(estPose, getEstimationStdDevs(estPose.toPose2d()), estimate.timestampSeconds);
+      return new CameraResult(
+          estPose, getEstimationStdDevs(estPose.toPose2d()), estimate.timestampSeconds);
     } catch (Exception e) {
       return new CameraResult(new Pose3d(), VecBuilder.fill(0, 0, 0), 0);
     }

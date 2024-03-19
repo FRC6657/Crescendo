@@ -164,11 +164,11 @@ public class Superstructure {
   public Command extendIntake() {
 
     return Commands.either(
-      processNote(),
-      Commands.sequence(
-        logEvent("Extending Intake"),
-        intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
-        intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed)),
+        processNote(),
+        Commands.sequence(
+            logEvent("Extending Intake"),
+            intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
+            intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed)),
         () -> ignoreTOF);
   }
 
@@ -440,7 +440,10 @@ public class Superstructure {
             drivebase);
     return Commands.sequence(
             Commands.runOnce(
-                () -> Logger.recordOutput("Superstructure/CurrentPath", isRed() ? traj.flipped().getPoses() : traj.getPoses())),
+                () ->
+                    Logger.recordOutput(
+                        "Superstructure/CurrentPath",
+                        isRed() ? traj.flipped().getPoses() : traj.getPoses())),
             setPoseCommand,
             swerveCommand,
             Commands.runOnce(() -> drivebase.stop(), drivebase))
@@ -477,7 +480,8 @@ public class Superstructure {
         CenFS0(),
         intakePath("CenF-S02", true),
         Commands.parallel(
-            processNote().andThen(readyPiece()).onlyIf(() -> (intake.hasNote() || ignoreTOF)), drivebase.goToShotPoint()),
+            processNote().andThen(readyPiece()).onlyIf(() -> (intake.hasNote() || ignoreTOF)),
+            drivebase.goToShotPoint()),
         retractIntake(),
         shootPiece());
   }
