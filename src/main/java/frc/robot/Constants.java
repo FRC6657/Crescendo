@@ -335,8 +335,8 @@ public class Constants {
     public static final double kPivotCurrentLimit = 50;
     public static final double kRollersCurrentLimit = 20;
 
-    public static final double kGroundIntakeSpeed = 0.5;
-    public static final double kFeedSpeed = -0.65;
+    public static final double kGroundIntakeSpeed = 0.7;
+    public static final double kFeedSpeed = -0.25;
 
     public static Slot0Configs kPivotSlot0 =
         new Slot0Configs()

@@ -30,8 +30,6 @@ import frc.robot.subsystems.drive.MAXSwerve;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.led.LEDs;
 import frc.robot.subsystems.outtake.Outtake;
-import frc.robot.util.TOFSensor;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
