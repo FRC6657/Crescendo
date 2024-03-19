@@ -63,7 +63,7 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean tofUnplugged() {
-    return intakeInputs.tofDistance < 0;
+    return intakeInputs.tofUnplugged;
   }
 
   @Override

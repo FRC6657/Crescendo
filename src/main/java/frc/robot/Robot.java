@@ -191,8 +191,9 @@ public class Robot extends LoggedRobot {
     operator.button(1).onTrue(superstructure.ampMode());
     operator.button(2).onTrue(superstructure.speakerMode());
     operator.button(3).onTrue(superstructure.readyPiece());
-    operator.button(7).onTrue(superstructure.raiseClimbers());
-    operator.button(8).onTrue(superstructure.lowerClimbers());
+    operator.button(6).onTrue(superstructure.raiseClimbers());
+    operator.button(7).onTrue(superstructure.lowerClimbers());
+    operator.button(8).onTrue(superstructure.processNote());
 
     operator.button(9).onTrue(superstructure.firstReset());
     operator.button(9).onFalse(superstructure.secondReset());

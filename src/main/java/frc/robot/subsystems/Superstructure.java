@@ -66,9 +66,6 @@ public class Superstructure {
 
   private boolean climbersUp = false;
 
-  @AutoLogOutput(key = "Superstructure/Ignore TOF")
-  private boolean ignoreTOF = false;
-
   public Superstructure(
       MAXSwerve drivebase, Intake intake, Outtake outtake, Climb climb, LEDs leds) {
 
@@ -79,7 +76,7 @@ public class Superstructure {
     this.leds = leds;
 
     // Automatically run process note when the note is detected, but only in teleop
-    noteDetector = new Trigger(() -> ((intake.noteDetected() && DriverStation.isTeleop()) && !ignoreTOF));
+    noteDetector = new Trigger(() -> ((intake.noteDetected() && DriverStation.isTeleop()) && !intake.tofUnplugged()));
     noteDetector.onTrue(processNote());
 
     // Seed the latest event key
@@ -108,9 +105,7 @@ public class Superstructure {
     return Commands.sequence(
             leds.changeColorCommand(LEDConstants.kProcessingColor),
             Commands.runOnce(() -> currentNoteState = noteState.Processing),
-            logEvent("Extending Intake"),
-            intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
-            intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed),
+            retractIntake(),
             Commands.waitUntil(intake::atSetpoint),
             chamberNote(),
             relocateNote(),
@@ -172,14 +167,10 @@ public class Superstructure {
 
   // Command to retract the intake
   public Command retractIntake() {
-    return 
-    Commands.either(
-      processNote(),
-      Commands.sequence(
-        logEvent("Retracting Intake"),
-        intake.changeRollerSpeed(0),
-        intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle)),
-        () -> ignoreTOF);
+    return Commands.sequence(
+      logEvent("Retracting Intake"),
+      intake.changeRollerSpeed(0),
+      intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
   }
 
   // Command to return the robot to its default position
@@ -216,6 +207,7 @@ public class Superstructure {
                 intake.changeRollerSpeed(-IntakeConstants.kFeedSpeed),
                 outtake.changeRPMSetpoint(-OuttakeConstants.kFeedRPM),
                 Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
+                Commands.waitSeconds(0.1),
                 intake.changeRollerSpeed(0),
                 outtake.changeRPMSetpoint(0),
                 Commands.runOnce(() -> currentNoteState = noteState.Intake))
@@ -275,7 +267,7 @@ public class Superstructure {
             outtake.changeRPMSetpoint(0),
             intake.changeRollerSpeed(0),
             Commands.runOnce(() -> currentNoteState = noteState.Outtake))
-        .onlyIf(() -> intake.hasNote() || ignoreTOF)
+        .onlyIf(() -> intake.hasNote() || intake.tofUnplugged())
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
 
@@ -482,7 +474,7 @@ public class Superstructure {
         CenFS0(),
         intakePath("CenF-S02", true),
         Commands.parallel(
-            processNote().andThen(readyPiece()).onlyIf(() -> (intake.hasNote() || ignoreTOF)),
+            processNote().andThen(readyPiece()).onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
             drivebase.goToShotPoint()),
         retractIntake(),
         shootPiece());
