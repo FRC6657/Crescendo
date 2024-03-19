@@ -5,6 +5,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
@@ -114,10 +115,10 @@ public class AprilTagCamera {
   public CameraResult getCameraResult() {
     try {
       var estimate = getEstimatedGlobalPose().get();
-      var estPose = estimate.estimatedPose.toPose2d();
-      return new CameraResult(estPose, getEstimationStdDevs(estPose), estimate.timestampSeconds);
+      var estPose = estimate.estimatedPose;
+      return new CameraResult(estPose, getEstimationStdDevs(estPose.toPose2d()), estimate.timestampSeconds);
     } catch (Exception e) {
-      return new CameraResult(new Pose2d(), VecBuilder.fill(0, 0, 0), 0);
+      return new CameraResult(new Pose3d(), VecBuilder.fill(0, 0, 0), 0);
     }
   }
 

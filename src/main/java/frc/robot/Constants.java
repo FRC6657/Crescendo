@@ -77,11 +77,11 @@ public class Constants {
     public static final String kNoteCameraName = "NoteCamera";
 
     public static final class CameraResult {
-      public final Pose2d estimatedPose;
+      public final Pose3d estimatedPose;
       public final Matrix<N3, N1> stdDevs;
       public final double timestamp;
 
-      public CameraResult(Pose2d estPose, Matrix<N3, N1> stdDevs, double timestamp) {
+      public CameraResult(Pose3d estPose, Matrix<N3, N1> stdDevs, double timestamp) {
         this.estimatedPose = estPose;
         this.stdDevs = stdDevs;
         this.timestamp = timestamp;

@@ -231,7 +231,7 @@ public class Robot extends LoggedRobot {
       Logger.recordOutput("Vision/BackGlobalEstimate", backResult.estimatedPose);
       if (RobotBase.isReal()) {
         drivebase.addVisionMeasurement(
-            backResult.estimatedPose, backResult.timestamp, backResult.stdDevs);
+            backResult.estimatedPose.toPose2d(), backResult.timestamp, backResult.stdDevs);
       }
     }
 
@@ -239,7 +239,7 @@ public class Robot extends LoggedRobot {
       Logger.recordOutput("Vision/SideGlobalEstimate", sideResult.estimatedPose);
       if (RobotBase.isReal()) {
         // drivebase.addVisionMeasurement(
-        //     sideResult.estimatedPose, sideResult.timestamp, sideResult.stdDevs);
+        //     sideResult.estimatedPose.toPose2d(), sideResult.timestamp, sideResult.stdDevs);
       }
     }
   }
