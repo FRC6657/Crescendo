@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.CameraResult;
 import java.util.Optional;
+
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -101,7 +103,7 @@ public class AprilTagCamera {
     // Decrease std devs if multiple targets are visible
     if (numTags > 1) estStdDevs = VisionConstants.kMultiTagStdDevs;
     // Increase std devs based on (average) distance
-    if (avgDist > 2.5)
+    if (numTags == 1 && avgDist > 4)
       estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
     else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
 

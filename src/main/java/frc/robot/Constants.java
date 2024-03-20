@@ -126,7 +126,7 @@ public class Constants {
     // Auto Align
     public static final double kAA_P_X = 3.5;
     public static final double kAA_P_Y = 3.5;
-    public static final double kAA_P_Theta = 3;
+    public static final double kAA_P_Theta = 8;
 
     public static final double kAA_T_Clamp = 3; // m/s
     public static final double kAA_R_Clamp = 2 * Math.PI; // rad/s
@@ -333,9 +333,9 @@ public class Constants {
     public static final double kMaxPivotAngle = 152.25;
 
     public static final double kPivotCurrentLimit = 50;
-    public static final double kRollersCurrentLimit = 20;
+    public static final double kRollersCurrentLimit = 30;
 
-    public static final double kGroundIntakeSpeed = 0.7;
+    public static final double kGroundIntakeSpeed = 0.9;
     public static final double kFeedSpeed = -0.25;
 
     public static Slot0Configs kPivotSlot0 =

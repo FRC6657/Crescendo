@@ -240,8 +240,7 @@ public class Robot extends LoggedRobot {
     if (sideResult.timestamp != 0.0) {
       Logger.recordOutput("Vision/SideGlobalEstimate", sideResult.estimatedPose);
       if (RobotBase.isReal()) {
-        // drivebase.addVisionMeasurement(
-        //     sideResult.estimatedPose.toPose2d(), sideResult.timestamp, sideResult.stdDevs);
+        drivebase.addVisionMeasurement(sideResult.estimatedPose.toPose2d(), sideResult.timestamp, sideResult.stdDevs);
       }
     }
   }
