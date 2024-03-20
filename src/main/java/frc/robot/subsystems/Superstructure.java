@@ -76,7 +76,9 @@ public class Superstructure {
     this.leds = leds;
 
     // Automatically run process note when the note is detected, but only in teleop
-    noteDetector = new Trigger(() -> ((intake.noteDetected() && DriverStation.isTeleop()) && !intake.tofUnplugged()));
+    noteDetector =
+        new Trigger(
+            () -> ((intake.noteDetected() && DriverStation.isTeleop()) && !intake.tofUnplugged()));
     noteDetector.onTrue(processNote());
 
     // Seed the latest event key
@@ -159,18 +161,18 @@ public class Superstructure {
 
   // Command to extend the intake
   public Command extendIntake() {
-        return Commands.sequence(
-            logEvent("Extending Intake"),
-            intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
-            intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed));
+    return Commands.sequence(
+        logEvent("Extending Intake"),
+        intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
+        intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed));
   }
 
   // Command to retract the intake
   public Command retractIntake() {
     return Commands.sequence(
-      logEvent("Retracting Intake"),
-      intake.changeRollerSpeed(0),
-      intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
+        logEvent("Retracting Intake"),
+        intake.changeRollerSpeed(0),
+        intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
   }
 
   // Command to return the robot to its default position
@@ -466,29 +468,35 @@ public class Superstructure {
 
   public Command SouFS0145() {
     return Commands.sequence(
-      SouFS0(),
-      intakePath("SouF-S0143.1", true),
-      Commands.parallel(
-            processNote().andThen(readyPiece()).onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
+        SouFS0(),
+        intakePath("SouF-S0143.1", true),
+        Commands.parallel(
+            processNote()
+                .andThen(readyPiece())
+                .onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
             drivebase.goToShotPoint()),
-      shootPiece(),
-      intakePath("SouF-S0143.2", true),
-      Commands.parallel(
-            processNote().andThen(readyPiece()).onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
+        shootPiece(),
+        intakePath("SouF-S0143.2", true),
+        Commands.parallel(
+            processNote()
+                .andThen(readyPiece())
+                .onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
             drivebase.goToShotPoint()),
-      shootPiece(),
-      intakePath("SouF-S0143.3", true),
-      Commands.parallel(
-            processNote().andThen(readyPiece()).onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
+        shootPiece(),
+        intakePath("SouF-S0143.3", true),
+        Commands.parallel(
+            processNote()
+                .andThen(readyPiece())
+                .onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
             drivebase.goToShotPoint()),
-      shootPiece(),
-      intakePath("SouF-S0143.4", 1, 1.7),
-      Commands.parallel(
-            processNote().andThen(readyPiece()).onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
+        shootPiece(),
+        intakePath("SouF-S0143.4", 1, 1.7),
+        Commands.parallel(
+            processNote()
+                .andThen(readyPiece())
+                .onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
             drivebase.goToShotPoint()),
-      shootPiece()
-      
-    );
+        shootPiece());
   }
 
   public Command CenFS0() {
@@ -501,7 +509,9 @@ public class Superstructure {
         CenFS0(),
         intakePath("CenF-S02", true),
         Commands.parallel(
-            processNote().andThen(readyPiece()).onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
+            processNote()
+                .andThen(readyPiece())
+                .onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
             drivebase.goToShotPoint()),
         retractIntake(),
         shootPiece());
