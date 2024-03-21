@@ -25,7 +25,7 @@ public class Vision {
 
   private AprilTagCamera backCamera;
   private AprilTagCamera sideCamera;
-  // private NoteCamera noteCamera;
+  private NoteCamera noteCamera;
 
   private VisionSystemSim visionSim;
 
@@ -35,7 +35,7 @@ public class Vision {
     backCamera = new AprilTagCamera(backCameraInfo.name, backCameraInfo.cameraPose);
     sideCamera = new AprilTagCamera(sideCameraInfo.name, sideCameraInfo.cameraPose);
 
-    // noteCamera = new NoteCamera(noteCameraName);
+    noteCamera = new NoteCamera(noteCameraName);
 
     if (RobotBase.isSimulation()) {
       visionSim = new VisionSystemSim("main");
@@ -55,8 +55,7 @@ public class Vision {
 
   @AutoLogOutput(key = "Vision/NoteX")
   public double getNoteX() {
-    // return noteCamera.getNoteX();
-    return 0;
+    return noteCamera.getNoteX();
   }
 
   public void simulationPeriodic(Pose2d robotSimPose) {
