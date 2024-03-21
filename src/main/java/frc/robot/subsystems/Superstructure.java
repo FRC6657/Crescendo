@@ -141,6 +141,14 @@ public class Superstructure {
         leds.disableBlinkMode());
   }
 
+  public Command toggleClimb() {
+    if (climbersUp == false) {
+      return raiseClimbers();
+    } else {
+      return lowerClimbers();
+    }
+  }
+
   // Command to stow the outtake
   public Command stowOuttake() {
     return Commands.sequence(

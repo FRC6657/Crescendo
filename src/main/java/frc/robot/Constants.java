@@ -135,7 +135,7 @@ public class Constants {
     public static final double kAA_R_Tolerance = Units.degreesToRadians(2); // rad
 
     // Note Aim
-    public static final double kNA_P = 1d/20;
+    public static final double kNA_P = 1d / 20;
 
     // Starting Positions
     public static final Pose2d BLUE_CENTER_FENDER =
