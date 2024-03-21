@@ -150,25 +150,24 @@ public class Robot extends LoggedRobot {
     autoChooser.addOption("AmpF-S0", superstructure.AmpFS0());
     autoChooser.addOption("AmpF-S041", superstructure.AmpFS041());
     autoChooser.addOption("SouF-S0145", superstructure.SouFS0145());
-    // autoChooser.addOption("Accel Sysid", superstructure.accelSysid());
     // autoChooser.addOption("CenF-S03214", superstructure.CenFS3214());
 
     NoteVisualizer.setRobotPoseSupplier(drivebase::getPose);
 
-    // Set the default command for the drivebase for TeleOP driving
+    // Set the default command for the drivebase for TeleOp driving
     drivebase.setDefaultCommand(
         drivebase.runVelocityFieldRelative(
             () ->
                 new ChassisSpeeds(
                     -MathUtil.applyDeadband(driver.getLeftY(), 0.05)
                         * MAXSwerveConstants.kMaxDriveSpeed
-                        * 0.7,
+                        * (driver.b().getAsBoolean() ? DriveConstants.kSlowSpeed : 0.7),
                     -MathUtil.applyDeadband(driver.getLeftX(), 0.05)
                         * MAXSwerveConstants.kMaxDriveSpeed
-                        * 0.7,
+                        * (driver.b().getAsBoolean() ? DriveConstants.kSlowSpeed : 0.7),
                     -MathUtil.applyDeadband(driver.getRightX(), 0.05)
                         * DriveConstants.kMaxAngularVelocity
-                        * 0.4)));
+                        * (driver.b().getAsBoolean() ? DriveConstants.kSlowSpeed : 0.4))));
 
     driver
         .a()
