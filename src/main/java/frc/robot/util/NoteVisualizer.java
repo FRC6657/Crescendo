@@ -53,7 +53,6 @@ public class NoteVisualizer {
                           && DriverStation.getAlliance().get().equals(Alliance.Red);
                   final Pose3d endPose =
                       new Pose3d(isRed ? redSpeaker : blueSpeaker, startPose.getRotation());
-
                   final double duration =
                       startPose.getTranslation().getDistance(endPose.getTranslation()) / shotSpeed;
                   final Timer timer = new Timer();

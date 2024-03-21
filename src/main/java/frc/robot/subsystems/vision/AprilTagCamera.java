@@ -14,8 +14,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.CameraResult;
 import java.util.Optional;
-
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
