@@ -179,6 +179,7 @@ public class Robot extends LoggedRobot {
                         drivebase.goToShotPoint(),
                         drivebase.goToAmpPose(),
                         superstructure::inSpeakerMode)
+                    .alongWith(superstructure.readyPiece())
                     .andThen(superstructure.shootPiece()),
                 intake::extended));
 
