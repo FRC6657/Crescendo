@@ -109,6 +109,7 @@ public class Superstructure {
             Commands.runOnce(() -> currentNoteState = noteState.Processing),
             retractIntake(),
             Commands.waitUntil(intake::atSetpoint),
+            Commands.waitSeconds(0.5),
             chamberNote(),
             relocateNote(),
             leds.changeColorCommand(LEDConstants.kEnabledColor))
@@ -217,7 +218,7 @@ public class Superstructure {
                 intake.changeRollerSpeed(-IntakeConstants.kFeedSpeed),
                 outtake.changeRPMSetpoint(-OuttakeConstants.kFeedRPM),
                 Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
-                Commands.waitSeconds(0.1),
+                Commands.waitSeconds(0.05),
                 intake.changeRollerSpeed(0),
                 outtake.changeRPMSetpoint(0),
                 Commands.runOnce(() -> currentNoteState = noteState.Intake))
@@ -229,6 +230,22 @@ public class Superstructure {
     commands[3] = readyPiece().onlyIf(() -> readyToShoot);
 
     return Commands.sequence(commands);
+  }
+
+  public Command noteEject(){
+    return Commands.sequence(
+      intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed),
+      Commands.waitSeconds(0.5),
+      intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle)
+    );
+  }
+
+  public Command spitOutNotes(){
+    return Commands.sequence(
+      intake.changePivotSetpoint(10),
+      Commands.waitUntil(intake::atSetpoint),
+      intake.changeRollerSpeed(-1)
+    );
   }
 
   // Readys the robot to shoot the current piece
@@ -279,6 +296,22 @@ public class Superstructure {
             Commands.runOnce(() -> currentNoteState = noteState.Outtake))
         .onlyIf(() -> intake.hasNote() || intake.tofUnplugged())
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+  }
+
+   public Command unreadyPiece() {
+    
+      if (currentScoringMode == ScoringMode.Amp && currentNoteState == noteState.Outtake) {
+        return Commands.sequence(
+          Commands.runOnce(() -> readyToShoot = false),
+          Commands.runOnce(() -> currentNoteState = noteState.Processing),
+          Commands.runOnce(()-> relocateNote())
+        );
+      } else {
+        return Commands.sequence(
+          
+        );
+      }
+    
   }
 
   // Command to shoot the current piece
@@ -474,31 +507,24 @@ public class Superstructure {
         autoStart(AutoConstants.BLUE_SOURCE_FENDER, AutoConstants.RED_SOURCE_FENDER));
   }
 
-  public Command SouFS0145() {
+  public Command AmpFS0145() {
     return Commands.sequence(
-        SouFS0(),
-        intakePath("SouF-S0143.1", true),
+        AmpFS0(),
+        intakePath("AmpF-S0145.1", true),
         Commands.parallel(
             processNote()
                 .andThen(readyPiece())
                 .onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
             drivebase.goToShotPoint()),
         shootPiece(),
-        intakePath("SouF-S0143.2", true),
+        intakePath("AmpF-S0145.2", true),
         Commands.parallel(
             processNote()
                 .andThen(readyPiece())
                 .onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
             drivebase.goToShotPoint()),
         shootPiece(),
-        intakePath("SouF-S0143.3", true),
-        Commands.parallel(
-            processNote()
-                .andThen(readyPiece())
-                .onlyIf(() -> (intake.hasNote() || intake.tofUnplugged())),
-            drivebase.goToShotPoint()),
-        shootPiece(),
-        intakePath("SouF-S0143.4", 1, 1.7),
+        intakePath("AmpF-S0145.3", true),
         Commands.parallel(
             processNote()
                 .andThen(readyPiece())
@@ -544,15 +570,38 @@ public class Superstructure {
         shootPiece(),
         intakePath("CenF-S03214.3", true),
         Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
-        shootPiece(),
-        intakePath("CenF-S03214.4", 1, 1.7),
-        drivebase.goToShotPoint(),
         shootPiece());
+        // intakePath("CenF-S03214.4", 1, 1.7),
+        // drivebase.goToShotPoint(),
+        // shootPiece());
+  }
+
+  public Command CenFS0123(){
+    return Commands.sequence(
+      CenFS0(),
+      intakePath("CenF-S0123.1", true),
+      Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
+      shootPiece(),
+      intakePath("CenF-S0123.2", true),
+      Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
+      shootPiece(),
+      intakePath("CenF-S0123.3", true),
+      Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
+      shootPiece()
+    );
   }
 
   public Command AmpFS0() {
     return Commands.sequence(
         autoStart(AutoConstants.BLUE_AMP_FENDER, AutoConstants.RED_AMP_FENDER));
+  }
+
+  public Command AmpFS01(){
+    return Commands.sequence(
+      AmpFS0(),
+      intakePath("AmpF-S01", true),
+      Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint())
+    );
   }
 
   public Command AmpFS041() {
@@ -564,6 +613,27 @@ public class Superstructure {
         intakePath("AmpF-S041.2", 2),
         drivebase.goToShotPoint(),
         shootPiece());
+  }
+
+
+  public Command SouFS03(){
+    return Commands.sequence(
+      SouFS0(),
+      intakePath("SouF-S03", true),
+      Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint())
+    );
+  }
+
+  public Command SouFS087(){
+    return Commands.sequence(
+      SouFS0(),
+    intakePath("SouF-S087.1", 2, 4),
+    drivebase.goToShotPoint(),
+    shootPiece(),
+    intakePath("SouF-S087.2", 2, 5),
+    drivebase.goToShotPoint(),
+    shootPiece()
+    );
   }
 
   // Sysid at home

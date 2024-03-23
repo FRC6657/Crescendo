@@ -135,7 +135,7 @@ public class Constants {
     public static final double kAA_R_Tolerance = Units.degreesToRadians(2); // rad
 
     // Note Aim
-    public static final double kNA_P = 1d / 20;
+    public static final double kNA_P = 1d / 17;
 
     // Starting Positions
     public static final Pose2d BLUE_CENTER_FENDER =
@@ -335,7 +335,7 @@ public class Constants {
     public static final double kMaxPivotAngle = 152.25;
 
     public static final double kPivotCurrentLimit = 50;
-    public static final double kRollersCurrentLimit = 30;
+    public static final double kRollersCurrentLimit = 60;
 
     public static final double kGroundIntakeSpeed = 0.9;
     public static final double kFeedSpeed = -0.25;
@@ -350,8 +350,8 @@ public class Constants {
 
     public static MotionMagicConfigs kPivotMotionMagicConfig =
         new MotionMagicConfigs()
-            .withMotionMagicCruiseVelocity(Units.degreesToRotations(600))
-            .withMotionMagicAcceleration(Units.degreesToRotations(1000));
+            .withMotionMagicCruiseVelocity(Units.degreesToRotations(250))
+            .withMotionMagicAcceleration(Units.degreesToRotations(500));
 
     public static final CurrentLimitsConfigs kPivotCurrentConfigs =
         new CurrentLimitsConfigs()

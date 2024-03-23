@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ClimbConstants.ClimberInformation;
@@ -146,10 +145,13 @@ public class Robot extends LoggedRobot {
     autoChooser.addDefaultOption("None", null);
     autoChooser.addOption("CenF-S0", superstructure.CenFS0());
     autoChooser.addOption("CenF-S02", superstructure.CenFS02());
-    autoChooser.addOption("CenF-S03", superstructure.CenFS03());
     autoChooser.addOption("AmpF-S0", superstructure.AmpFS0());
     autoChooser.addOption("AmpF-S041", superstructure.AmpFS041());
-    autoChooser.addOption("SouF-S0145", superstructure.SouFS0145());
+    autoChooser.addOption("AmpF-S0145", superstructure.AmpFS0145());
+    autoChooser.addOption("CenF-S0123", superstructure.CenFS0123());
+    autoChooser.addOption("SouF-S03", superstructure.SouFS03());
+    autoChooser.addOption("AmpF-S03", superstructure.AmpFS01());
+    autoChooser.addOption("SouF-S087", superstructure.SouFS087());
     // autoChooser.addOption("CenF-S03214", superstructure.CenFS3214());
 
     NoteVisualizer.setRobotPoseSupplier(drivebase::getPose);
@@ -161,13 +163,13 @@ public class Robot extends LoggedRobot {
                 new ChassisSpeeds(
                     -MathUtil.applyDeadband(driver.getLeftY(), 0.05)
                         * MAXSwerveConstants.kMaxDriveSpeed
-                        * (driver.b().getAsBoolean() ? DriveConstants.kSlowSpeed : 0.7),
+                        * (driver.b().getAsBoolean() ? DriveConstants.kSlowSpeed : 1),
                     -MathUtil.applyDeadband(driver.getLeftX(), 0.05)
                         * MAXSwerveConstants.kMaxDriveSpeed
-                        * (driver.b().getAsBoolean() ? DriveConstants.kSlowSpeed : 0.7),
+                        * (driver.b().getAsBoolean() ? DriveConstants.kSlowSpeed : 1),
                     -MathUtil.applyDeadband(driver.getRightX(), 0.05)
                         * DriveConstants.kMaxAngularVelocity
-                        * (driver.b().getAsBoolean() ? DriveConstants.kSlowSpeed : 0.4))));
+                        * (driver.b().getAsBoolean() ? DriveConstants.kSlowSpeed : 1))));
 
     driver
         .a()
@@ -181,7 +183,13 @@ public class Robot extends LoggedRobot {
                         superstructure::inSpeakerMode)
                     .alongWith(superstructure.readyPiece())
                     .andThen(superstructure.shootPiece()),
-                intake::extended));
+                intake::pivotSetpointIsMin));
+
+    // driver
+    //     .a()
+    //     .whileTrue(
+    //             drivebase.noteAim(
+    //                 driver::getLeftY, driver::getLeftX, driver::getRightX, vision::getNoteX));
 
     driver
         .rightTrigger()
@@ -194,9 +202,15 @@ public class Robot extends LoggedRobot {
     operator.button(3).onTrue(superstructure.readyPiece());
     // operator.button(4).onTrue(superstructure.unreadyPiece());
 
-    operator.button(5).onTrue(new InstantCommand(led::amplifySignal));
+    operator.button(4).onTrue(superstructure.raiseClimbers());
 
-    operator.button(6).onTrue(superstructure.toggleClimb());
+    operator.button(5).onTrue(superstructure.lowerClimbers());
+
+    operator.button(6).onTrue(superstructure.spitOutNotes());
+    operator.button(6).onFalse(superstructure.retractIntake());
+
+    operator.button(7).onTrue(superstructure.noteEject());
+    operator.button(7).onFalse(superstructure.retractIntake());
 
     operator.button(8).onTrue(superstructure.processNote());
 
@@ -251,6 +265,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopInit() {
     led.changeColor(LEDConstants.kEnabledColor);
+    
   }
 
   @Override
