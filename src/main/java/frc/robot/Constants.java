@@ -331,20 +331,20 @@ public class Constants {
     public static final double kGearingPivot = (1d / 12) * (16d / 36);
     public static final double kGearingRollers = (11d / 24);
 
-    public static final double kMinPivotAngle = -17;
+    public static final double kMinPivotAngle = -23;
     public static final double kMaxPivotAngle = 152.25;
 
     public static final double kPivotCurrentLimit = 50;
     public static final double kRollersCurrentLimit = 60;
 
-    public static final double kGroundIntakeSpeed = 0.9;
+    public static final double kGroundIntakeSpeed = 0.5;
     public static final double kFeedSpeed = -0.25;
 
     public static Slot0Configs kPivotSlot0 =
         new Slot0Configs()
             .withKS(0)
             .withKV(12d / ((6380d / 60) * kGearingPivot)) // Volts/Mechanism RPS
-            .withKP(300)
+            .withKP(70)
             .withKI(0)
             .withKD(0);
 
@@ -354,7 +354,7 @@ public class Constants {
             .withMotionMagicAcceleration(Units.degreesToRotations(500));
 
     public static final CurrentLimitsConfigs kPivotCurrentConfigs =
-        new CurrentLimitsConfigs()
+        new CurrentLimitsConfigs()  
             .withStatorCurrentLimit(kPivotCurrentLimit)
             .withSupplyCurrentLimit(kPivotCurrentLimit)
             .withStatorCurrentLimitEnable(true)
@@ -386,7 +386,7 @@ public class Constants {
     public static final double kPivotCurrentLimit = 30;
     public static final double kFlywheelCurrentLimit = 30;
 
-    public static final double kFeedRPM = 400;
+    public static final double kFeedRPM = 300;
     public static final double kSpeakerRPM = 2750;
     public static final double kAmpRPM = 1000;
 

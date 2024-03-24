@@ -109,7 +109,7 @@ public class Superstructure {
             Commands.runOnce(() -> currentNoteState = noteState.Processing),
             retractIntake(),
             Commands.waitUntil(intake::atSetpoint),
-            Commands.waitSeconds(0.5),
+            Commands.waitSeconds(0),
             chamberNote(),
             relocateNote(),
             leds.changeColorCommand(LEDConstants.kEnabledColor))
@@ -173,6 +173,7 @@ public class Superstructure {
     return Commands.sequence(
         logEvent("Extending Intake"),
         intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle),
+        outtake.changePivotSetpoint(15),
         intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed));
   }
 
@@ -181,7 +182,9 @@ public class Superstructure {
     return Commands.sequence(
         logEvent("Retracting Intake"),
         intake.changeRollerSpeed(0),
-        intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle));
+        intake.changePivotSetpoint(IntakeConstants.kMaxPivotAngle),
+        Commands.waitUntil(intake::atSetpoint),
+        outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle));
   }
 
   // Command to return the robot to its default position
@@ -627,10 +630,10 @@ public class Superstructure {
   public Command SouFS087(){
     return Commands.sequence(
       SouFS0(),
-    intakePath("SouF-S087.1", 2, 4),
+    intakePath("SouF-S087.1", 1, 3),
     drivebase.goToShotPoint(),
     shootPiece(),
-    intakePath("SouF-S087.2", 2, 5),
+    intakePath("SouF-S087.2", 1, 4.5),
     drivebase.goToShotPoint(),
     shootPiece()
     );
