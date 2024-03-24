@@ -245,6 +245,7 @@ public class Superstructure {
 
   public Command spitOutNotes(){
     return Commands.sequence(
+      outtake.changePivotSetpoint(20),
       intake.changePivotSetpoint(10),
       Commands.waitUntil(intake::atSetpoint),
       intake.changeRollerSpeed(-1)
@@ -401,7 +402,7 @@ public class Superstructure {
             Commands.sequence(
                 Commands.sequence(Commands.waitSeconds(intakeRetractSecond), retractIntake())
                     .until(intake::noteDetected),
-                processNote().unless(intake::pivotSetpointIsMax))));
+                processNote().unless(intake::pivotSetpointIsMax).andThen(readyPiece()))));
   }
 
   public Command intakePath(String pathName, double intakeRetractSecond) {
@@ -627,9 +628,10 @@ public class Superstructure {
     );
   }
 
+  //INITIAL
   public Command SouFS087(){
     return Commands.sequence(
-      SouFS0(),
+    autoStart(AutoConstants.BLUE_SOURCE_AUTO_START, AutoConstants.RED_SOURCE_AUTO_START),
     intakePath("SouF-S087.1", 1, 3),
     drivebase.goToShotPoint(),
     shootPiece(),
@@ -638,6 +640,7 @@ public class Superstructure {
     shootPiece()
     );
   }
+
 
   // Sysid at home
   double maxVel = 3.5;

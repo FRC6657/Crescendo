@@ -3,6 +3,7 @@ package frc.robot;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -124,8 +125,8 @@ public class Constants {
     public static final PIDController kThetaController = new PIDController(8, 0, 0);
 
     // Auto Align
-    public static final double kAA_P_X = 3.5;
-    public static final double kAA_P_Y = 3.5;
+    public static final double kAA_P_X = 3.7;
+    public static final double kAA_P_Y = 3.7;
     public static final double kAA_P_Theta = 8;
 
     public static final double kAA_T_Clamp = 3; // m/s
@@ -147,6 +148,10 @@ public class Constants {
     public static final Pose2d BLUE_SOURCE_FENDER = new Pose2d(0.695, 4.385, new Rotation2d(-1.05));
     public static final Pose2d RED_SOURCE_FENDER =
         new Pose2d(15.875, 4.385, new Rotation2d(-2.091));
+
+    public static final Pose2d BLUE_SOURCE_AUTO_START = new Pose2d(1.216, 3.960, new Rotation2d(-0.963));
+    public static final Pose2d RED_SOURCE_AUTO_START = new Pose2d(15.3, 3.960, new Rotation2d(-2.179));
+
   }
 
   public static final class DriveConstants {
@@ -278,7 +283,7 @@ public class Constants {
     public static final IdleMode kDriveIdleMode = IdleMode.kBrake;
     public static final IdleMode kTurnIdleMode = IdleMode.kBrake;
 
-    public static final int kDriveCurrentLimit = 40; // amps
+    public static final int kDriveCurrentLimit = 50; // amps
     public static final int kTurnCurrentLimit = 20; // amps
   }
 
@@ -352,6 +357,7 @@ public class Constants {
         new MotionMagicConfigs()
             .withMotionMagicCruiseVelocity(Units.degreesToRotations(250))
             .withMotionMagicAcceleration(Units.degreesToRotations(500));
+
 
     public static final CurrentLimitsConfigs kPivotCurrentConfigs =
         new CurrentLimitsConfigs()  

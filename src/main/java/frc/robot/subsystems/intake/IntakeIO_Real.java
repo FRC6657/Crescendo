@@ -1,8 +1,10 @@
 package frc.robot.subsystems.intake;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -46,9 +48,9 @@ public class IntakeIO_Real implements IntakeIO {
         1.0 / IntakeConstants.kGearingPivot; // Sets default output to pivot rotations
     pivotConfigs.Slot0 = IntakeConstants.kPivotSlot0; // PID Constants
     pivotConfigs.CurrentLimits = IntakeConstants.kPivotCurrentConfigs; // Current Limits
-    pivotConfigs.MotionMagic = IntakeConstants.kPivotMotionMagicConfig; // Motion Magic Constants
     pivotConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     pivotConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    pivotConfigs.MotionMagic = IntakeConstants.kPivotMotionMagicConfig;
     pivotConfigurator.apply(pivotConfigs);
     pivotMotor.setNeutralMode(NeutralModeValue.Brake);
 
