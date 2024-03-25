@@ -185,12 +185,6 @@ public class Robot extends LoggedRobot {
                     .andThen(superstructure.shootPiece()),
                 intake::pivotSetpointIsMin));
 
-    // driver
-    //     .a()
-    //     .whileTrue(
-    //             drivebase.noteAim(
-    //                 driver::getLeftY, driver::getLeftX, driver::getRightX, vision::getNoteX));
-
     driver
         .rightTrigger()
         .onTrue(superstructure.extendIntake())
@@ -200,11 +194,9 @@ public class Robot extends LoggedRobot {
     operator.button(1).onTrue(superstructure.ampMode());
     operator.button(2).onTrue(superstructure.speakerMode());
     operator.button(3).onTrue(superstructure.readyPiece());
-    // operator.button(4).onTrue(superstructure.unreadyPiece());
 
-    operator.button(4).onTrue(superstructure.raiseClimbers());
-
-    operator.button(5).onTrue(superstructure.lowerClimbers());
+    //TODO test
+    operator.button(4).onTrue(superstructure.toggleClimb());
 
     operator.button(6).onTrue(superstructure.spitOutNotes());
     operator.button(6).onFalse(superstructure.retractIntake());
@@ -223,6 +215,7 @@ public class Robot extends LoggedRobot {
     // debug
     //     .button(2)
     //     .onTrue(Commands.runOnce(() -> superstructure.overrideNoteState(noteState.Outtake)));
+    
     led.changeColor(LEDConstants.kDisabledColor);
   }
 

@@ -3,7 +3,6 @@ package frc.robot;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -283,7 +282,7 @@ public class Constants {
     public static final IdleMode kDriveIdleMode = IdleMode.kBrake;
     public static final IdleMode kTurnIdleMode = IdleMode.kBrake;
 
-    public static final int kDriveCurrentLimit = 50; // amps
+    public static final int kDriveCurrentLimit = 40; // amps
     public static final int kTurnCurrentLimit = 20; // amps
   }
 

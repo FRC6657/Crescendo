@@ -632,10 +632,10 @@ public class Superstructure {
   public Command SouFS087(){
     return Commands.sequence(
     autoStart(AutoConstants.BLUE_SOURCE_AUTO_START, AutoConstants.RED_SOURCE_AUTO_START),
-    intakePath("SouF-S087.1", 1, 3),
+    intakePath("SouF-S087.1", 0, 7),
     drivebase.goToShotPoint(),
     shootPiece(),
-    intakePath("SouF-S087.2", 1, 4.5),
+    intakePath("SouF-S087.2", 0, 10),
     drivebase.goToShotPoint(),
     shootPiece()
     );
