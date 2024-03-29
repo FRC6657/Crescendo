@@ -134,7 +134,7 @@ public class IntakeIO_Real implements IntakeIO {
     Logger.recordOutput("Intake/TOFStatus", measurement.status);
 
     if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
-      inputs.tofDistance = Units.metersToInches(sensor.getMeasurement().distance_mm);
+      inputs.tofDistance = Units.metersToInches(sensor.getMeasurement().distance_mm * 0.001);
       inputs.tofUnplugged = false;
     }else{
       inputs.tofDistance = -1;
