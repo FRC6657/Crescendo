@@ -114,6 +114,7 @@ public class Constants {
 
     public static final int kIntakeRollers = 16;
     public static final int kIntakePivot = 17;
+    public static final int kIntakeTOF = 18;
   }
 
   public static final class AutoConstants {
@@ -148,9 +149,10 @@ public class Constants {
     public static final Pose2d RED_SOURCE_FENDER =
         new Pose2d(15.875, 4.385, new Rotation2d(-2.091));
 
-    public static final Pose2d BLUE_SOURCE_AUTO_START = new Pose2d(1.216, 3.960, new Rotation2d(-0.963));
-    public static final Pose2d RED_SOURCE_AUTO_START = new Pose2d(15.3, 3.960, new Rotation2d(-2.179));
-
+    public static final Pose2d BLUE_SOURCE_AUTO_START =
+        new Pose2d(1.216, 3.960, new Rotation2d(-0.963));
+    public static final Pose2d RED_SOURCE_AUTO_START =
+        new Pose2d(15.3, 3.960, new Rotation2d(-2.179));
   }
 
   public static final class DriveConstants {
@@ -357,9 +359,8 @@ public class Constants {
             .withMotionMagicCruiseVelocity(Units.degreesToRotations(250))
             .withMotionMagicAcceleration(Units.degreesToRotations(500));
 
-
     public static final CurrentLimitsConfigs kPivotCurrentConfigs =
-        new CurrentLimitsConfigs()  
+        new CurrentLimitsConfigs()
             .withStatorCurrentLimit(kPivotCurrentLimit)
             .withSupplyCurrentLimit(kPivotCurrentLimit)
             .withStatorCurrentLimitEnable(true)

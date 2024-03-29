@@ -60,7 +60,7 @@ public class Intake extends SubsystemBase {
     return intakeInputs.pivotMotorPosition < 0 && intakeInputs.atSetpoint;
   }
 
-  public boolean pivotSetpointIsMin(){
+  public boolean pivotSetpointIsMin() {
     return intakeInputs.pivotMotorSetpoint == IntakeConstants.kMinPivotAngle;
   }
 
@@ -70,10 +70,10 @@ public class Intake extends SubsystemBase {
 
   @AutoLogOutput(key = "Intake/TOF Unplugged")
   public boolean tofUnplugged() {
-    if(DriverStation.isTeleop()) {
-    return true; 
+    if (DriverStation.isTeleop()) {
+      return true;
     } else {
-     return intakeInputs.tofUnplugged;
+      return intakeInputs.tofUnplugged;
     }
   }
 
