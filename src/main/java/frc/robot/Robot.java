@@ -195,7 +195,7 @@ public class Robot extends LoggedRobot {
     operator.button(2).onTrue(superstructure.speakerMode());
     operator.button(3).onTrue(superstructure.readyPiece());
 
-    //TODO test
+    // TODO test
     operator.button(4).onTrue(superstructure.toggleClimb());
 
     operator.button(6).onTrue(superstructure.spitOutNotes());
@@ -215,7 +215,7 @@ public class Robot extends LoggedRobot {
     // debug
     //     .button(2)
     //     .onTrue(Commands.runOnce(() -> superstructure.overrideNoteState(noteState.Outtake)));
-    
+
     led.changeColor(LEDConstants.kDisabledColor);
   }
 
@@ -258,7 +258,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopInit() {
     led.changeColor(LEDConstants.kEnabledColor);
-    
   }
 
   @Override

@@ -6,13 +6,15 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import au.grapplerobotics.LaserCan;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.Constants.CodeConstants;
 import frc.robot.Constants.IntakeConstants;
-import frc.robot.util.TOFSensor;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class IntakeIO_Real implements IntakeIO {
 
@@ -23,7 +25,7 @@ public class IntakeIO_Real implements IntakeIO {
   TalonFX rollerMotor = new TalonFX(Constants.CANID.kIntakeRollers);
 
   // Intake TOF Sensor
-  TOFSensor sensor = new TOFSensor(9);
+  LaserCan sensor = new LaserCan(Constants.CANID.kIntakeTOF);
 
   // Variables to store/log the setpoints
   @AutoLogOutput(key = "Intake/Angle Setpoint")
@@ -96,8 +98,6 @@ public class IntakeIO_Real implements IntakeIO {
     rollerMotor.setInverted(true);
     rollerMotor.setNeutralMode(NeutralModeValue.Brake);
 
-    sensor.setRange(160000, 6000000, 0, 27);
-
     // Feed the PID with default values
     changePivotSetpoint(IntakeConstants.kMaxPivotAngle);
     changeRollerSpeed(0);
@@ -128,8 +128,19 @@ public class IntakeIO_Real implements IntakeIO {
         pivotSetpoint.withPosition(
             Units.degreesToRotations(angleSetpoint))); // Degrees to Native Rotations
 
-    inputs.tofDistance = sensor.getMappedDistance();
-    inputs.tofUnplugged = sensor.getMappedDistance() < -0.2;
+
+    
+    var measurement = sensor.getMeasurement();
+    Logger.recordOutput("Intake/TOFStatus", measurement.status);
+
+    if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
+      inputs.tofDistance = Units.metersToInches(sensor.getMeasurement().distance_mm * 0.001);
+      inputs.tofUnplugged = false;
+    }else{
+      inputs.tofDistance = -1;
+      inputs.tofUnplugged = true;
+    }
+
   }
 
   /**

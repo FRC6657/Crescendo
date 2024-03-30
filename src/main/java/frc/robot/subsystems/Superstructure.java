@@ -235,21 +235,19 @@ public class Superstructure {
     return Commands.sequence(commands);
   }
 
-  public Command noteEject(){
+  public Command noteEject() {
     return Commands.sequence(
-      intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed),
-      Commands.waitSeconds(0.5),
-      intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle)
-    );
+        intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed),
+        Commands.waitSeconds(0.5),
+        intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle));
   }
 
-  public Command spitOutNotes(){
+  public Command spitOutNotes() {
     return Commands.sequence(
-      outtake.changePivotSetpoint(20),
-      intake.changePivotSetpoint(10),
-      Commands.waitUntil(intake::atSetpoint),
-      intake.changeRollerSpeed(-1)
-    );
+        outtake.changePivotSetpoint(20),
+        intake.changePivotSetpoint(10),
+        Commands.waitUntil(intake::atSetpoint),
+        intake.changeRollerSpeed(-1));
   }
 
   // Readys the robot to shoot the current piece
@@ -302,20 +300,16 @@ public class Superstructure {
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
 
-   public Command unreadyPiece() {
-    
-      if (currentScoringMode == ScoringMode.Amp && currentNoteState == noteState.Outtake) {
-        return Commands.sequence(
+  public Command unreadyPiece() {
+
+    if (currentScoringMode == ScoringMode.Amp && currentNoteState == noteState.Outtake) {
+      return Commands.sequence(
           Commands.runOnce(() -> readyToShoot = false),
           Commands.runOnce(() -> currentNoteState = noteState.Processing),
-          Commands.runOnce(()-> relocateNote())
-        );
-      } else {
-        return Commands.sequence(
-          
-        );
-      }
-    
+          Commands.runOnce(() -> relocateNote()));
+    } else {
+      return Commands.sequence();
+    }
   }
 
   // Command to shoot the current piece
@@ -575,24 +569,23 @@ public class Superstructure {
         intakePath("CenF-S03214.3", true),
         Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
         shootPiece());
-        // intakePath("CenF-S03214.4", 1, 1.7),
-        // drivebase.goToShotPoint(),
-        // shootPiece());
+    // intakePath("CenF-S03214.4", 1, 1.7),
+    // drivebase.goToShotPoint(),
+    // shootPiece());
   }
 
-  public Command CenFS0123(){
+  public Command CenFS0123() {
     return Commands.sequence(
-      CenFS0(),
-      intakePath("CenF-S0123.1", true),
-      Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
-      shootPiece(),
-      intakePath("CenF-S0123.2", true),
-      Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
-      shootPiece(),
-      intakePath("CenF-S0123.3", true),
-      Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
-      shootPiece()
-    );
+        CenFS0(),
+        intakePath("CenF-S0123.1", true),
+        Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
+        shootPiece(),
+        intakePath("CenF-S0123.2", true),
+        Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
+        shootPiece(),
+        intakePath("CenF-S0123.3", true),
+        Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()),
+        shootPiece());
   }
 
   public Command AmpFS0() {
@@ -600,12 +593,11 @@ public class Superstructure {
         autoStart(AutoConstants.BLUE_AMP_FENDER, AutoConstants.RED_AMP_FENDER));
   }
 
-  public Command AmpFS01(){
+  public Command AmpFS01() {
     return Commands.sequence(
-      AmpFS0(),
-      intakePath("AmpF-S01", true),
-      Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint())
-    );
+        AmpFS0(),
+        intakePath("AmpF-S01", true),
+        Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()));
   }
 
   public Command AmpFS041() {
@@ -619,28 +611,24 @@ public class Superstructure {
         shootPiece());
   }
 
-
-  public Command SouFS03(){
+  public Command SouFS03() {
     return Commands.sequence(
-      SouFS0(),
-      intakePath("SouF-S03", true),
-      Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint())
-    );
+        SouFS0(),
+        intakePath("SouF-S03", true),
+        Commands.parallel(processNote().andThen(readyPiece()), drivebase.goToShotPoint()));
   }
 
-  //INITIAL
-  public Command SouFS087(){
+  // INITIAL
+  public Command SouFS087() {
     return Commands.sequence(
-    autoStart(AutoConstants.BLUE_SOURCE_AUTO_START, AutoConstants.RED_SOURCE_AUTO_START),
-    intakePath("SouF-S087.1", 0, 7),
-    drivebase.goToShotPoint(),
-    shootPiece(),
-    intakePath("SouF-S087.2", 0, 10),
-    drivebase.goToShotPoint(),
-    shootPiece()
-    );
+        autoStart(AutoConstants.BLUE_SOURCE_AUTO_START, AutoConstants.RED_SOURCE_AUTO_START),
+        intakePath("SouF-S087.1", 0, 7),
+        drivebase.goToShotPoint(),
+        shootPiece(),
+        intakePath("SouF-S087.2", 0, 10),
+        drivebase.goToShotPoint(),
+        shootPiece());
   }
-
 
   // Sysid at home
   double maxVel = 3.5;
