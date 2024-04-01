@@ -1,13 +1,12 @@
 package frc.robot.subsystems.intake;
 
+import au.grapplerobotics.LaserCan;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
-import au.grapplerobotics.LaserCan;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
@@ -128,19 +127,16 @@ public class IntakeIO_Real implements IntakeIO {
         pivotSetpoint.withPosition(
             Units.degreesToRotations(angleSetpoint))); // Degrees to Native Rotations
 
-
-    
     var measurement = sensor.getMeasurement();
     Logger.recordOutput("Intake/TOFStatus", measurement.status);
 
-    if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
+    if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
       inputs.tofDistance = Units.metersToInches(sensor.getMeasurement().distance_mm * 0.001);
       inputs.tofUnplugged = false;
-    }else{
+    } else {
       inputs.tofDistance = -1;
       inputs.tofUnplugged = true;
     }
-
   }
 
   /**
