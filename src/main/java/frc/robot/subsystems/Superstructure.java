@@ -65,6 +65,7 @@ public class Superstructure {
   private boolean readyToShoot = false;
 
   private boolean climbersUp = false;
+  private boolean intendedClimbState = false;
 
   public Superstructure(
       MAXSwerve drivebase, Intake intake, Outtake outtake, Climb climb, LEDs leds) {
@@ -126,6 +127,7 @@ public class Superstructure {
         .beforeStarting(logEvent("Raising Climbers"))
         .andThen(
             Commands.sequence(
+                Commands.runOnce(() -> intendedClimbState = true),
                 Commands.waitUntil(outtake::atPivotSetpoint),
                 climb.changeSetpoint(ClimbConstants.kMaxHeight - 0.5),
                 leds.enableBlinkMode(),
@@ -136,6 +138,7 @@ public class Superstructure {
   public Command lowerClimbers() {
     return Commands.sequence(
         logEvent("Lowering Climbers"),
+        Commands.runOnce(() -> intendedClimbState = false),
         climb.changeSetpoint(0.1),
         Commands.waitUntil(climb::atSetpoint),
         Commands.runOnce(() -> climbersUp = false),
@@ -143,11 +146,10 @@ public class Superstructure {
   }
 
   public Command toggleClimb() {
-    if (climbersUp == false) {
-      return raiseClimbers();
-    } else {
-      return lowerClimbers();
-    }
+    return Commands.either(
+      raiseClimbers(), 
+      lowerClimbers(), 
+      ()-> intendedClimbState);
   }
 
   // Command to stow the outtake
