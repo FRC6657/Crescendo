@@ -93,10 +93,10 @@ public class Constants {
 
     public static final int kPDH = 1;
 
-    public static final int kFrontLeftDrive = 2;
-    public static final int kBackLeftDrive = 4;
-    public static final int kFrontRightDrive = 3;
-    public static final int kBackRightDrive = 5;
+    public static final int kFrontLeftDrive = 3;
+    public static final int kBackLeftDrive = 5;
+    public static final int kFrontRightDrive = 2;
+    public static final int kBackRightDrive = 4;
 
     public static final int kFrontLeftTurn = 6;
     public static final int kBackLeftTurn = 8;
@@ -334,13 +334,13 @@ public class Constants {
 
   public static final class IntakeConstants {
 
-    public static final double kGearingPivot = (1d / 12) * (16d / 36);
+    public static final double kGearingPivot = (1d / 20) * (16d / 36);
     public static final double kGearingRollers = (11d / 24);
 
     public static final double kMinPivotAngle = -23;
     public static final double kMaxPivotAngle = 152.25;
 
-    public static final double kPivotCurrentLimit = 50;
+    public static final double kPivotCurrentLimit = 30;
     public static final double kRollersCurrentLimit = 60;
 
     public static final double kGroundIntakeSpeed = 0.5;
