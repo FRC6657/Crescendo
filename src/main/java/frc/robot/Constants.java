@@ -74,7 +74,7 @@ public class Constants {
     public static final CameraInformation kSideCameraInfo =
         new CameraInformation("Camera_Side", kSideCameraPose);
 
-    public static final String kNoteCameraName = "NoteCamera";
+    public static final String kNoteCameraName = "Note_Camera";
 
     public static final class CameraResult {
       public final Pose3d estimatedPose;
