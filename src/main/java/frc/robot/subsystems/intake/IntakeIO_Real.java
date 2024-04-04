@@ -134,7 +134,7 @@ public class IntakeIO_Real implements IntakeIO {
       inputs.tofDistance = Units.metersToInches(sensor.getMeasurement().distance_mm * 0.001);
       inputs.tofUnplugged = false;
     } else {
-      inputs.tofDistance = -1;
+      inputs.tofDistance = 100;
       inputs.tofUnplugged = true;
     }
   }
