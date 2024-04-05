@@ -294,7 +294,7 @@ public class MAXSwerve extends SubsystemBase {
   public Pose2d getNearestShotPoint() {
     Translation2d speakerCenter =
         (isRed()) ? new Translation2d(16.3, 5.549) : new Translation2d(0, 5.549);
-    double shotDistance = 1.75; // meters
+    double shotDistance = 1.7; // meters
     double xLimit = isRed() ? 15.300000 : 1.216700;
 
     double vX = getPose().getX() - speakerCenter.getX();

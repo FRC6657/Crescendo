@@ -57,7 +57,7 @@ public class Constants {
             new Rotation3d(Math.PI, 0.122173 + Math.PI, -1.28248701081));
 
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(0.4, 0.4, 0.4);
-    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);
+    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
 
     public static final class CameraInformation {
       public final String name;
@@ -94,9 +94,9 @@ public class Constants {
     public static final int kPDH = 1;
 
     public static final int kFrontLeftDrive = 3;
-    public static final int kBackLeftDrive = 5;
+    public static final int kBackLeftDrive = 4;
     public static final int kFrontRightDrive = 2;
-    public static final int kBackRightDrive = 4;
+    public static final int kBackRightDrive = 5;
 
     public static final int kFrontLeftTurn = 7;
     public static final int kBackLeftTurn = 8;
@@ -125,8 +125,8 @@ public class Constants {
     public static final PIDController kThetaController = new PIDController(8, 0, 0);
 
     // Auto Align
-    public static final double kAA_P_X = 3.7;
-    public static final double kAA_P_Y = 3.7;
+    public static final double kAA_P_X = 3.8;
+    public static final double kAA_P_Y = 3.8;
     public static final double kAA_P_Theta = 8;
 
     public static final double kAA_T_Clamp = 3; // m/s
@@ -340,10 +340,12 @@ public class Constants {
     public static final double kMinPivotAngle = -19;
     public static final double kMaxPivotAngle = 152.25;
 
-    public static final double kPivotCurrentLimit = 30;
+    public static final double kPivotSupplyLimit = 40;
+    public static final double kPivotStatorLimit = 80;
+
     public static final double kRollersCurrentLimit = 60;
 
-    public static final double kGroundIntakeSpeed = 0.5;
+    public static final double kGroundIntakeSpeed = 0.7;
     public static final double kFeedSpeed = -0.25;
 
     public static Slot0Configs kPivotSlot0 =
@@ -356,16 +358,16 @@ public class Constants {
 
     public static MotionMagicConfigs kPivotMotionMagicConfig =
         new MotionMagicConfigs()
-            .withMotionMagicCruiseVelocity(Units.degreesToRotations(250))
-            .withMotionMagicAcceleration(Units.degreesToRotations(500));
+            .withMotionMagicCruiseVelocity(Units.degreesToRotations(400))
+            .withMotionMagicAcceleration(Units.degreesToRotations(1200));
 
     public static final CurrentLimitsConfigs kPivotCurrentConfigs =
         new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(kPivotCurrentLimit)
-            .withSupplyCurrentLimit(kPivotCurrentLimit)
+            .withStatorCurrentLimit(kPivotStatorLimit)
+            .withSupplyCurrentLimit(kPivotSupplyLimit)
             .withStatorCurrentLimitEnable(true)
             .withSupplyCurrentLimitEnable(true)
-            .withSupplyCurrentThreshold(kPivotCurrentLimit)
+            .withSupplyCurrentThreshold(kPivotSupplyLimit)
             .withSupplyTimeThreshold(0);
 
     public static final CurrentLimitsConfigs kRollersCurrentConfigs =
@@ -393,7 +395,7 @@ public class Constants {
     public static final double kFlywheelCurrentLimit = 30;
 
     public static final double kFeedRPM = 300;
-    public static final double kSpeakerRPM = 2750;
+    public static final double kSpeakerRPM = 2950;
     public static final double kAmpRPM = 1000;
 
     public static Slot0Configs kPivotSlot0 =

@@ -56,6 +56,7 @@ public class IntakeIO_Real implements IntakeIO {
     // Pivot Status Signals
     var pivotPositionSignal = pivotMotor.getPosition();
     var pivotVelocitySignal = pivotMotor.getVelocity();
+    var pivotAccelerationSignal = pivotMotor.getAcceleration();
     var pivotTempSignal = pivotMotor.getDeviceTemp();
     var pivotVoltageSignal = pivotMotor.getMotorVoltage();
     var pivotCurrentSignal = pivotMotor.getSupplyCurrent();
@@ -63,6 +64,7 @@ public class IntakeIO_Real implements IntakeIO {
 
     pivotPositionSignal.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
     pivotVelocitySignal.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
+    pivotAccelerationSignal.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
     pivotTempSignal.setUpdateFrequency(CodeConstants.kMainLoopFrequency / 4);
     pivotVoltageSignal.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
     pivotCurrentSignal.setUpdateFrequency(CodeConstants.kMainLoopFrequency);
@@ -110,6 +112,7 @@ public class IntakeIO_Real implements IntakeIO {
         Units.rotationsToDegrees(pivotMotor.getPosition().getValueAsDouble()); // Degrees
     inputs.pivotMotorVelocity =
         Units.rotationsToDegrees(pivotMotor.getVelocity().getValueAsDouble()); // Degrees per second
+    inputs.pivotMotorAcceleration = Units.rotationsToDegrees(pivotMotor.getAcceleration().getValueAsDouble());
     inputs.pivotMotorTemp = pivotMotor.getDeviceTemp().getValueAsDouble(); // Celcius
     inputs.pivotMotorVoltage = pivotMotor.getMotorVoltage().getValueAsDouble(); // Volts
     inputs.pivotMotorCurrent = pivotMotor.getSupplyCurrent().getValueAsDouble(); // Amps

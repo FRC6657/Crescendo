@@ -79,7 +79,7 @@ public class Superstructure {
     // Automatically run process note when the note is detected, but only in teleop
     noteDetector =
         new Trigger(
-            () -> ((intake.noteDetected() && DriverStation.isTeleop()) && !intake.tofUnplugged()));
+            () -> ((intake.noteDetected()) && !intake.tofUnplugged() && !DriverStation.isAutonomous()));
     noteDetector.onTrue(processNote());
 
     // Seed the latest event key
@@ -108,9 +108,11 @@ public class Superstructure {
     return Commands.sequence(
             leds.changeColorCommand(LEDConstants.kProcessingColor),
             Commands.runOnce(() -> currentNoteState = noteState.Processing),
+            logEvent("Processing Note"),
+            Commands.waitSeconds(0.2),
             retractIntake(),
             Commands.waitUntil(intake::atSetpoint),
-            Commands.waitSeconds(0),
+            Commands.waitUntil(outtake::atPivotSetpoint),
             chamberNote(),
             relocateNote(),
             leds.changeColorCommand(LEDConstants.kEnabledColor))
@@ -396,8 +398,8 @@ public class Superstructure {
             Commands.waitSeconds(intakeExtendSecond),
             extendIntake(),
             Commands.sequence(
-                Commands.sequence(Commands.waitSeconds(intakeRetractSecond), retractIntake())
-                    .until(intake::noteDetected),
+                Commands.sequence(
+                  Commands.waitSeconds(intakeRetractSecond), retractIntake()).until(intake::noteDetected),
                 processNote().unless(intake::pivotSetpointIsMax).andThen(readyPiece()))));
   }
 
@@ -624,10 +626,10 @@ public class Superstructure {
   public Command SouFS087() {
     return Commands.sequence(
         autoStart(AutoConstants.BLUE_SOURCE_AUTO_START, AutoConstants.RED_SOURCE_AUTO_START),
-        intakePath("SouF-S087.1", 0, 7),
+        intakePath("SouF-S087.1", 0.1, 4),
         drivebase.goToShotPoint(),
         shootPiece(),
-        intakePath("SouF-S087.2", 0, 10),
+        intakePath("SouF-S087.2", 0.1, 5),
         drivebase.goToShotPoint(),
         shootPiece());
   }

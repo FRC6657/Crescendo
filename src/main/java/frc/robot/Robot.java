@@ -196,7 +196,8 @@ public class Robot extends LoggedRobot {
     operator.button(3).onTrue(superstructure.readyPiece());
 
     // TODO test
-    operator.button(4).onTrue(superstructure.toggleClimb());
+    operator.button(4).onTrue(superstructure.raiseClimbers());
+    operator.button(5).onTrue(superstructure.lowerClimbers());
 
     operator.button(6).onTrue(superstructure.spitOutNotes());
     operator.button(6).onFalse(superstructure.retractIntake());
@@ -239,20 +240,24 @@ public class Robot extends LoggedRobot {
     var sideResult = vision.getSideCameraResult();
 
     if (backResult.timestamp != 0.0) {
+      if(Math.abs(backResult.estimatedPose.getZ())  < 0.3){
       Logger.recordOutput("Vision/BackGlobalEstimate", backResult.estimatedPose);
       if (RobotBase.isReal()) {
         drivebase.addVisionMeasurement(
             backResult.estimatedPose.toPose2d(), backResult.timestamp, backResult.stdDevs);
       }
     }
+  }
 
     if (sideResult.timestamp != 0.0) {
+      if(Math.abs(sideResult.estimatedPose.getZ())  < 0.3){
       Logger.recordOutput("Vision/SideGlobalEstimate", sideResult.estimatedPose);
       if (RobotBase.isReal()) {
         drivebase.addVisionMeasurement(
             sideResult.estimatedPose.toPose2d(), sideResult.timestamp, sideResult.stdDevs);
       }
     }
+  }
   }
 
   @Override

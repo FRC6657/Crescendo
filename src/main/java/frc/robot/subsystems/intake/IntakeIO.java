@@ -9,6 +9,7 @@ public interface IntakeIO {
 
     public double pivotMotorPosition = 0.0; // Degrees
     public double pivotMotorVelocity = 0.0; // Degrees per second
+    public double pivotMotorAcceleration = 0.0;
     public double pivotMotorTemp = 0.0; // Celcius
     public double pivotMotorVoltage = 0.0; // Volts
     public double pivotMotorCurrent = 0.0; // Amps
