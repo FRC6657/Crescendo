@@ -251,6 +251,8 @@ public class Superstructure {
         outtake.changePivotSetpoint(20),
         intake.changePivotSetpoint(10),
         Commands.waitUntil(intake::atSetpoint),
+        Commands.waitUntil(outtake::atPivotSetpoint),
+        outtake.changeRPMSetpoint(300),
         intake.changeRollerSpeed(-1));
   }
 
@@ -626,10 +628,10 @@ public class Superstructure {
   public Command SouFS087() {
     return Commands.sequence(
         autoStart(AutoConstants.BLUE_SOURCE_AUTO_START, AutoConstants.RED_SOURCE_AUTO_START),
-        intakePath("SouF-S087.1", 0.1, 4),
+        intakePath("SouF-S087-New.1", 0.1, 4),
         drivebase.goToShotPoint(),
         shootPiece(),
-        intakePath("SouF-S087.2", 0.1, 5),
+        intakePath("SouF-S087-New.2", 0.1, 5),
         drivebase.goToShotPoint(),
         shootPiece());
   }

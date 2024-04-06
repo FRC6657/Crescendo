@@ -178,11 +178,9 @@ public class Robot extends LoggedRobot {
                 drivebase.noteAim(
                     driver::getLeftY, driver::getLeftX, driver::getRightX, vision::getNoteX),
                 Commands.either(
-                        drivebase.goToShotPoint(),
-                        drivebase.goToAmpPose(),
-                        superstructure::inSpeakerMode)
-                    .alongWith(superstructure.readyPiece())
-                    .andThen(superstructure.shootPiece()),
+                        drivebase.goToShotPoint().alongWith(superstructure.readyPiece()).andThen(superstructure.shootPiece()),
+                        drivebase.goToAmpPose().alongWith(superstructure.readyPiece()),
+                        superstructure::inSpeakerMode),
                 intake::pivotSetpointIsMin));
 
     driver
@@ -190,6 +188,8 @@ public class Robot extends LoggedRobot {
         .onTrue(superstructure.extendIntake())
         .onFalse(superstructure.retractIntake());
     driver.leftTrigger().onTrue(superstructure.shootPiece());
+
+    
 
     operator.button(1).onTrue(superstructure.ampMode());
     operator.button(2).onTrue(superstructure.speakerMode());
@@ -200,7 +200,7 @@ public class Robot extends LoggedRobot {
     operator.button(5).onTrue(superstructure.lowerClimbers());
 
     operator.button(6).onTrue(superstructure.spitOutNotes());
-    operator.button(6).onFalse(superstructure.retractIntake());
+    operator.button(6).onFalse(superstructure.retractIntake().andThen(outtake.changeRPMSetpoint(0)));
 
     operator.button(7).onTrue(superstructure.noteEject());
     operator.button(7).onFalse(superstructure.retractIntake());
@@ -246,6 +246,8 @@ public class Robot extends LoggedRobot {
         drivebase.addVisionMeasurement(
             backResult.estimatedPose.toPose2d(), backResult.timestamp, backResult.stdDevs);
       }
+    }else{
+      Logger.recordOutput("Vision/ThrownOutBackGlobalEstimate", backResult.estimatedPose);
     }
   }
 
@@ -253,10 +255,12 @@ public class Robot extends LoggedRobot {
       if(Math.abs(sideResult.estimatedPose.getZ())  < 0.3){
       Logger.recordOutput("Vision/SideGlobalEstimate", sideResult.estimatedPose);
       if (RobotBase.isReal()) {
-        drivebase.addVisionMeasurement(
-            sideResult.estimatedPose.toPose2d(), sideResult.timestamp, sideResult.stdDevs);
+        //drivebase.addVisionMeasurement(
+        //   sideResult.estimatedPose.toPose2d(), sideResult.timestamp, sideResult.stdDevs);
       }
-    }
+      }else{
+        Logger.recordOutput("Vision/ThrownOutSideGlobalEstimate", sideResult.estimatedPose);
+      }
   }
   }
 
