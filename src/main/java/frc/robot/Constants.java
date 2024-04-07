@@ -57,7 +57,7 @@ public class Constants {
             new Rotation3d(Math.PI, 0.122173 + Math.PI, -1.28248701081));
 
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(0.4, 0.4, 0.4);
-    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
+    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.07, 0.07, 0.3);
 
     public static final class CameraInformation {
       public final String name;
@@ -430,7 +430,7 @@ public class Constants {
 
     public static final CurrentLimitsConfigs kFlywheelCurrentConfigs =
         new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(kFlywheelCurrentLimit)
+            .withStatorCurrentLimit(kFlywheelCurrentLimit * 2)
             .withSupplyCurrentLimit(kFlywheelCurrentLimit)
             .withStatorCurrentLimitEnable(true)
             .withSupplyCurrentLimitEnable(true)

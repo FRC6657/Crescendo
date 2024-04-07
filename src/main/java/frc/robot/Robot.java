@@ -200,10 +200,10 @@ public class Robot extends LoggedRobot {
     operator.button(5).onTrue(superstructure.lowerClimbers());
 
     operator.button(6).onTrue(superstructure.spitOutNotes());
-    operator.button(6).onFalse(superstructure.retractIntake().andThen(outtake.changeRPMSetpoint(0)));
+    operator.button(6).onFalse(superstructure.retractIntake());
 
-    operator.button(7).onTrue(superstructure.noteEject());
-    operator.button(7).onFalse(superstructure.retractIntake());
+    operator.button(7).onTrue(superstructure.outtakeEject());
+    operator.button(7).onFalse(superstructure.retractIntake().andThen(outtake.changeRPMSetpoint(0)));
 
     operator.button(8).onTrue(superstructure.processNote());
 

@@ -239,22 +239,22 @@ public class Superstructure {
     return Commands.sequence(commands);
   }
 
-  public Command noteEject() {
+  public Command outtakeEject() {
     return Commands.sequence(
-        intake.changeRollerSpeed(IntakeConstants.kGroundIntakeSpeed),
-        Commands.waitSeconds(0.5),
-        intake.changePivotSetpoint(IntakeConstants.kMinPivotAngle));
+        outtake.changePivotSetpoint(20),
+        Commands.waitUntil(outtake::atPivotSetpoint),
+        outtake.changeRPMSetpoint(300));
   }
 
   public Command spitOutNotes() {
     return Commands.sequence(
-        outtake.changePivotSetpoint(20),
         intake.changePivotSetpoint(10),
+        outtake.changePivotSetpoint(20),
         Commands.waitUntil(intake::atSetpoint),
         Commands.waitUntil(outtake::atPivotSetpoint),
-        outtake.changeRPMSetpoint(300),
         intake.changeRollerSpeed(-1));
   }
+
 
   // Readys the robot to shoot the current piece
   // The behavior of this command is dependant on the current scoring mode
@@ -332,6 +332,7 @@ public class Superstructure {
                 Commands.waitUntil(outtake::atPivotSetpoint),
                 outtake.changeRPMSetpoint(OuttakeConstants.kAmpRPM),
                 Commands.waitUntil(() -> !outtake.beamBroken()).unless(RobotBase::isSimulation),
+                Commands.waitSeconds(1),
                 outtake.changeRPMSetpoint(0),
                 outtake.changePivotSetpoint(OuttakeConstants.kMinPivotAngle),
                 Commands.runOnce(() -> currentNoteState = noteState.None),
@@ -502,7 +503,8 @@ public class Superstructure {
     return Commands.sequence(
         Commands.runOnce(() -> drivebase.setPose(isRed() ? redPos : bluePos)),
         Commands.runOnce(() -> currentNoteState = noteState.Intake),
-        drivebase.goToShotPoint().alongWith(readyPiece()),
+        readyPiece(),
+        //drivebase.goToShotPoint().alongWith(readyPiece()),
         shootPiece());
   }
 
