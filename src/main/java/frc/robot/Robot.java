@@ -197,7 +197,8 @@ public class Robot extends LoggedRobot {
 
     // TODO test
     operator.button(4).onTrue(superstructure.raiseClimbers());
-    operator.button(5).onTrue(superstructure.lowerClimbers());
+    operator.button(4).onFalse(superstructure.lowerClimbers());
+    //operator.button(5).onTrue(superstructure.lowerClimbers());
 
     operator.button(6).onTrue(superstructure.spitOutNotes());
     operator.button(6).onFalse(superstructure.retractIntake());
