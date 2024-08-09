@@ -195,10 +195,9 @@ public class Robot extends LoggedRobot {
     operator.button(2).onTrue(superstructure.speakerMode());
     operator.button(3).onTrue(superstructure.readyPiece());
 
-    // TODO test
     operator.button(4).onTrue(superstructure.raiseClimbers());
     operator.button(4).onFalse(superstructure.lowerClimbers());
-    operator.button(5).onTrue(superstructure.lowerClimbers());//This button is no longer needed but it might be fine as a forgot the correct button
+    operator.button(5).onTrue(superstructure.lowerClimbers());//This button can be repurposed
 
     operator.button(6).onTrue(superstructure.spitOutNotes());
     operator.button(6).onFalse(superstructure.retractIntake());
@@ -218,7 +217,9 @@ public class Robot extends LoggedRobot {
     //     .button(2)
     //     .onTrue(Commands.runOnce(() -> superstructure.overrideNoteState(noteState.Outtake)));
 
-    led.changeColor(LEDConstants.kDisabledColor);
+    //note, ask Andy about these debugs, I don't think they are needed
+
+    led.changeColor(LEDConstants.kDisabledColor);//correct colors when initiating the robot
   }
 
   @Override
