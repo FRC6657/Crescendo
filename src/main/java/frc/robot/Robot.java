@@ -217,8 +217,6 @@ public class Robot extends LoggedRobot {
     //     .button(2)
     //     .onTrue(Commands.runOnce(() -> superstructure.overrideNoteState(noteState.Outtake)));
 
-    //note, ask Andy about these debugs, I don't think they are needed
-
     led.changeColor(LEDConstants.kDisabledColor);//correct colors when initiating the robot
   }
 
