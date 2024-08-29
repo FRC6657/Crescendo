@@ -48,7 +48,7 @@ public class ClimberIO_Real implements ClimberIO {
 
     voltage = MathUtil.clamp(mPID.calculate(mEncoder.getPosition(), setpoint), -12, 12);
     mMotor.setVoltage(voltage);
-  }
+  } //Elena, remove this test then commit and push
 
   @Override
   public void updateInputs(ClimberIOInputs inputs) {
