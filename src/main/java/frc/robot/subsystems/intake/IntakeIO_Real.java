@@ -112,7 +112,8 @@ public class IntakeIO_Real implements IntakeIO {
         Units.rotationsToDegrees(pivotMotor.getPosition().getValueAsDouble()); // Degrees
     inputs.pivotMotorVelocity =
         Units.rotationsToDegrees(pivotMotor.getVelocity().getValueAsDouble()); // Degrees per second
-    inputs.pivotMotorAcceleration = Units.rotationsToDegrees(pivotMotor.getAcceleration().getValueAsDouble());
+    inputs.pivotMotorAcceleration =
+        Units.rotationsToDegrees(pivotMotor.getAcceleration().getValueAsDouble());
     inputs.pivotMotorTemp = pivotMotor.getDeviceTemp().getValueAsDouble(); // Celcius
     inputs.pivotMotorVoltage = pivotMotor.getMotorVoltage().getValueAsDouble(); // Volts
     inputs.pivotMotorCurrent = pivotMotor.getSupplyCurrent().getValueAsDouble(); // Amps

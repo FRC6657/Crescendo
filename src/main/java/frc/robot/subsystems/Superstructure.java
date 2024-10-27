@@ -79,7 +79,10 @@ public class Superstructure {
     // Automatically run process note when the note is detected, but only in teleop
     noteDetector =
         new Trigger(
-            () -> ((intake.noteDetected()) && !intake.tofUnplugged() && !DriverStation.isAutonomous()));
+            () ->
+                ((intake.noteDetected())
+                    && !intake.tofUnplugged()
+                    && !DriverStation.isAutonomous()));
     noteDetector.onTrue(processNote());
 
     // Seed the latest event key
@@ -148,10 +151,7 @@ public class Superstructure {
   }
 
   public Command toggleClimb() {
-    return Commands.either(
-      raiseClimbers(), 
-      lowerClimbers(), 
-      ()-> intendedClimbState);
+    return Commands.either(raiseClimbers(), lowerClimbers(), () -> intendedClimbState);
   }
 
   // Command to stow the outtake
@@ -254,7 +254,6 @@ public class Superstructure {
         Commands.waitUntil(outtake::atPivotSetpoint),
         intake.changeRollerSpeed(-1));
   }
-
 
   // Readys the robot to shoot the current piece
   // The behavior of this command is dependant on the current scoring mode
@@ -401,8 +400,8 @@ public class Superstructure {
             Commands.waitSeconds(intakeExtendSecond),
             extendIntake(),
             Commands.sequence(
-                Commands.sequence(
-                  Commands.waitSeconds(intakeRetractSecond), retractIntake()).until(intake::noteDetected),
+                Commands.sequence(Commands.waitSeconds(intakeRetractSecond), retractIntake())
+                    .until(intake::noteDetected),
                 processNote().unless(intake::pivotSetpointIsMax).andThen(readyPiece()))));
   }
 
@@ -504,7 +503,7 @@ public class Superstructure {
         Commands.runOnce(() -> drivebase.setPose(isRed() ? redPos : bluePos)),
         Commands.runOnce(() -> currentNoteState = noteState.Intake),
         readyPiece(),
-        //drivebase.goToShotPoint().alongWith(readyPiece()),
+        // drivebase.goToShotPoint().alongWith(readyPiece()),
         shootPiece());
   }
 

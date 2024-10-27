@@ -48,7 +48,7 @@ public class ClimberIO_Real implements ClimberIO {
 
     voltage = MathUtil.clamp(mPID.calculate(mEncoder.getPosition(), setpoint), -12, 12);
     mMotor.setVoltage(voltage);
-  } 
+  }
 
   @Override
   public void updateInputs(ClimberIOInputs inputs) {

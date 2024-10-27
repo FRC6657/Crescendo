@@ -178,9 +178,12 @@ public class Robot extends LoggedRobot {
                 drivebase.noteAim(
                     driver::getLeftY, driver::getLeftX, driver::getRightX, vision::getNoteX),
                 Commands.either(
-                        drivebase.goToShotPoint().alongWith(superstructure.readyPiece()).andThen(superstructure.shootPiece()),
-                        drivebase.goToAmpPose().alongWith(superstructure.readyPiece()),
-                        superstructure::inSpeakerMode),
+                    drivebase
+                        .goToShotPoint()
+                        .alongWith(superstructure.readyPiece())
+                        .andThen(superstructure.shootPiece()),
+                    drivebase.goToAmpPose().alongWith(superstructure.readyPiece()),
+                    superstructure::inSpeakerMode),
                 intake::pivotSetpointIsMin));
 
     driver
@@ -189,21 +192,21 @@ public class Robot extends LoggedRobot {
         .onFalse(superstructure.retractIntake());
     driver.leftTrigger().onTrue(superstructure.shootPiece());
 
-    
-
     operator.button(1).onTrue(superstructure.ampMode());
     operator.button(2).onTrue(superstructure.speakerMode());
     operator.button(3).onTrue(superstructure.readyPiece());
 
     operator.button(4).onTrue(superstructure.raiseClimbers());
     operator.button(4).onFalse(superstructure.lowerClimbers());
-    operator.button(5).onTrue(superstructure.lowerClimbers());//This button can be repurposed
+    operator.button(5).onTrue(superstructure.lowerClimbers()); // This button can be repurposed
 
     operator.button(6).onTrue(superstructure.spitOutNotes());
     operator.button(6).onFalse(superstructure.retractIntake());
 
     operator.button(7).onTrue(superstructure.outtakeEject());
-    operator.button(7).onFalse(superstructure.retractIntake().andThen(outtake.changeRPMSetpoint(0)));
+    operator
+        .button(7)
+        .onFalse(superstructure.retractIntake().andThen(outtake.changeRPMSetpoint(0)));
 
     operator.button(8).onTrue(superstructure.processNote());
 
@@ -217,7 +220,7 @@ public class Robot extends LoggedRobot {
     //     .button(2)
     //     .onTrue(Commands.runOnce(() -> superstructure.overrideNoteState(noteState.Outtake)));
 
-    led.changeColor(LEDConstants.kDisabledColor);//correct colors when initiating the robot
+    led.changeColor(LEDConstants.kDisabledColor); // correct colors when initiating the robot
   }
 
   @Override
@@ -240,28 +243,28 @@ public class Robot extends LoggedRobot {
     var sideResult = vision.getSideCameraResult();
 
     if (backResult.timestamp != 0.0) {
-      if(Math.abs(backResult.estimatedPose.getZ())  < 0.3){
-      Logger.recordOutput("Vision/BackGlobalEstimate", backResult.estimatedPose);
-      if (RobotBase.isReal()) {
-        drivebase.addVisionMeasurement(
-            backResult.estimatedPose.toPose2d(), backResult.timestamp, backResult.stdDevs);
+      if (Math.abs(backResult.estimatedPose.getZ()) < 0.3) {
+        Logger.recordOutput("Vision/BackGlobalEstimate", backResult.estimatedPose);
+        if (RobotBase.isReal()) {
+          drivebase.addVisionMeasurement(
+              backResult.estimatedPose.toPose2d(), backResult.timestamp, backResult.stdDevs);
+        }
+      } else {
+        Logger.recordOutput("Vision/ThrownOutBackGlobalEstimate", backResult.estimatedPose);
       }
-    }else{
-      Logger.recordOutput("Vision/ThrownOutBackGlobalEstimate", backResult.estimatedPose);
     }
-  }
 
     if (sideResult.timestamp != 0.0) {
-      if(Math.abs(sideResult.estimatedPose.getZ())  < 0.3){
-      Logger.recordOutput("Vision/SideGlobalEstimate", sideResult.estimatedPose);
-      if (RobotBase.isReal()) {
-        //drivebase.addVisionMeasurement(
-        //   sideResult.estimatedPose.toPose2d(), sideResult.timestamp, sideResult.stdDevs);
-      }
-      }else{
+      if (Math.abs(sideResult.estimatedPose.getZ()) < 0.3) {
+        Logger.recordOutput("Vision/SideGlobalEstimate", sideResult.estimatedPose);
+        if (RobotBase.isReal()) {
+          // drivebase.addVisionMeasurement(
+          //   sideResult.estimatedPose.toPose2d(), sideResult.timestamp, sideResult.stdDevs);
+        }
+      } else {
         Logger.recordOutput("Vision/ThrownOutSideGlobalEstimate", sideResult.estimatedPose);
       }
-  }
+    }
   }
 
   @Override
